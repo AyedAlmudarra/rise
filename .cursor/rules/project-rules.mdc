@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# RISE Project Rules
+
+**Vision:** A business management platform connecting Startups and Investors in the Saudi market, using AI for analysis and matchmaking. Built with React (MaterialM template), Supabase, and OpenAI.
+
+**Core Documentation:**
+
+*   Project Goals & Vision: [01-project-overview.md](mdc:.cursor/rules/01-project-overview.md)
+*   Technology Stack: [02-tech-stack.md](mdc:cursor_project_rules/02-tech-stack.md)
+*   Coding Style: [03-coding-style.md](mdc:.cursor/rules/03-coding-style.md)
+*   System Architecture: [04-architecture.md](mdc:.cursor/rules/04-architecture.md)
+*   Feature Breakdown: [05-feature-breakdown.md](mdc:.cursor/rules/05-feature-breakdown.md)
+*   API Conventions: [06-api-conventions.md](mdc:.cursor/rules/06-api-conventions.md)
+*   Testing Strategy: [07-testing-strategy.md](mdc:.cursor/rules/07-testing-strategy.md)
+*   Deployment Plan: [08-deployment.md](mdc:.cursor/rules/08-deployment.md)
+*   Detailed User Flows: [09-user-flows.md](mdc:.cursor/rules/09-user-flows.md)
+*   Template Structure: [10-template-structure.md](mdc:.cursor/rules/10-template-structure.md)
+*   Mock Data Strategy: [11-mock-data-strategy.md](mdc:.cursor/rules/11-mock-data-strategy.md)
+*   Implementation Progress: [implementation-plan.mdc](mdc:.cursor/rules/implementation-plan.mdc)
+
+
+**Key Principles:**
+*   Strictly follow the rules defined in the linked documents.
+*   Adhere to the MaterialM template structure and coding style.
+*   Prioritize clear communication: **Never make assumptions.** If requirements or context are unclear, always ask for clarification before proceeding.
+*   Write clear, understandable, and maintainable code: Favor explicit variable names, add comments for complex logic, and ensure code is easy to modify.
+*   Focus on code quality and bug prevention: Manually test changes thoroughly. Write code defensively, considering edge cases and potential errors, even without automated tests initially.
+*   Update @implementation-plan.mdc after completing each task.
