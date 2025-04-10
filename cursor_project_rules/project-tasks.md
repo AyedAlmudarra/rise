@@ -19,7 +19,7 @@ This document outlines the development tasks for the RISE platform.
 
 ## Task 2: Implement Basic User Authentication (Signup/Login)
 
-*   **Status:** In Progress
+*   **Status:** Done
 *   **Summary:** Adapted the template's login view (`auth1/Login.tsx`) and form (`authforms/AuthLogin.tsx`) for RISE. Created a mock sign-in handler using MSW in `frontend/src/api/mocks/handlers/auth.ts` and integrated it into `mockHandlers.ts`. Updated `AuthLogin.tsx` to call `supabase.auth.signInWithPassword` (intercepted by MSW). Implemented protected routing using `ProtectedRoute.tsx` in `Router.tsx`. Added user session management via `AuthContext.tsx` and `AuthProvider`.
 *   **Goal:** Implement core signup and login functionality using Supabase Auth and template components, leveraging MSW for initial UI feedback.
 *   **Steps:**
@@ -28,7 +28,7 @@ This document outlines the development tasks for the RISE platform.
     *   Implement UI logic in auth views/forms to call Supabase Auth functions (intercepted by MSW initially). (Done - Updated AuthLogin.tsx to call supabase.auth.signInWithPassword)
     *   Set up protected routes in `frontend/src/routes/Router.tsx`. (Done - Created ProtectedRoute.tsx and applied it in Router.tsx)
     *   Manage user session state. (Done - Implemented AuthContext.tsx and wrapped app in AuthProvider)
-    *   Commit changes. (Pending)
+    *   Commit changes. (Done)
 
 ---
 
@@ -44,5 +44,18 @@ This document outlines the development tasks for the RISE platform.
     *   Ensure the `RegisterInvestor.tsx` view correctly renders the updated form. (Done)
     *   Adjust layout/styling as needed, ensuring the page is scrollable. (Done)
     *   Commit changes. (Done)
+
+---
+
+## Task 4: Implement Startup Registration Backend/Mock Handling
+
+*   **Status:** In Progress
+*   **Goal:** Ensure the data submitted via the `AuthRegisterStartup.tsx` form is correctly processed by the backend (initially using MSW mock handlers).
+*   **Steps:**
+    *   Create/update mock handlers in `frontend/src/api/mocks/handlers/startup.ts` (or similar) to intercept the Supabase insert call from `AuthRegisterStartup.tsx`. (Done)
+    *   Ensure the mock handler correctly receives and logs all fields from the startup form. (Done)
+    *   Test the complete startup registration flow from the UI to the mock handler. (Done)
+    *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
+    *   Commit changes. (To Do)
 
 --- 
