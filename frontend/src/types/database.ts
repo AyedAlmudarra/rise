@@ -27,4 +27,22 @@ export interface StartupProfile {
 }
 
 // You can add interfaces for other tables here as needed, e.g.:
-// export interface InvestorProfile { ... } 
+export interface InvestorProfile {
+  // From Supabase (auto-generated)
+  id: number; // Assuming integer primary key
+  user_id: string; // Foreign key to auth.users.id (UUID)
+  created_at: string; // ISO 8601 timestamp string
+
+  // From AuthRegisterInvestor form
+  job_title: string | null;
+  company_name: string | null;
+  preferred_industries: string[]; // Array of strings
+  preferred_geography: string[]; // Array of strings
+  preferred_stage: string[]; // Array of strings
+  website: string | null;
+  linkedin_profile: string | null;
+  company_description: string | null; // Added from form
+
+  // Add any other fields expected in the 'investors' table
+  // updated_at?: string;
+} 

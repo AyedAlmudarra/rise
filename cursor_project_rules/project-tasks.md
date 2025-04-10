@@ -95,7 +95,7 @@ This document outlines the development tasks for the RISE platform.
 
 ## Task 6: Enhance Startup Dashboard with Placeholders and Data Fetching
 
-*   **Status:** To Do
+*   **Status:** Done
 *   **Goal:** Structure the Startup Dashboard to dynamically display the logged-in startup's basic company information fetched from the (mocked) database and include clearly defined placeholder sections for future metrics, AI features, and investor interactions using Flowbite `Card` components and a grid layout.
 *   **Detailed Steps:**
 
@@ -136,6 +136,43 @@ This document outlines the development tasks for the RISE platform.
         *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
 
     7.  **Commit:**
-        *   Commit all changes. (To Do)
+        *   Commit all changes. (Done)
+
+## Task 7: Enhance Investor Dashboard with Placeholders and Data Fetching
+
+*   **Status:** In Progress
+*   **Goal:** Structure the Investor Dashboard to dynamically display the logged-in investor's basic information fetched from the (mocked) database and include clearly defined placeholder sections for deal flow, AI suggestions, and watchlist using Flowbite `Card` components and a grid layout.
+*   **Detailed Steps:**
+
+    1.  **Define Investor Data Type:**
+        *   In `frontend/src/types/database.ts`, define an `InvestorProfile` interface reflecting the fields submitted by `AuthRegisterInvestor.tsx` (e.g., `user_id`, `job_title`, `company_name`, `preferred_industries`, `preferred_geography`, `preferred_stage`, `website`, `linkedin_profile`) plus Supabase auto-fields (`id`, `created_at`). Ensure array fields (`preferred_industries`, etc.) are typed correctly (e.g., `string[]`). (Done)
+
+    2.  **Implement Data Fetching in `InvestorDashboard.tsx`:**
+        *   Import necessary hooks (`useState`, `useEffect`), components (`Spinner`, `Alert`), types (`InvestorProfile`), context (`useAuth`), and Supabase client.
+        *   Add state variables: `investorData`, `dataLoading`, `dataError`.
+        *   Add `useEffect` hook (dependency `[user]`) to fetch data using `supabase.from('investors').select('*').eq('user_id', user.id).single()`. Handle loading, success, and error states.
+        *   Render loading (`Spinner`) and error (`Alert`) indicators conditionally. (Done)
+
+    3.  **Create Investor Overview Card:**
+        *   Import `Card` from `flowbite-react`.
+        *   Render a `Card` titled "Investor Profile Summary".
+        *   Conditionally display `investorData` fields if available (e.g., `job_title`, `company_name`). Display arrays like `preferred_industries` appropriately (e.g., as a comma-separated string or list items).
+        *   Use fallback text ("N/A") for missing fields.
+        *   Display "No investor profile found." if data is fetched but null. (Done)
+
+    4.  **Remove Old Placeholders & Add New Placeholder Cards:**
+        *   Remove imports and usage of `LatestDeal` and `PopularProducts`.
+        *   Create three new `Card` components with appropriate titles ("Deal Flow", "AI-Suggested Startups", "Watchlist Summary") and placeholder paragraph content. (Done)
+
+    5.  **Adjust Layout:**
+        *   Use a main `div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6"` below the welcome message/loading indicators.
+        *   Place the "Investor Profile Summary" `Card` in the first column (`lg:col-span-1`).
+        *   Place the three new placeholder `Card`s ("Deal Flow", "AI-Suggested Startups", "Watchlist Summary") in the remaining two columns (`lg:col-span-2`), potentially using a nested grid or stacking them. (Done)
+
+    6.  **Update Task Definition:**
+        *   Add this detailed task definition to `cursor_project_rules/project-tasks.md`. (Done)
+
+    7.  **Commit:**
+        *   Commit all related changes. (To Do)
 
 --- 
