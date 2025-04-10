@@ -1,9 +1,12 @@
 import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
-import { Link } from "react-router";
 import React, { useState } from "react";
 import { supabase } from "src/lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
+// Import Link from react-router-dom if needed later
+// import { Link } from "react-router-dom";
 
 const AuthLogin = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +26,19 @@ const AuthLogin = () => {
       if (signInError) {
         console.error('Supabase Sign In Error:', signInError.message);
         setError(signInError.message);
-      } else {
+      } else if (data.user) {
         console.log('Supabase Sign In Success:', data);
-        // TODO: Handle successful login (e.g., redirect, update user context)
-        // The mock handler currently provides mock data here.
+        const role = data.user.user_metadata?.role;
+        if (role === 'startup') {
+          navigate('/startup/dashboard');
+        } else if (role === 'investor') {
+          navigate('/investor/dashboard');
+        } else {
+          console.warn('User has unknown or missing role:', role);
+          navigate('/');
+        }
+      } else {
+        setError("Sign in successful but user data not received.");
       }
     } catch (catchError: any) {
       console.error("Error during sign in:", catchError);

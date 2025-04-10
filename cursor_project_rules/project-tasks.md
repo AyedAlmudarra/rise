@@ -49,13 +49,26 @@ This document outlines the development tasks for the RISE platform.
 
 ## Task 4: Implement Startup Registration Backend/Mock Handling
 
-*   **Status:** In Progress
+*   **Status:** Done
 *   **Goal:** Ensure the data submitted via the `AuthRegisterStartup.tsx` form is correctly processed by the backend (initially using MSW mock handlers).
 *   **Steps:**
     *   Create/update mock handlers in `frontend/src/api/mocks/handlers/startup.ts` (or similar) to intercept the Supabase insert call from `AuthRegisterStartup.tsx`. (Done)
     *   Ensure the mock handler correctly receives and logs all fields from the startup form. (Done)
     *   Test the complete startup registration flow from the UI to the mock handler. (Done)
     *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
-    *   Commit changes. (To Do)
+    *   Commit changes. (Done)
 
---- 
+---
+
+## Task 5: Implement Basic Startup & Investor Dashboards
+
+*   **Status:** To Do
+*   **Goal:** Create initial landing dashboards for logged-in Startup and Investor users, utilizing existing template components for structure and basic widgets/cards.
+*   **Steps:**
+    *   Define routes for `/startup/dashboard` and `/investor/dashboard` in `frontend/src/routes/Router.tsx`. Ensure these routes use the `ProtectedRoute` component and potentially the `FullLayout` component. (Done)
+    *   Create new view files: `frontend/src/views/dashboards/StartupDashboard.tsx` and `frontend/src/views/dashboards/InvestorDashboard.tsx`. (Done)
+    *   Inside `StartupDashboard.tsx` and `InvestorDashboard.tsx`, import and display a basic page title (e.g., "Startup Dashboard", "Investor Dashboard") and the user's name/email obtained from `AuthContext`. (Done)
+    *   Select and integrate 1-2 relevant pre-built components (e.g., welcome card, simple stat card) from `frontend/src/components/dashboards/` or `frontend/src/components/widgets/` into each new dashboard view as placeholders for future content. (Done)
+    *   Modify the login logic (likely in `frontend/src/views/authentication/authforms/AuthLogin.tsx` or `AuthContext.tsx`) to redirect users to `/startup/dashboard` or `/investor/dashboard` based on their role after successful login. (Done)
+    *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
+    *   Commit changes. (To Do) 

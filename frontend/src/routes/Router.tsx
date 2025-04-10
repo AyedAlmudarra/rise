@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import  { lazy } from 'react';
-import { Navigate, createBrowserRouter } from "react-router";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import Loadable from '../layouts/full/shared/loadable/Loadable';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
@@ -16,6 +16,8 @@ const FrontendPageLayout = Loadable(lazy(() => import('../layouts/blank/Frontend
 const EcommerceDashboard = Loadable(lazy(() => import('../views/dashboards/Ecommerce')));
 const Analytics = Loadable(lazy(() => import('../views/dashboards/Analytics')));
 const Crm = Loadable(lazy(() => import('../views/dashboards/Crm')));
+const StartupDashboard = Loadable(lazy(() => import('../views/dashboards/StartupDashboard')));
+const InvestorDashboard = Loadable(lazy(() => import('../views/dashboards/InvestorDashboard')));
 
 /* ****Apps***** */
 const Contact = Loadable(lazy(() => import('../views/apps/contact/Contact')));
@@ -195,8 +197,6 @@ const ShadcnBasicTable = Loadable(lazy(() => import('../views/shadcn-tables/Basi
 // authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth1/Login')));
 const Login2 = Loadable(lazy(() => import('../views/authentication/auth2/Login')));
-const Register = Loadable(lazy(() => import('../views/authentication/auth1/Register')));
-const Register2 = Loadable(lazy(() => import('../views/authentication/auth2/Register')));
 const ForgotPassword = Loadable(lazy(() => import('../views/authentication/auth1/ForgotPassword')));
 const ForgotPassword2 = Loadable(
   lazy(() => import('../views/authentication/auth2/ForgotPassword')),
@@ -210,6 +210,9 @@ const Maintainance = Loadable(lazy(() => import('../views/authentication/Maintai
 // landingpage
 const Landingpage = Loadable(lazy(() => import('../views/pages/landingpages/LandingPages')));
 
+// Add new RISE-specific registration components
+const RegisterStartup = Loadable(lazy(() => import('../views/authentication/RegisterStartup')));
+const RegisterInvestor = Loadable(lazy(() => import('../views/authentication/RegisterInvestor')));
 
 // front end pages
 const Homepage = Loadable(lazy(() => import('../views/pages/frontend-pages/Homepage')));
@@ -231,6 +234,8 @@ const Router = [
           { path: '/', exact: true, element: <EcommerceDashboard /> },
           { path: '/dashboards/analytics', exact: true, element: <Analytics /> },
           { path: '/dashboards/crm', exact: true, element: <Crm /> },
+          { path: '/startup/dashboard', exact: true, element: <StartupDashboard /> },
+          { path: '/investor/dashboard', exact: true, element: <InvestorDashboard /> },
           { path: '/apps/contacts', element: <Contact /> },
           { path: '/apps/ecommerce/shop', element: <Ecommerce /> },
           { path: '/apps/ecommerce/list', element: <EcomProductList /> },
@@ -373,8 +378,8 @@ const Router = [
     children: [
       { path: 'auth1/login', element: <Login /> },
       { path: 'auth2/login', element: <Login2 /> },
-      { path: 'auth1/register', element: <Register /> },
-      { path: 'auth2/register', element: <Register2 /> },
+      { path: 'register/startup', element: <RegisterStartup /> },
+      { path: 'register/investor', element: <RegisterInvestor /> },
       { path: 'auth1/forgot-password', element: <ForgotPassword /> },
       { path: 'auth2/forgot-password', element: <ForgotPassword2 /> },
       { path: 'auth1/two-steps', element: <TwoSteps /> },
