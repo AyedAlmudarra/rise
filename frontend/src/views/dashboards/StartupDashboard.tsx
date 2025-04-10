@@ -1,7 +1,9 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext'; // Adjust path if needed
 import Congratulations from '../../components/dashboards/analytics/Congratulations'; // Welcome card
-import RecentTransactionCard from '../../components/widgets/cards/RecentTransactionCard'; // Placeholder stat card
+// import RecentTransactionCard from '../../components/widgets/cards/RecentTransactionCard'; // Placeholder stat card - REMOVED
+import Products from '../../components/dashboards/analytics/Products'; // Placeholder for key metrics
+import Customer from '../../components/dashboards/analytics/Customer'; // Placeholder for investor interest
 
 const StartupDashboard = () => {
   const { user, loading } = useAuth();
@@ -24,7 +26,12 @@ const StartupDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Congratulations />
-        <RecentTransactionCard />
+      </div>
+
+      {/* Grid for placeholder components */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <Products />
+        <Customer />
       </div>
 
       {/* <p>Placeholder for startup-specific widgets and information.</p> */}

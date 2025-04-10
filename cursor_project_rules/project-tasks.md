@@ -62,7 +62,7 @@ This document outlines the development tasks for the RISE platform.
 
 ## Task 5: Implement Basic Startup & Investor Dashboards
 
-*   **Status:** To Do
+*   **Status:** Done
 *   **Goal:** Create initial landing dashboards for logged-in Startup and Investor users, utilizing existing template components for structure and basic widgets/cards.
 *   **Steps:**
     *   Define routes for `/startup/dashboard` and `/investor/dashboard` in `frontend/src/routes/Router.tsx`. Ensure these routes use the `ProtectedRoute` component and potentially the `FullLayout` component. (Done)
@@ -70,5 +70,25 @@ This document outlines the development tasks for the RISE platform.
     *   Inside `StartupDashboard.tsx` and `InvestorDashboard.tsx`, import and display a basic page title (e.g., "Startup Dashboard", "Investor Dashboard") and the user's name/email obtained from `AuthContext`. (Done)
     *   Select and integrate 1-2 relevant pre-built components (e.g., welcome card, simple stat card) from `frontend/src/components/dashboards/` or `frontend/src/components/widgets/` into each new dashboard view as placeholders for future content. (Done)
     *   Modify the login logic (likely in `frontend/src/views/authentication/authforms/AuthLogin.tsx` or `AuthContext.tsx`) to redirect users to `/startup/dashboard` or `/investor/dashboard` based on their role after successful login. (Done)
+    *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
+    *   Commit changes. (Done)
+
+## Task 5.1: Refine Dashboard Placeholders with Role-Specific Components
+
+*   **Status:** To Do
+*   **Goal:** Replace generic placeholder components on the Startup and Investor dashboards with more role-specific template components (from `components/dashboards/analytics/`) to better represent future functionality, using a consistent grid layout.
+*   **Steps:**
+    *   **Startup Dashboard (`StartupDashboard.tsx`):**
+        *   Keep the `Congratulations` component.
+        *   Remove `RecentTransactionCard`.
+        *   Import and integrate `Products` (as placeholder for key metrics). (Done)
+        *   Import and integrate `Customer` (as placeholder for investor interest). (Done)
+        *   Arrange components in a `grid grid-cols-1 lg:grid-cols-2 gap-6` layout below the welcome message/user info. (Done)
+    *   **Investor Dashboard (`InvestorDashboard.tsx`):**
+        *   Keep the `Congratulations` component.
+        *   Remove `RecentTransactionCard`.
+        *   Import and integrate `LatestDeal` (as placeholder for deal flow/watchlist). (Done)
+        *   Import and integrate `PopularProducts` (as placeholder for suggested startups). (Done)
+        *   Arrange components in the same `grid grid-cols-1 lg:grid-cols-2 gap-6` layout below the welcome message/user info. (Done)
     *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
     *   Commit changes. (To Do) 
