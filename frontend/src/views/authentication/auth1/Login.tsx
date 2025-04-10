@@ -1,8 +1,7 @@
-
 import { Link } from "react-router";
 import Logo from "src/layouts/full/shared/logo/Logo";
 import AuthLogin from "../authforms/AuthLogin";
-import SocialButtons from "../authforms/SocialButtons";
+// import SocialButtons from "../authforms/SocialButtons"; // Comment out SocialButtons
 import LeftSidebarPart from "../LeftSidebarPart";
 
 
@@ -18,14 +17,14 @@ const Login = () => {
             <div className="flex h-screen items-center px-3 lg:justify-start justify-center">
               <div className="max-w-[420px] w-full mx-auto">
                 <Logo />
-                <h3 className="text-2xl font-bold my-3">Sign In</h3>
+                <h3 className="text-2xl font-bold my-3">Sign In to RISE</h3>
                 <p className="text-darklink text-sm font-medium">
-                  Your Admin Dashboard
+                  Enter your credentials to access your account
                 </p>
-                <SocialButtons title="or sign in with" />
+                {/* <SocialButtons title="or sign in with" /> // Comment out SocialButtons usage */}
                 <AuthLogin />
                 <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-center">
-                  <p>New to MaterialM?</p>
+                  <p>New to RISE?</p>
                   <Link
                     to={"/auth/auth1/register"}
                     className="text-primary text-sm font-medium"

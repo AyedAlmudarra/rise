@@ -9,8 +9,10 @@ import { TicketHandlers } from 'src/api/ticket/TicketData';
 import { Emailhandlers } from 'src/api/email/EmailData';
 import { InvoiceHandlers } from 'src/api/invoice/invoceLists';
 import { Kanbanhandlers } from 'src/api/kanban/KanbanData';
+import { authHandlers } from './auth';
 
 export const mockHandlers = [
+  ...authHandlers,
   ...Contacthandlers,
   ...Chathandlers,
   ...Ecommercehandlers,

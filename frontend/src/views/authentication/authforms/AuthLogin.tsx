@@ -1,20 +1,61 @@
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
 import { Link } from "react-router";
-
+import React, { useState } from "react";
+import { supabase } from "src/lib/supabaseClient";
 
 const AuthLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (signInError) {
+        console.error('Supabase Sign In Error:', signInError.message);
+        setError(signInError.message);
+      } else {
+        console.log('Supabase Sign In Success:', data);
+        // TODO: Handle successful login (e.g., redirect, update user context)
+        // The mock handler currently provides mock data here.
+      }
+    } catch (catchError: any) {
+      console.error("Error during sign in:", catchError);
+      setError(catchError.message || "An unexpected error occurred.");
+    } finally {
+       setLoading(false);
+    }
+  };
+
   return (
     <>
-      <form className="mt-6">
+      <form className="mt-6" onSubmit={handleSubmit}>
+        {error && (
+          <Alert color="failure" className="mb-4">
+            {error}
+          </Alert>
+        )}
         <div className="mb-4">
           <div className="mb-2 block">
-            <Label htmlFor="Username" value="Username" />
+            <Label htmlFor="email" value="Email Address" />
           </div>
           <TextInput
-            id="username"
-            type="text"
+            id="email"
+            type="email"
             sizing="md"
             className="form-control"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
         <div className="mb-4">
@@ -26,24 +67,13 @@ const AuthLogin = () => {
             type="password"
             sizing="md"
             className="form-control"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
-        <div className="flex justify-between my-5">
-          <div className="flex items-center gap-2">
-            <Checkbox id="accept" className="checkbox" />
-            <Label
-              htmlFor="accept"
-              className="opacity-90 font-normal cursor-pointer"
-            >
-              Remeber this Device
-            </Label>
-          </div>
-          <Link to={"/auth/auth1/forgot-password"} className="text-primary text-sm font-medium">
-            Forgot Password ?
-          </Link>
-        </div>
-        <Button color={"primary"} to="/" as={Link} className="w-full">
-          Sign in
+        <Button color={"primary"} type="submit" className="w-full mt-5" disabled={loading}>
+          {loading ? 'Signing In...' : 'Sign in'}
         </Button>
       </form>
     </>

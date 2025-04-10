@@ -6,6 +6,7 @@ import Spinner from './views/spinner/Spinner.tsx'
 import { CustomizerContextProvider } from './context/CustomizerContext.tsx'
 import './utils/i18n';
 import { DashboardContextProvider } from './context/DashboardContext/DashboardContext.tsx'
+import { AuthProvider } from './context/AuthContext';
 
 async function deferRender(){
   const {worker} = await import("./api/mocks/browser.ts");
@@ -17,13 +18,15 @@ async function deferRender(){
 
 deferRender().then(() => {
   createRoot(document.getElementById('root')!).render(
-    <DashboardContextProvider>
-    <CustomizerContextProvider>
-  <Suspense fallback={<Spinner />}>
-          <App />
-      </Suspense>
-      </CustomizerContextProvider>
-      </DashboardContextProvider>
+    <AuthProvider>
+      <DashboardContextProvider>
+      <CustomizerContextProvider>
+    <Suspense fallback={<Spinner />}>
+            <App />
+        </Suspense>
+        </CustomizerContextProvider>
+        </DashboardContextProvider>
+      </AuthProvider>
       ,
   )
 })

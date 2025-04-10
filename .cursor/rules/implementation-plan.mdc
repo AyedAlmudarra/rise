@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Implementation Plan
+
+This document tracks the step-by-step implementation of features for the RISE platform. Each major step or feature completion will be logged here.
+
+*(This plan will be populated as development progresses)*
+
+
+--- 
+
+## Task 1: Initial Project Cleanup & Supabase Setup (Done)
+
+*   **Summary:** Installed supabase-js client, created .env file for credentials, and added client initialization logic. Template cleanup steps were skipped for now.
+*   **Goal:** Prepare the template for RISE development and establish Supabase connection.
+*   **Steps:**
+    *   ~~Review and remove unused example routes, views, components, and assets from `frontend/`.~~ (Skipped)
+    *   ~~Remove or adapt template-specific configuration/content (e.g., sidebar items, branding).~~ (Skipped)
+    *   Install Supabase client: `cd frontend && npm install @supabase/supabase-js`. (Done)
+    *   Create Supabase environment variables (`.env` file): `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. (Done)
+    *   Set up Supabase client initialization (e.g., in `frontend/src/lib/supabaseClient.ts`). (Done)
+    *   Commit changes. (Done)
+
+
+---
+
+# Implementation Plan
+
+// ... existing code ...
+
+---
+
+## Task 2: Implement Basic User Authentication (Signup/Login) (In Progress)
+
+*   **Goal:** Implement core signup and login functionality using Supabase Auth and template components, leveraging MSW for initial UI feedback.
+*   **Steps:**
+    *   Adapt/create authentication views in `frontend/src/views/authentication/` for RISE. (Done - Adapted auth1/Login.tsx and authforms/AuthLogin.tsx)
+    *   Define mock handlers in `frontend/src/api/mocks/` for relevant Supabase Auth endpoints. (Done - Created handlers/auth.ts with sign-in mock and added to mockHandlers.ts)
+    *   Implement UI logic in auth views/forms to call Supabase Auth functions (intercepted by MSW initially). (Done - Updated AuthLogin.tsx to call supabase.auth.signInWithPassword)
+    *   Set up protected routes in `frontend/src/routes/Router.tsx`. (Done - Created ProtectedRoute.tsx and applied it in Router.tsx)
+    *   Manage user session state. (Done - Implemented AuthContext.tsx and wrapped app in AuthProvider)
+    *   Commit changes.
+
+---
+
+---
