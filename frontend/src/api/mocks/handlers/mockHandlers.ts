@@ -11,10 +11,12 @@ import { InvoiceHandlers } from 'src/api/invoice/invoceLists';
 import { Kanbanhandlers } from 'src/api/kanban/KanbanData';
 import { authHandlers } from './auth';
 import { startupHandlers } from './startup';
+import { investorHandlers } from './investor';
 
 export const mockHandlers = [
   ...authHandlers,
   ...startupHandlers,
+  ...investorHandlers,
   ...Contacthandlers,
   ...Chathandlers,
   ...Ecommercehandlers,

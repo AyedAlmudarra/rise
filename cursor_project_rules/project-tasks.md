@@ -173,6 +173,42 @@ This document outlines the development tasks for the RISE platform.
         *   Add this detailed task definition to `cursor_project_rules/project-tasks.md`. (Done)
 
     7.  **Commit:**
-        *   Commit all related changes. (To Do)
+        *   Commit all related changes. (Done)
 
 --- 
+
+## Task 8: Implement Mock Data Handlers for Profile Fetching
+
+*   **Status:** Done
+*   **Goal:** Create MSW handlers to intercept Supabase `GET` requests (specifically `.select().eq('user_id', ...).single()`) for the `startups` and `investors` tables, returning predefined mock profile data corresponding to the requested `user_id`. This will allow the dashboards to display data for users like `startup@rise.com`.
+*   **Detailed Steps:**
+
+    1.  **Define Mock Startup Profile Data (`startup.ts`):**
+        *   **File:** `frontend/src/api/mocks/handlers/startup.ts`
+        *   **Action:** Define `const mockStartupProfiles: { [userId: string]: StartupProfile }` mapping user IDs (e.g., `'mock-startup-uuid-1'`) to `StartupProfile` objects containing plausible data.
+        *   **(Done)**
+
+    2.  **Implement Startup Select Handler (`startup.ts`):**
+        *   **File:** `frontend/src/api/mocks/handlers/startup.ts`
+        *   **Action:** Add `http.get(\`\${supabaseUrl}/rest/v1/startups\`, ...)` handler.
+        *   Parse `request.url` to extract `user_id` from `?user_id=eq.USER_ID`.
+        *   Check if `select=*` is present and `user_id` filter exists.
+        *   Look up `user_id` in `mockStartupProfiles`.
+        *   Return found profile object with status 200, or a 406 error object if not found (mimicking `.single()`).
+        *   **(Done)**
+
+    3.  **Define Mock Investor Profile Data & Handler (`investor.ts`):**
+        *   **File:** `frontend/src/api/mocks/handlers/investor.ts` (New File)
+        *   **Action:** Create file, define `const mockInvestorProfiles`, and implement `http.get(\`\${supabaseUrl}/rest/v1/investors\`, ...)` handler similar to step 2, using `mockInvestorProfiles`.
+        *   **(Done)**
+
+    4.  **Update `mockHandlers.ts`:**
+        *   **File:** `frontend/src/api/mocks/handlers/mockHandlers.ts`
+        *   **Action:** Import `investorHandlers` from `./investor` and add `...investorHandlers` to the `mockHandlers` array.
+        *   **(Done)**
+
+    5.  **Update Task Definition:**
+        *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
+
+    6.  **Commit:**
+        *   Commit all related changes. (Done) 
