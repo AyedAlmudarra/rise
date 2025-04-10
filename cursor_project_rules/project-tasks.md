@@ -75,7 +75,7 @@ This document outlines the development tasks for the RISE platform.
 
 ## Task 5.1: Refine Dashboard Placeholders with Role-Specific Components
 
-*   **Status:** To Do
+*   **Status:** Done
 *   **Goal:** Replace generic placeholder components on the Startup and Investor dashboards with more role-specific template components (from `components/dashboards/analytics/`) to better represent future functionality, using a consistent grid layout.
 *   **Steps:**
     *   **Startup Dashboard (`StartupDashboard.tsx`):**
@@ -91,4 +91,51 @@ This document outlines the development tasks for the RISE platform.
         *   Import and integrate `PopularProducts` (as placeholder for suggested startups). (Done)
         *   Arrange components in the same `grid grid-cols-1 lg:grid-cols-2 gap-6` layout below the welcome message/user info. (Done)
     *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
-    *   Commit changes. (To Do) 
+    *   Commit changes. (Done)
+
+## Task 6: Enhance Startup Dashboard with Placeholders and Data Fetching
+
+*   **Status:** To Do
+*   **Goal:** Structure the Startup Dashboard to dynamically display the logged-in startup's basic company information fetched from the (mocked) database and include clearly defined placeholder sections for future metrics, AI features, and investor interactions using Flowbite `Card` components and a grid layout.
+*   **Detailed Steps:**
+
+    1.  **Define Startup Data Type (Optional but Recommended):**
+        *   Create an interface or type named `StartupProfile` (e.g., in a new file `frontend/src/types/database.ts` or similar) that accurately reflects the structure of the data stored in the `startups` table (based on the fields sent in `AuthRegisterStartup.tsx`: `user_id`, `name`, `description`, `industry`, `sector`, `operational_stage`, `location_city`, `num_customers`, `num_employees`, `annual_revenue`, `annual_expenses`, `kpi_cac`, `kpi_clv`, `kpi_retention_rate`, `kpi_conversion_rate`, `logo_url`, `pitch_deck_url`, plus Supabase auto-generated `id`, `created_at`). Ensure nullable fields are typed correctly (e.g., `string | null`). (Done)
+
+    2.  **Implement Data Fetching in `StartupDashboard.tsx`:**
+        *   Import `useState`, `useEffect` from React.
+        *   Import `useAuth` from `../../context/AuthContext`.
+        *   Import `supabase` from `../../lib/supabaseClient`.
+        *   Import the `StartupProfile` type if created in step 1.
+        *   Import `Spinner`, `Alert` from `flowbite-react`.
+        *   Add state variables: `startupData`, `dataLoading`, `dataError`.
+        *   Add `useEffect` hook with `[user]` dependency to fetch data using `supabase.from('startups').select('*').eq('user_id', user.id).single()`. Handle loading, success, and error states.
+        *   Render loading (`Spinner`) and error (`Alert`) indicators conditionally.
+        (Done)
+
+    3.  **Create Company Overview Card:**
+        *   Import `Card` from `flowbite-react`.
+        *   Render a `Card` with title "Company Overview".
+        *   Conditionally display `startupData.name`, `.industry`, `.operational_stage`, `.location_city`, `.description` if `!dataLoading && startupData`.
+        *   Use fallback text (e.g., "N/A") for null/empty fields.
+        *   Display "No company profile found." if `!dataLoading && !startupData && !dataError`.
+        (Done)
+
+    4.  **Remove Old Placeholders & Add New Placeholder Cards:**
+        *   Remove imports and usage of `Products` and `Customer` components.
+        *   Create four new `Card` components with appropriate titles ("Key Metrics", "AI Insights & Recommendations", "Funding Readiness Score", "Investor Interest") and placeholder paragraph content.
+        (Done)
+
+    5.  **Adjust Layout:**
+        *   Use a main `div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6"` below the welcome message/loading indicators.
+        *   Place the "Company Overview" `Card` in the first column (e.g., `lg:col-span-1`).
+        *   Place the other four placeholder `Card`s in the remaining two columns (e.g., two cards in `lg:col-span-1`, two cards in the last `lg:col-span-1`, possibly using nested grids or adjusting spans).
+        (Done)
+
+    6.  **Update Task Definition:**
+        *   Add this task definition to `cursor_project_rules/project-tasks.md`. (Done)
+
+    7.  **Commit:**
+        *   Commit all changes. (To Do)
+
+--- 
