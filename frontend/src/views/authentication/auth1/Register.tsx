@@ -1,6 +1,4 @@
-
-
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import Logo from "src/layouts/full/shared/logo/Logo";
 import AuthRegister from "../authforms/AuthRegister";
 import SocialButtons from "../authforms/SocialButtons";

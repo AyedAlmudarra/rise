@@ -1,9 +1,9 @@
-
+import React from "react";
 import CardBox from "../../shared/CardBox";
 import banner from "/src/assets/images/backgrounds/school.png";
 import { Button } from "flowbite-react";
-import { Link } from "react-router";
-
+import { Link } from "react-router-dom";
+import { IconMail } from "@tabler/icons-react";
 
 const Ticket = () => {
   return (

@@ -1,6 +1,5 @@
-
-
-import { Link } from "react-router";
+import React from "react";
+import { Link } from "react-router-dom";
 import Logo from "src/layouts/full/shared/logo/Logo";
 import AuthTwoSteps from "../authforms/AuthTwoSteps";
 import LeftSidebarPart from "../LeftSidebarPart";

@@ -1,5 +1,4 @@
-
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import Banner1 from "/src/assets/images/landingpage/background/banner-bg-1.png";
 import Banner2 from "/src/assets/images/landingpage/background/banner-bg-2.png";
 import Banner3 from "/src/assets/images/landingpage/background/banner-bg-3.png";

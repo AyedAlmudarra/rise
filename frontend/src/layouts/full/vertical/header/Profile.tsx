@@ -1,9 +1,10 @@
+import React from "react";
 import { Icon } from "@iconify/react";
 import { Button, Dropdown } from "flowbite-react";
 import * as profileData from "./Data";
 import SimpleBar from "simplebar-react";
 import user1 from "/src/assets//images/profile/user-1.jpg"
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   return (

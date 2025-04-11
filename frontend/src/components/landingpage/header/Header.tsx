@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import "flowbite";
 import {Navbar } from "flowbite-react";
@@ -7,7 +6,8 @@ import DemosMenu from "./DemosMenu";
 import MobileDrawer from "./MobileDrawer";
 import FrontPageMenu from "./FrontPageMenu";
 import FullLogo from "src/layouts/full/shared/logo/FullLogo";
-import { Link } from "react-router";
+import Logo from "src/layouts/full/shared/logo/Logo";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isSticky, setIsSticky] = useState(false);

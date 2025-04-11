@@ -1,10 +1,9 @@
-
+import React from "react";
 import { Icon } from "@iconify/react";
 import { GoDot } from "react-icons/go";
 import { format } from "date-fns";
-import { Avatar, Badge, Card } from "flowbite-react";
-import  { useEffect, useContext } from "react";
-import { Link } from "react-router";
+import { Avatar, Badge, Card, Tooltip } from "flowbite-react";
+import { Link } from "react-router-dom";
 import { BlogPostType } from "src/types/apps/blog";
 import { BlogContext, BlogContextProps } from "src/context/BlogContext";
 

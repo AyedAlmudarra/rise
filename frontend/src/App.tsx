@@ -1,4 +1,4 @@
-import { RouterProvider } from "react-router";
+import { RouterProvider } from "react-router-dom";
 
 import { Flowbite, ThemeModeScript } from 'flowbite-react';
 import customTheme from './utils/theme/custom-theme';
@@ -11,7 +11,7 @@ function App() {
     <>
       <ThemeModeScript />
       <Flowbite theme={{ theme: customTheme }}>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </Flowbite>
       <Toaster />
     </>

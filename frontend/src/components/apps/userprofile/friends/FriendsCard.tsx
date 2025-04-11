@@ -7,7 +7,7 @@ import {
 } from "react-icons/tb";
 import { Badge, TextInput } from "flowbite-react";
 import { Icon } from "@iconify/react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { UserDataContext } from "src/context/UserDataContext";
 import CardBox from "src/components/shared/CardBox";
 import React from "react";

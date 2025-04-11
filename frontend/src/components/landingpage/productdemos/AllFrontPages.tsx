@@ -2,7 +2,7 @@ import React from "react";
 
 import { Button } from "flowbite-react";
 import { FrontMenu } from "../Data";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 const AllFrontPages = () => {
   return (
     <>

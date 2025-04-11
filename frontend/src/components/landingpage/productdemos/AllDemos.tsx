@@ -1,7 +1,7 @@
 import React from "react";
 import * as DemosName from "../Data";
 import { Button } from "flowbite-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 const AllDemos = () => {
   return (
     <>

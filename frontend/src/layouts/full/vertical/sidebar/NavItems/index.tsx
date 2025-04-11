@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { ChildItem } from "../Sidebaritems";
 import { Sidebar } from "flowbite-react";
 import { Icon } from "@iconify/react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { DashboardContext } from "src/context/DashboardContext/DashboardContext";
 

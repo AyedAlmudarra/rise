@@ -1,13 +1,10 @@
-
+import React, { useState } from "react";
 import { Modal, TextInput } from "flowbite-react";
-import { useState } from "react";
 import { Icon } from "@iconify/react";
 import * as SearchData from "./Data";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-import { Link } from "react-router";
-
-
+import { Link } from "react-router-dom";
 
 const Search = () => {
   const [openModal, setOpenModal] = useState(false);

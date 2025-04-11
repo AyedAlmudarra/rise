@@ -1,11 +1,10 @@
-
-
+import React from "react";
 import CardBox from "../../shared/CardBox";
 import { Dropdown } from "flowbite-react";
 import { HiOutlineDotsVertical  } from "react-icons/hi";
 import { Icon } from "@iconify/react";
 import Chart from "react-apexcharts"
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const CrmMarketingReport = () => {
   const dropdownItems = ["Action", "Another action", "Something else"];

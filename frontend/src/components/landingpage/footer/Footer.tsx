@@ -1,5 +1,6 @@
-import { Link } from "react-router";
-import Logo from "src/layouts/full/shared/logo/Logo";
+import { Link } from "react-router-dom";
+import { Container, Button } from "flowbite-react";
+import Logo from "src/layouts/full/shared/logo/FullLogo";
 
 
 const Footer = () => {

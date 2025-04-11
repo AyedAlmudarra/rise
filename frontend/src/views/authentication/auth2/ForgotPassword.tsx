@@ -1,12 +1,9 @@
-
-
-import { Button } from "flowbite-react";
+import React from "react";
+import { Button, Label, TextInput } from "flowbite-react";
 import CardBox from "src/components/shared/CardBox";
 import Logo from "src/layouts/full/shared/logo/Logo";
 import AuthForgotPassword from "../authforms/AuthForgotPassword";
-import { Link } from "react-router";
-
-
+import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
   return (

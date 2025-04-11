@@ -1,9 +1,11 @@
-
+import React from "react";
+import Chart from "react-apexcharts";
+import { ApexOptions } from "apexcharts";
 import CardBox from "../../shared/CardBox";
 import { Icon } from "@iconify/react";
 import { Badge, Dropdown } from "flowbite-react";
 import { HiOutlineDotsVertical  } from "react-icons/hi";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 
 const EarningReports = () => {

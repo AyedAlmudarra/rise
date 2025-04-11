@@ -1,9 +1,14 @@
-
 import React from "react";
 import Google from "/src/assets/images/svgs/google-icon.svg";
 import FB from "/src/assets/images/svgs/facebook-icon.svg";
 import { HR } from "flowbite-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
+import {
+  IconBrandFacebook,
+  IconBrandGithub,
+  IconBrandTwitter,
+} from "@tabler/icons-react";
+import { Button } from "flowbite-react";
 
 interface MyAppProps {
     title?:string;

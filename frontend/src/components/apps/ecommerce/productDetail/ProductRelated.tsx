@@ -1,11 +1,13 @@
-
-
-
+import React from "react";
+import { ProductContext } from "src/context/Ecommercecontext";
+import { useContext } from "react";
+import CardBox from "src/components/shared/CardBox";
+import { Link } from "react-router-dom";
 import { Button, Rating, Tooltip } from "flowbite-react";
 import { Icon } from "@iconify/react";
-import { Link } from "react-router";
 import ProductsData from "src/api/eCommerce/ProductsData";
-import CardBox from "src/components/shared/CardBox";
+import { IconBasket } from "@tabler/icons-react";
+
 const ProductRelated = () => {
   return (
     <>

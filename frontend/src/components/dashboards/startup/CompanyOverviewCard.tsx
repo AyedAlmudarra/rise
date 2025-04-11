@@ -6,12 +6,13 @@ import {
   IconWorld, IconCategory, IconChartBar, IconMapPin, IconBuildingStore, IconCoin,
   IconMail, IconBell, IconChartPie, IconArrowNarrowUp, IconDeviceFloppy, IconDownload,
   IconCalendarEvent, IconCurrencyDollar, IconBooks, IconTrendingUp, IconUserCheck,
-  IconTargetArrow, IconAward, IconBuildingSkyscraper, IconBrandGithub, IconDeviceAnalytics
+  IconTargetArrow, IconAward, IconBuildingSkyscraper, IconBrandGithub, IconDeviceAnalytics,
+  IconCloudUpload, IconArrowUpRight
 } from '@tabler/icons-react';
-import { MockStartupData } from '../../../api/mocks/data/startupDashboardMockData';
+import { StartupProfile } from 'src/types/database';
 
 interface CompanyOverviewCardProps {
-  startupData: MockStartupData;
+  startupData: StartupProfile | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -57,6 +58,18 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
     }
   ]);
 
+  if (isLoading) {
+    return <CardBox><div className="p-4 text-center">Loading company overview...</div></CardBox>;
+  }
+
+  if (error) {
+    return <CardBox><div className="p-4 text-center text-red-500">Error loading data: {error}</div></CardBox>;
+  }
+
+  if (!startupData) {
+     return <CardBox><div className="p-4 text-center">No startup data available.</div></CardBox>;
+  }
+
   const logoUrl = startupData.logo_url || 'https://flowbite.com/docs/images/logo.svg';
   const description = startupData.description || 'No company description available.';
   
@@ -64,14 +77,13 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
     ? `${description.substring(0, 120)}...` 
     : description;
 
-  // Calculate profile completeness based on filled fields
-  const requiredFields = [
+  const requiredFields: (keyof StartupProfile)[] = [
     'name', 'description', 'industry', 'sector', 'location_city', 
     'operational_stage', 'num_employees', 'annual_revenue'
   ];
   
   const filledFields = requiredFields.filter(field => 
-    field in startupData && startupData[field as keyof MockStartupData]
+    startupData[field]
   );
   
   const completionPercentage = Math.round((filledFields.length / requiredFields.length) * 100);
@@ -90,28 +102,10 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
     setShowProfileModal(false);
   };
 
-  // Enhanced company milestones
-  const companyMilestones = [
-    { date: 'Jan 2020', title: 'Company Founded', description: 'Started operations with seed funding' },
-    { date: 'Jun 2020', title: 'MVP Launch', description: 'First product version released to beta users' },
-    { date: 'Mar 2021', title: 'First 100 Customers', description: 'Reached 100 paying customers milestone' },
-    { date: 'Nov 2021', title: 'Seed Round Closed', description: '$2.5M raised from venture investors' },
-    { date: 'Apr 2022', title: 'Team Expansion', description: 'Grew to 15 full-time employees' }
-  ];
-
-  // Enhanced company metrics
-  const companyMetrics = [
-    { label: 'Revenue Growth', value: '+42%', trend: 'up', color: 'green' },
-    { label: 'Customer Retention', value: '87%', trend: 'up', color: 'blue' },
-    { label: 'Market Share', value: '12%', trend: 'up', color: 'purple' },
-    { label: 'Burn Rate', value: '$75K/mo', trend: 'down', color: 'amber' }
-  ];
-
   return (
     <>
       <CardBox className="overflow-hidden shadow-lg border-0 bg-white dark:bg-gray-800">
         <div className="relative">
-          {/* Cover image and avatar */}
           <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 relative">
             <div className="absolute top-2 right-2 z-10">
               <button 
@@ -143,7 +137,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                       {startupData.name || 'Unnamed Company'}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {startupData.tagline || (startupData.industry ? `${startupData.industry} company` : 'Technology startup')}
+                      {startupData.industry ? `${startupData.industry} company` : 'Technology startup'}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -156,7 +150,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </div>
             </div>
             
-            {/* Status badges row */}
             <div className="flex flex-wrap gap-2 mb-3">
               {startupData.operational_stage && (
                 <Badge color="indigo" size="sm" icon={IconBuildingSkyscraper}>
@@ -178,7 +171,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </Badge>
             </div>
             
-            {/* Company description */}
             <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
               <p>{truncatedDescription}</p>
               {description.length > 120 && (
@@ -191,7 +183,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               )}
             </div>
             
-            {/* Profile completion */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-1">
                 <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -212,7 +203,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </div>
             </div>
             
-            {/* Key company info */}
             <div className="space-y-2 mb-4 text-sm">
               <div className="flex items-center text-gray-700 dark:text-gray-300">
                 <IconCategory size={18} className="mr-2 text-blue-500 flex-shrink-0" />
@@ -277,7 +267,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </div>
             </div>
             
-            {/* Team members section - conditionally shown */}
             {showTeam && (
               <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
                 <h4 className="text-sm font-semibold mb-2 flex items-center">
@@ -317,7 +306,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </div>
             )}
             
-            {/* Quick actions */}
             <div className="grid grid-cols-2 gap-3 mt-4">
               <Button size="sm" color="light" className="w-full relative group overflow-hidden">
                 <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
@@ -331,7 +319,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </Button>
             </div>
             
-            {/* Additional quick actions */}
             <div className="grid grid-cols-3 gap-2 mt-2">
               <Button size="xs" color="light" className="w-full">
                 <IconBriefcase size={14} className="mr-1" />
@@ -347,7 +334,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </Button>
             </div>
             
-            {/* Social media links */}
             <div className="flex justify-center gap-3 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700">
               <Tooltip content="LinkedIn Profile">
                 <button className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
@@ -366,7 +352,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               </Tooltip>
             </div>
             
-            {/* Premium alert */}
             <div className="mt-2 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 p-2 rounded-lg border border-amber-200 dark:border-amber-800/30">
               <div className="flex items-center text-xs text-amber-800 dark:text-amber-300">
                 <IconBell size={14} className="mr-1.5 flex-shrink-0" />
@@ -379,7 +364,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
           </div>
         </div>
         
-        {/* Profile Modal */}
         <Modal
           show={showProfileModal}
           onClose={() => setShowProfileModal(false)}
@@ -391,7 +375,6 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
           <Modal.Body>
             <Tabs
               aria-label="Company profile tabs" 
-              style="underline"
               onActiveTabChange={(tab: number) => setActiveTab(tab === 0 ? 'profile' : tab === 1 ? 'insights' : tab === 2 ? 'milestones' : 'share')}
             >
               <Tabs.Item 
@@ -477,70 +460,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 icon={IconChartPie}
                 active={activeTab === 'insights'}
               >
-                <div className="space-y-4">
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                    <h6 className="text-sm font-semibold mb-3">Profile Performance</h6>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm text-center">
-                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{profileViews}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Profile Views</div>
-                        <div className="text-xs text-green-500 flex items-center justify-center mt-1">
-                          <IconArrowNarrowUp size={12} className="mr-1" />
-                          23% 
-                        </div>
-                      </div>
-                      <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm text-center">
-                        <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">48</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Investor Views</div>
-                        <div className="text-xs text-green-500 flex items-center justify-center mt-1">
-                          <IconArrowNarrowUp size={12} className="mr-1" />
-                          12% 
-                        </div>
-                      </div>
-                      <div className="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm text-center">
-                        <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">8</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Connection Requests</div>
-                        <div className="text-xs text-green-500 flex items-center justify-center mt-1">
-                          <IconArrowNarrowUp size={12} className="mr-1" />
-                          50% 
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Company Key Metrics */}
-                    <h6 className="text-sm font-semibold mb-2">Key Performance Metrics</h6>
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      {companyMetrics.map((metric, index) => (
-                        <div key={index} className="bg-white dark:bg-gray-700 rounded-lg p-3 flex items-center justify-between">
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{metric.label}</div>
-                            <div className="text-lg font-bold text-gray-900 dark:text-white">{metric.value}</div>
-                          </div>
-                          <div className={`text-${metric.color}-500 flex items-center text-sm`}>
-                            {metric.trend === 'up' ? (
-                              <IconTrendingUp size={18} />
-                            ) : (
-                              <IconArrowNarrowUp size={18} className="transform rotate-180" />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <h6 className="text-sm font-semibold mb-2">Profile Completeness Impact</h6>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                      Profiles with 100% completion receive up to 5x more investor views
-                    </div>
-                    <div className="h-12 bg-gray-200 dark:bg-gray-600 rounded-lg relative overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 absolute" 
-                        style={{ width: `${completionPercentage}%` }}
-                      ></div>
-                      <div className="absolute inset-0 flex items-center justify-center text-white font-medium text-sm">
-                        {completionPercentage}% Complete
-                      </div>
-                    </div>
-                  </div>
+                <div className="p-4 text-center text-gray-500">
+                  Insights data will be displayed here.
                 </div>
               </Tabs.Item>
               
@@ -549,79 +470,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 icon={IconCalendarEvent}
                 active={activeTab === 'milestones'}
               >
-                <div className="space-y-4">
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                    <h6 className="text-sm font-semibold mb-3 flex items-center">
-                      <IconAward size={16} className="mr-2 text-amber-500" />
-                      Company Milestones & Achievements
-                    </h6>
-                    
-                    <div className="relative border-l-2 border-blue-500 ml-2 pl-6 pb-2">
-                      {companyMilestones.map((milestone, index) => (
-                        <div key={index} className="mb-6 relative">
-                          <div className="absolute -left-8 mt-1.5 w-4 h-4 rounded-full bg-blue-500 border-2 border-white dark:border-gray-800"></div>
-                          <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
-                            {milestone.date}
-                          </div>
-                          <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                            {milestone.title}
-                          </div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
-                            {milestone.description}
-                          </div>
-                        </div>
-                      ))}
-                      
-                      <Button size="xs" color="light" className="ml-1 mt-2">
-                        <IconCalendarEvent size={14} className="mr-1.5" />
-                        Add Milestone
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                    <h6 className="text-sm font-semibold mb-3 flex items-center">
-                      <IconBooks size={16} className="mr-2 text-purple-500" />
-                      Documents & Resources
-                    </h6>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                        <div className="flex items-center">
-                          <IconFileAnalytics size={16} className="mr-2 text-blue-500" />
-                          <span>Pitch Deck 2023</span>
-                        </div>
-                        <Button size="xs" color="light">
-                          View
-                        </Button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                        <div className="flex items-center">
-                          <IconCurrencyDollar size={16} className="mr-2 text-green-500" />
-                          <span>Financial Projections</span>
-                        </div>
-                        <Button size="xs" color="light">
-                          View
-                        </Button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                        <div className="flex items-center">
-                          <IconBriefcase size={16} className="mr-2 text-amber-500" />
-                          <span>Business Plan</span>
-                        </div>
-                        <Button size="xs" color="light">
-                          View
-                        </Button>
-                      </div>
-                      
-                      <Button size="xs" color="light" className="w-full mt-2">
-                        <IconUpload size={14} className="mr-1.5" />
-                        Upload Document
-                      </Button>
-                    </div>
-                  </div>
+                <div className="p-4 text-center text-gray-500">
+                  Company milestones will be displayed here.
                 </div>
               </Tabs.Item>
               
@@ -673,8 +523,9 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
             </Button>
           </Modal.Footer>
         </Modal>
-      </>
-    );
-  };
+      </CardBox>
+    </>
+  );
+};
 
 export default CompanyOverviewCard; 

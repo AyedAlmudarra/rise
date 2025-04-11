@@ -1,12 +1,16 @@
-
+import React, { useEffect } from "react";
 import { MdCheck } from "react-icons/md";
 import "flowbite";
 import { Badge, Button, HR, Rating } from "flowbite-react";
 
-import  { useContext, useState } from "react";
-import { Link, useParams } from "react-router";
+import { useContext, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { ProductContext } from "src/context/Ecommercecontext";
 import { ProductType } from "src/types/apps/eCommerce";
+import ProductCarousel from "./ProductCarousel";
+import ProductReview from "./ProductReview";
+import ProductDesc from "./ProductDesc";
+import { Breadcrumb } from "flowbite-react";
 
 
 const ProductDetail = () => {

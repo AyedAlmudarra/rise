@@ -1,21 +1,17 @@
-
 import CardBox from "../../shared/CardBox";
-
-
-import user1 from "/src/assets/images/profile/user-6.jpg";
-import user2 from "/src/assets/images/profile/user-2.jpg";
-import user3 from "/src/assets/images/profile/user-3.jpg";
+import avatar1 from "src/assets/images/profile/user-1.jpg";
+import avatar2 from "src/assets/images/profile/user-2.jpg";
+import avatar3 from "src/assets/images/profile/user-3.jpg";
 import img1 from "/src/assets/images/blog/blog-img1.jpg";
 import img2 from "/src/assets/images/blog/blog-img2.jpg";
 import img3 from "/src/assets/images/blog/blog-img3.jpg";
-import { Badge } from "flowbite-react";
+import { Badge, Avatar, Tooltip } from "flowbite-react";
 import { IconEye, IconMessage2, IconPoint } from "@tabler/icons-react";
-import { Link } from "react-router";
-
+import { Link } from "react-router-dom";
 
 const BlogCardsData = [
   {
-    avatar: user1,
+    avatar: avatar1,
     coveravatar: img1,
     read: "2 min Read",
     title: "As yen tumbles, gadget-loving Japan goes for secondhand iPhones",
@@ -27,7 +23,7 @@ const BlogCardsData = [
     url:''
   },
   {
-    avatar: user2,
+    avatar: avatar2,
     coveravatar: img2,
     read: "2 min Read",
     title:
@@ -40,7 +36,7 @@ const BlogCardsData = [
     url:''
   },
   {
-    avatar: user3,
+    avatar: avatar3,
     coveravatar: img3,
     read: "2 min Read",
     title: "COVID outbreak deepens as more lockdowns loom in China",

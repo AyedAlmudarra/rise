@@ -1,10 +1,10 @@
-
+import React from "react";
 import { format } from "date-fns";
 import { GoDot } from "react-icons/go";
 import { Icon } from "@iconify/react";
 import CardBox from "../../shared/CardBox";
 import { Avatar, Badge, Tooltip } from "flowbite-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { BlogPostType } from "src/types/apps/blog";
 
 

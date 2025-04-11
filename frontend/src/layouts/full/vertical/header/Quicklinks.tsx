@@ -1,6 +1,8 @@
-
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import * as QuicklinksData from "./Data";
+import React from "react";
+import { Badge, Dropdown } from "flowbite-react";
+import { IconListDetails } from "@tabler/icons-react";
 
 const Quicklinks = () => {
   return (

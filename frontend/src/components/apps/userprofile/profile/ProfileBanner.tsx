@@ -1,4 +1,3 @@
-
 import {
   TbBrandDribbble,
   TbBrandFacebook,
@@ -11,9 +10,9 @@ import {
 import Banner from "/src/assets/images/backgrounds/profilebg.jpg";
 import { Button } from "flowbite-react";
 import ProfileTab from "./ProfileTab";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import CardBox from "src/components/shared/CardBox";
-import profileImg from "/src/assets/images/profile/user-1.jpg"
+import ProfileImg from "/src/assets/images/profile/user-1.jpg";
 
 const ProfileBanner = () => {
   return (
@@ -58,7 +57,7 @@ const ProfileBanner = () => {
             <div className="lg:col-span-4 col-span-12 lg:order-2 order-1">
               <div className="text-center -mt-20">
                 <img
-                  src={profileImg}
+                  src={ProfileImg}
                   alt="profile"
                   height="100"
                   width="100"

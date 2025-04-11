@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Button, Drawer } from "flowbite-react";
 import { IconMenu2 } from "@tabler/icons-react";
 import MobileDemosMenu from "./MobileDemoMenus";
 import FullLogo from "src/layouts/full/shared/logo/FullLogo";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
+import Quicklinks from "src/layouts/full/vertical/header/Quicklinks";
+import SimpleBar from "simplebar-react";
 
 const MobileDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);

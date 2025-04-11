@@ -1,8 +1,8 @@
-
+import React from "react";
 import * as AppsData from "src/layouts/full/vertical/header/Data";
 import { IconChevronDown, IconHelp } from "@tabler/icons-react";
 import { Button, Dropdown } from "flowbite-react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import Quicklinks from "src/layouts/full/vertical/header/Quicklinks";
 
 const PagesMenu = () => {
