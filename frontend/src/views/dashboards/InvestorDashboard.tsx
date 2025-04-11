@@ -290,7 +290,7 @@ const InvestorDashboard = () => {
 
   const renderDashboardTabs = () => (
     <div className="mb-6">
-      <Tabs aria-label="Dashboard tabs" style="underline" onActiveTabChange={(tab) => {
+      <Tabs aria-label="Dashboard tabs"  onActiveTabChange={(tab) => {
         const tabId = tab === 0 ? 'overview' : tab === 1 ? 'deals' : tab === 2 ? 'suggestions' : tab === 3 ? 'watchlist' : 'insights';
         setActiveTab(tabId);
       }}>
@@ -383,10 +383,11 @@ const InvestorDashboard = () => {
                 <div className="flex items-center justify-between mt-6">
                   <div className="flex space-x-1">
                     {Array.from({ length: maxSteps }).map((_, i) => (
-                      <div 
-                        key={i}
-                        className={`h-2 w-2 rounded-full ${i + 1 === step ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
-                      />
+                      i + 1 === step ? (
+                        <div key={i} className="h-2 w-2 rounded-full bg-blue-600" />
+                      ) : (
+                        <div key={i} className="h-2 w-2 rounded-full bg-gray-300 dark:bg-gray-600" />
+                      )
                     ))}
                   </div>
                   <div className="flex space-x-2">
