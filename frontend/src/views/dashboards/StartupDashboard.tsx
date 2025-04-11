@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import { StartupProfile } from '../../types/database';
 import { Spinner, Alert, Badge, Tabs, Card, Avatar, Button, Dropdown, Timeline } from 'flowbite-react';
-import { mockStartupData } from '../../api/mocks/data/startupDashboardMockData';
+import { mockStartupData, generateMockData } from '../../api/mocks/data/startupDashboardMockData';
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   IconBulb, 
   IconRefresh, 
@@ -56,6 +59,7 @@ import {
 
 const StartupDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [startupData, setStartupData] = useState<StartupProfile | null>(null);
   const [dataLoading, setDataLoading] = useState<boolean>(true);
   const [dataError, setDataError] = useState<string | null>(null);
@@ -65,6 +69,18 @@ const StartupDashboard = () => {
   const [notificationCount, setNotificationCount] = useState<number>(3);
   const [showMetricsSummary, setShowMetricsSummary] = useState<boolean>(true);
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
+  const [isNewUser, setIsNewUser] = useState<boolean>(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
+  
+  // Generate dynamic mock data based on the fetched startup profile
+  const [mockData, setMockData] = useState(mockStartupData);
+  
+  // Update mock data whenever startupData changes
+  useEffect(() => {
+    if (startupData) {
+      setMockData(generateMockData(startupData));
+    }
+  }, [startupData]);
 
   // Mock notifications data
   const notifications = [
@@ -91,6 +107,18 @@ const StartupDashboard = () => {
 
   useEffect(() => {
     fetchStartupData();
+    
+    // Check if user was recently registered (within last 5 minutes)
+    const registrationTime = localStorage.getItem('registration_timestamp');
+    if (registrationTime) {
+      const timeDiff = Date.now() - parseInt(registrationTime);
+      if (timeDiff < 5 * 60 * 1000) { // 5 minutes
+        setIsNewUser(true);
+        setShowWelcomeModal(true);
+        // Clear the registration timestamp
+        localStorage.removeItem('registration_timestamp');
+      }
+    }
   }, [user]);
 
   const fetchStartupData = async () => {
@@ -115,21 +143,48 @@ const StartupDashboard = () => {
 
       if (data) {
         setStartupData(data);
+        // If this is the first time fetching data after registration
+        // Set isNewUser flag for welcome experience
+        if (isNewUser) {
+          toast.success("Welcome to your startup dashboard!", {
+            icon: "🚀"
+          });
+        }
       } else {
         setStartupData(null);
+        if (isNewUser) {
+          // Handle case where startup profile was created but not found
+          toast.error("There was an issue loading your profile. Please contact support.");
+        }
       }
       setLastUpdated(new Date());
     } catch (error: any) {
       console.error("Error fetching startup data:", error.message);
       setDataError(error.message);
       setStartupData(null);
+      toast.error("Error loading dashboard data. Please try refreshing.");
     } finally {
       setDataLoading(false);
     }
   };
 
+  const refreshData = useCallback(async () => {
+    // Show loading toast
+    toast.loading("Refreshing dashboard data...");
+    
+    try {
+      await fetchStartupData();
+      toast.dismiss(); // Clear loading toast
+      toast.success("Dashboard data refreshed!");
+    } catch (error) {
+      toast.dismiss(); // Clear loading toast
+      toast.error("Failed to refresh data");
+    }
+  }, []);
+
   const markAllNotificationsAsRead = () => {
     setNotificationCount(0);
+    toast.success("All notifications marked as read");
   };
 
   // Enhanced welcome message with notification center
@@ -249,7 +304,7 @@ const StartupDashboard = () => {
           </div>
           
           <button 
-            onClick={fetchStartupData}
+            onClick={refreshData}
             disabled={dataLoading}
             className="flex items-center px-3 py-1.5 text-sm bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 rounded-md shadow-sm text-blue-700 dark:text-white transition-colors disabled:opacity-60 ml-2"
           >
@@ -364,7 +419,7 @@ const StartupDashboard = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Revenue</p>
                   <div className="flex items-end">
                     <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                      ${mockStartupData.keyMetrics.annualRevenue?.toLocaleString() || 'N/A'}
+                      ${mockData.keyMetrics.annualRevenue?.toLocaleString() || 'N/A'}
                     </p>
                     <span className="ml-2 text-xs text-green-600 dark:text-green-400 flex items-center">
                       <IconArrowUp size={12} className="mr-0.5" /> 15%
@@ -383,7 +438,7 @@ const StartupDashboard = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Customers</p>
                   <div className="flex items-end">
                     <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                      {mockStartupData.keyMetrics.numCustomers?.toLocaleString() || 'N/A'}
+                      {mockData.keyMetrics.numCustomers?.toLocaleString() || 'N/A'}
                     </p>
                     <span className="ml-2 text-xs text-green-600 dark:text-green-400 flex items-center">
                       <IconArrowUp size={12} className="mr-0.5" /> 25%
@@ -402,7 +457,7 @@ const StartupDashboard = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">AI Insights</p>
                   <div className="flex items-center">
                     <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                      {mockStartupData.aiInsights.length}
+                      {mockData.aiInsights.length}
                     </p>
                     <Badge color="purple" className="ml-2">NEW</Badge>
                   </div>
@@ -419,7 +474,7 @@ const StartupDashboard = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">Funding Score</p>
                   <div className="flex items-end">
                     <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
-                      {mockStartupData.fundingReadiness.score}/100
+                      {mockData.fundingReadiness.score}/100
                     </p>
                     <span className="ml-2 text-xs text-amber-600 dark:text-amber-400 flex items-center">
                       <IconArrowUp size={12} className="mr-0.5" /> 5pts
@@ -534,7 +589,11 @@ const StartupDashboard = () => {
             }
           >
             <div className="p-4">
-              <CompanyOverviewCard startupData={startupData} loading={false} error={null} />
+              <CompanyOverviewCard 
+                startupData={startupData}
+                isLoading={dataLoading}
+                error={dataError}
+              />
             </div>
           </Tabs.Item>
           
@@ -548,7 +607,7 @@ const StartupDashboard = () => {
             }
           >
             <div className="p-4">
-              <KeyMetricsSection data={mockStartupData.keyMetrics} />
+              <KeyMetricsSection data={mockData.keyMetrics} />
             </div>
           </Tabs.Item>
           
@@ -558,12 +617,12 @@ const StartupDashboard = () => {
               <div className="flex items-center">
                 <IconRobot size={18} className="mr-2 text-purple-500" />
                 <span>AI Insights</span>
-                <Badge color="purple" size="xs" className="ml-2">{mockStartupData.aiInsights.length}</Badge>
+                <Badge color="purple" size="xs" className="ml-2">{mockData.aiInsights.length}</Badge>
               </div>
             }
           >
             <div className="p-4">
-              <AIInsightsSection insights={mockStartupData.aiInsights} />
+              <AIInsightsSection insights={mockData.aiInsights} />
             </div>
           </Tabs.Item>
           
@@ -577,7 +636,7 @@ const StartupDashboard = () => {
             }
           >
             <div className="p-4">
-              <FundingReadinessSection data={mockStartupData.fundingReadiness} />
+              <FundingReadinessSection data={mockData.fundingReadiness} />
             </div>
           </Tabs.Item>
           
@@ -587,16 +646,143 @@ const StartupDashboard = () => {
               <div className="flex items-center">
                 <IconUsers size={18} className="mr-2 text-red-500" />
                 <span>Investor Interest</span>
-                <Badge color="gray" size="xs" className="ml-2">{mockStartupData.investorInterest.profileViews}</Badge>
+                <Badge color="gray" size="xs" className="ml-2">{mockData.investorInterest.profileViews}</Badge>
               </div>
             }
           >
             <div className="p-4">
-              <InvestorInterestSection data={mockStartupData.investorInterest} />
+              <InvestorInterestSection data={mockData.investorInterest} />
             </div>
           </Tabs.Item>
         </Tabs>
       </Card>
+    );
+  };
+
+  // Create a WelcomeModal component
+  const WelcomeModal: React.FC<{
+    show: boolean;
+    onClose: () => void;
+    userName?: string;
+  }> = ({ show, onClose, userName }) => {
+    const [currentStep, setCurrentStep] = useState(0);
+    const steps = [
+      {
+        title: "Welcome to Your Startup Dashboard",
+        description: "We're excited to have you on board! Let's get you started with a quick tour of your new dashboard.",
+        icon: <IconBulb size={40} className="text-yellow-500" />
+      },
+      {
+        title: "Your Company Profile",
+        description: "View and update your startup information. A complete profile attracts more investor interest.",
+        icon: <IconBuilding size={40} className="text-blue-500" />
+      },
+      {
+        title: "Performance Metrics",
+        description: "Track your key business metrics and visualize your growth over time.",
+        icon: <IconChartPie size={40} className="text-green-500" />
+      },
+      {
+        title: "AI Insights & Recommendations",
+        description: "Get personalized AI-powered insights to help grow your business.",
+        icon: <IconRobot size={40} className="text-purple-500" />
+      },
+      {
+        title: "Ready to Go!",
+        description: "Your dashboard is all set up. Explore and make the most of the RISE platform!",
+        icon: <IconArrowUp size={40} className="text-indigo-500" />
+      }
+    ];
+
+    const handleNext = () => {
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        onClose();
+      }
+    };
+
+    if (!show) return null;
+
+    return (
+      <AnimatePresence>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div 
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full overflow-hidden"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          >
+            <div className="relative h-1.5 bg-gray-100 dark:bg-gray-700">
+              <motion.div 
+                className="absolute top-0 left-0 h-full bg-blue-600 dark:bg-blue-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            
+            <div className="px-6 pt-8 pb-6">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center text-center"
+              >
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-4">
+                  {steps[currentStep].icon}
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  {steps[currentStep].title}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-8">
+                  {steps[currentStep].description.replace('{userName}', userName || 'there')}
+                </p>
+                
+                <div className="flex gap-3 w-full">
+                  {currentStep > 0 && (
+                    <button
+                      onClick={() => setCurrentStep(currentStep - 1)}
+                      className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-800 dark:text-gray-200 font-medium transition-colors"
+                    >
+                      Back
+                    </button>
+                  )}
+                  <button
+                    onClick={handleNext}
+                    className={`${currentStep > 0 ? 'flex-1' : 'w-full'} px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg`}
+                  >
+                    {currentStep < steps.length - 1 ? 'Next' : 'Get Started'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+            
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center border-t border-gray-200 dark:border-gray-700">
+              <div className="flex space-x-1">
+                {steps.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => setCurrentStep(index)}
+                    className={`w-2 h-2 rounded-full ${currentStep === index ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={onClose}
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
+                Skip tour
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatePresence>
     );
   };
 
@@ -614,6 +800,14 @@ const StartupDashboard = () => {
           {renderActivitySection()}
           {renderDashboardTabs()}
         </>
+      )}
+
+      {showWelcomeModal && (
+        <WelcomeModal
+          show={showWelcomeModal}
+          onClose={() => setShowWelcomeModal(false)}
+          userName={user?.user_metadata?.full_name || user?.email || 'Startup Dashboard'}
+        />
       )}
     </div>
   );

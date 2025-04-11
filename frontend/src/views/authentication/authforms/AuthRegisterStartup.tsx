@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { startupRegistrationSchema, StartupRegistrationData } from "../../../types/startupRegistration";
 import { Progress } from "../../../components/shadcn-ui/Default-Ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 // Import all form components
 import AuthInfoForm from "./AuthInfoForm";
@@ -354,27 +355,23 @@ const AuthRegisterStartup = () => {
             kpi_avg_order_value: data.kpi_avg_order_value || null,
             kpi_market_share: data.kpi_market_share || null,
             kpi_yoy_growth: data.kpi_yoy_growth || null,
-            current_funding: data.currentFunding || null,
-            seeking_investment: data.seekingInvestment,
-            target_raise_amount: data.targetRaiseAmount || null,
             market_growth_rate: data.marketGrowthRate || null,
             market_key_trends: data.marketKeyTrends || null,
             target_customer_profile: data.targetCustomerProfile || null,
             customer_pain_points: data.customerPainPoints || null,
             market_barriers: data.marketBarriers || null,
             competitive_advantage: data.competitiveAdvantage || null,
-            founder_bio: data.founderBio || null,
-            founder_title: data.founderTitle || null,
-            founder_education: data.founderEducation || null,
-            previous_startup_experience: data.previousStartupExperience || null,
-            // Handle competitors
-            competitor_data: {
-              competitor1: data.competitor1Name ? {
+            current_funding: data.currentFunding || null,
+            seeking_investment: data.seekingInvestment || false,
+            target_raise_amount: data.targetRaiseAmount || null,
+            // Add competitor data if available
+            competitor_data: data.competitor1Name ? {
+              competitor1: {
                 name: data.competitor1Name,
                 size: data.competitor1Size,
                 threat: data.competitor1Threat,
                 differentiator: data.competitor1Differentiator
-              } : null,
+              },
               competitor2: data.competitor2Name ? {
                 name: data.competitor2Name,
                 size: data.competitor2Size,
@@ -386,19 +383,22 @@ const AuthRegisterStartup = () => {
                 size: data.competitor3Size,
                 threat: data.competitor3Threat,
                 differentiator: data.competitor3Differentiator
-              } : null,
-            },
-            // Store tech skills as an array of strings
-            tech_skills: Object.entries(data.techSkills || {})
-              .filter(([_, value]) => value)
-              .map(([key]) => key)
+              } : null
+            } : null
           }
         ]);
 
       if (insertError) throw insertError;
-
-      alert("Registration successful! Please check your email to verify your account.");
-      navigate("/auth/auth1/login");
+      
+      // 3. Show success toast and redirect to dashboard
+      toast.success("Registration Successful! Welcome to RISE.");
+      
+      // Set a timestamp for the registration to show welcome experience
+      localStorage.setItem('registration_timestamp', Date.now().toString());
+      
+      // Redirect to dashboard immediately without waiting for email verification
+      // We'll handle the email verification status on the dashboard
+      navigate("/startup/dashboard");
     } catch (error: any) {
       console.error("Error during registration:", error);
       setSubmissionError(error.message || "An unexpected error occurred during registration.");
