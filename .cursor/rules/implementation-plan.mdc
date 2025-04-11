@@ -46,4 +46,20 @@ This document tracks the step-by-step implementation of features for the RISE pl
 
 ---
 
+## Task 3: Redesign Startup Registration Form (Done)
+
+*   **Status:** Done
+*   **Summary:** Refactored `RegisterStartup.tsx` into a multi-tab form using shadcn Tabs and `react-hook-form` for state management/validation (with Zod). Created separate components (`BasicInfoForm`, `CompanyDetailsForm`, `DocumentsForm`) for each tab, integrating shadcn UI elements (`Input`, `Select`, `Textarea`, `Form*`) and a custom `FileUpload` component (replacing `DropZone`) for logo/pitch deck uploads. Added navigation buttons and basic Supabase submission logic (file upload needs backend handling).
+*   **Goal:** Overhaul the startup registration form with tabs, more fields, dropzones, and improved UI/UX using separate components.
+*   **Steps:**
+    *   Define tab structure (Basic Info, Company Details, Documents & Links) using shadcn Tabs. (Done)
+    *   Create separate components for each tab's content (`BasicInfoForm.tsx`, `CompanyDetailsForm.tsx`, `DocumentsForm.tsx`). (Done)
+    *   Refactor `RegisterStartup.tsx` to use the new tab layout and `react-hook-form`. (Done)
+    *   Populate tab components with relevant form fields using shadcn UI and `FormSectionCard`, including `Select` and `Textarea`. (Done)
+    *   Create and integrate a `FileUpload` component (replacing `DropZone`) into the Documents tab, integrated with `react-hook-form`. (Done)
+    *   Add Website/LinkedIn fields. (Done)
+    *   Refine styling, add interactivity (tab navigation, validation messages), and implement state management/validation (`react-hook-form`, `zod`). (Done)
+    *   Add basic Supabase submission logic. (Done)
+    *   Commit changes.
+
 ---
