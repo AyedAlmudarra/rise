@@ -2,19 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import { StartupProfile } from '../../types/database';
-import { Spinner, Alert, Badge, Tabs, Card, Avatar, Button, Dropdown, Timeline } from 'flowbite-react';
+import { Spinner, Alert, Badge, Card, Avatar, Button, Dropdown, Timeline, Modal, Progress, Tooltip, Tabs } from 'flowbite-react';
 import { mockStartupData, generateMockData } from '../../api/mocks/data/startupDashboardMockData';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  IconBulb, 
-  IconRefresh, 
-  IconChartBar, 
-  IconBuilding, 
-  IconChartPie, 
-  IconRobot, 
-  IconFocus, 
+import {
+  IconBulb,
+  IconRefresh,
+  IconChartBar,
+  IconBuilding,
+  IconChartPie,
+  IconRobot,
+  IconFocus,
   IconUsers,
   IconBell,
   IconDots,
@@ -29,15 +29,19 @@ import {
   IconArrowRight,
   IconChevronUp,
   IconChevronDown,
-  IconCheck
+  IconCheck,
+  IconX,
+  IconInfoCircle,
+  IconBriefcase,
+  IconTrendingUp
 } from "@tabler/icons-react";
 
 // Import the refactored section components
+import AIInsightsSection from '../../components/dashboards/startup/AIInsightsSection';
+import FundingReadinessSection from '../../components/dashboards/startup/FundingReadinessSection';
 import {
     CompanyOverviewCard,
     KeyMetricsSection,
-    AIInsightsSection,
-    FundingReadinessSection,
     InvestorInterestSection
 } from '../../components/dashboards/startup';
 
@@ -84,10 +88,10 @@ const StartupDashboard = () => {
 
   // Mock notifications data
   const notifications = [
-    { id: 1, type: 'investor', message: 'New investor viewed your profile', time: '10 minutes ago', read: false },
-    { id: 2, type: 'insight', message: 'New AI insight available about your customer retention', time: '2 hours ago', read: false },
-    { id: 3, type: 'funding', message: 'Your funding readiness score increased by 5 points', time: '1 day ago', read: false },
-    { id: 4, type: 'system', message: 'Weekly analytics report is ready', time: '2 days ago', read: true },
+    { id: 1, type: 'investor', message: 'Alpha Ventures viewed your profile', time: '10m ago', read: false, icon: <IconBriefcase size={18} className="text-blue-500" /> },
+    { id: 2, type: 'insight', message: 'AI Insight: Consider targeting the EdTech sector.', time: '2h ago', read: false, icon: <IconBulb size={18} className="text-yellow-500" /> },
+    { id: 3, type: 'funding', message: 'Funding Readiness Score increased to 75 (+5)', time: '1d ago', read: false, icon: <IconTrendingUp size={18} className="text-green-500" /> },
+    { id: 4, type: 'system', message: 'Weekly analytics report is ready', time: '2d ago', read: true, icon: <IconChartBar size={18} className="text-gray-500" /> },
   ];
 
   // Recent activities mock data
@@ -146,7 +150,7 @@ const StartupDashboard = () => {
         // If this is the first time fetching data after registration
         // Set isNewUser flag for welcome experience
         if (isNewUser) {
-          toast.success("Welcome to your startup dashboard!", {
+          toast.success("Welcome to your RISE dashboard!", {
             icon: "🚀"
           });
         }
@@ -175,7 +179,7 @@ const StartupDashboard = () => {
     try {
       await fetchStartupData();
       toast.dismiss(); // Clear loading toast
-      toast.success("Dashboard data refreshed!");
+      toast.success("Dashboard data refreshed!", { id: 'refresh-success' });
     } catch (error) {
       toast.dismiss(); // Clear loading toast
       toast.error("Failed to refresh data");
@@ -189,142 +193,103 @@ const StartupDashboard = () => {
 
   // Enhanced welcome message with notification center
   const renderWelcomeHeader = () => (
-    <div className="mb-6 bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900 p-6 rounded-xl shadow-md">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div className="flex items-start mb-4 md:mb-0">
-          <div className="mr-4">
-            <Avatar 
-              size="lg" 
-              rounded 
-              img={user?.user_metadata?.avatar_url || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"} 
-              bordered 
-              color="success" 
-            />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-1 text-white">
-              {user?.user_metadata?.full_name || user?.email || 'Startup Dashboard'}
-              <Badge color="indigo" className="ml-3">BETA</Badge>
-            </h1>
-            <p className="text-blue-100 flex items-center">
-              Welcome to your dashboard
-              {!dataLoading && (
-                <span className="text-xs text-blue-200 ml-4 flex items-center">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </span>
-              )}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-          <div className="relative">
-            <button 
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors relative"
-            >
-              <IconBell size={22} />
-              {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {notificationCount}
-                </span>
-              )}
-            </button>
-            
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden">
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                  <h3 className="font-medium">Notifications</h3>
-                  {notificationCount > 0 && (
-                    <button 
-                      onClick={markAllNotificationsAsRead}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Mark all as read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length > 0 ? (
-                    notifications.map(notification => (
-                      <div 
-                        key={notification.id} 
-                        className={`p-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                      >
-                        <div className="flex items-start">
-                          <div className={`p-2 rounded-full mr-3 ${notification.type === 'investor' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-500' : notification.type === 'insight' ? 'bg-green-100 dark:bg-green-900/30 text-green-500' : notification.type === 'funding' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-500' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'}`}>
-                            {notification.type === 'investor' ? (
-                              <IconUsers size={16} />
-                            ) : notification.type === 'insight' ? (
-                              <IconBulb size={16} />
-                            ) : notification.type === 'funding' ? (
-                              <IconChartBar size={16} />
-                            ) : (
-                              <IconBell size={16} />
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-800 dark:text-gray-200">{notification.message}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                      No notifications
+    <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+       <div className="flex items-center mb-3 sm:mb-0">
+         <Avatar
+            img={startupData?.logo_url || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(startupData?.name || user?.email || 'S')}&background=random&color=fff`}
+            rounded
+            size="lg"
+            className="mr-4 border-2 border-blue-500 p-0.5"
+         />
+         <div>
+           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+             {startupData?.name || 'Startup Dashboard'}
+           </h1>
+           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+             Welcome, {user?.user_metadata?.full_name || user?.email}
+             {!dataLoading && (
+                <Tooltip content={`Last updated: ${lastUpdated.toLocaleString()}`}>
+                 <span className="ml-3 hidden sm:inline">·</span>
+                 <IconRefresh size={14} className="ml-1 sm:ml-3 text-gray-400 hover:text-blue-600 cursor-pointer" onClick={refreshData} />
+                </Tooltip>
+             )}
+           </p>
+         </div>
+       </div>
+       <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+         <Tooltip content="Refresh Data">
+            <Button size="sm" color="light" onClick={refreshData} className="p-1.5">
+              <IconRefresh size={18} />
+            </Button>
+         </Tooltip>
+         <div className="relative">
+            <Tooltip content="Notifications">
+                <Button
+                 size="sm"
+                 color="light"
+                 onClick={() => setShowNotifications(!showNotifications)}
+                 className="relative p-1.5"
+                >
+                 <IconBell size={18} />
+                 {notificationCount > 0 && (
+                    <div className="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
+                      {notificationCount}
                     </div>
-                  )}
-                </div>
-                <div className="p-2 border-t border-gray-200 dark:border-gray-700 text-center">
-                  <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    View all notifications
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="relative">
-            <Dropdown 
-              label="" 
-              dismissOnClick={true} 
-              renderTrigger={() => (
-                <button className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors">
-                  <IconSettings size={22} />
-                </button>
-              )}
-            >
-              <Dropdown.Item icon={IconSettings}>Account Settings</Dropdown.Item>
-              <Dropdown.Item icon={IconBell}>Notification Preferences</Dropdown.Item>
-              <Dropdown.Item icon={IconDownload}>Export Data</Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item icon={IconStar}>Feature Requests</Dropdown.Item>
-              <Dropdown.Item icon={IconMail}>Help Center</Dropdown.Item>
-            </Dropdown>
-          </div>
-          
-          <button 
-            onClick={refreshData}
-            disabled={dataLoading}
-            className="flex items-center px-3 py-1.5 text-sm bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 rounded-md shadow-sm text-blue-700 dark:text-white transition-colors disabled:opacity-60 ml-2"
-          >
-            <IconRefresh size={16} className={`mr-1 ${dataLoading ? 'animate-spin text-blue-500' : ''}`} />
-            Refresh
-          </button>
-        </div>
-      </div>
-      
-      {/* Search bar (optional) */}
-      <div className="mt-4 relative max-w-md">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <IconSearch className="w-5 h-5 text-blue-200" />
-        </div>
-        <input
-          type="search"
-          className="block w-full p-2 pl-10 text-sm border border-blue-400/30 rounded-lg bg-blue-500/20 placeholder-blue-200 text-white focus:ring-blue-300 focus:border-blue-400"
-          placeholder="Search dashboard..."
-        />
-      </div>
+                 )}
+                </Button>
+            </Tooltip>
+           <AnimatePresence>
+             {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 border border-gray-200 dark:border-gray-700"
+                >
+                 <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                   <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Notifications</h3>
+                   {notificationCount > 0 && (
+                     <Button size="xs" color="light" onClick={markAllNotificationsAsRead}>
+                       Mark all read
+                     </Button>
+                   )}
+                 </div>
+                 <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                   {notifications.length > 0 ? (
+                     notifications.map(notification => (
+                       <div
+                         key={notification.id}
+                         className={`p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${notification.read ? 'opacity-60' : ''}`}
+                       >
+                         <div className="flex items-start">
+                           <div className="flex-shrink-0 mt-0.5 mr-3">{notification.icon}</div>
+                           <div className="flex-1">
+                             <p className="text-sm text-gray-800 dark:text-gray-200">{notification.message}</p>
+                             <p className="text-xs text-gray-500 dark:text-gray-400">{notification.time}</p>
+                           </div>
+                         </div>
+                       </div>
+                     ))
+                   ) : (
+                     <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">No new notifications</p>
+                   )}
+                 </div>
+                 <div className="p-2 border-t border-gray-200 dark:border-gray-700 text-center">
+                   <a href="#" className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                     View all notifications
+                   </a>
+                 </div>
+                </motion.div>
+             )}
+           </AnimatePresence>
+         </div>
+          <Tooltip content="Settings">
+              <Button size="sm" color="light" onClick={() => navigate('/settings')} className="p-1.5">
+                  <IconSettings size={18} />
+              </Button>
+          </Tooltip>
+       </div>
     </div>
   );
 
@@ -332,16 +297,20 @@ const StartupDashboard = () => {
   const renderStatusIndicators = () => {
     if (dataLoading) {
       return (
-        <div className="flex justify-center items-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-          <Spinner aria-label="Loading startup data..." size="lg" color="purple" />
-          <span className="pl-3 text-gray-700 dark:text-gray-300">Loading your dashboard data...</span>
+        <div className="flex justify-center items-center h-64">
+          <Spinner size="xl" color="info" aria-label="Loading dashboard data..." />
+          <p className="ml-3 text-gray-600 dark:text-gray-300">Loading dashboard...</p>
         </div>
       );
     }
     if (dataError) {
       return (
-        <Alert color="failure" className="my-4">
-          <span className="font-medium">Error!</span> Failed to load profile: {dataError}
+        <Alert color="failure" icon={IconInfoCircle}>
+          <h3 className="font-medium">Error Loading Dashboard</h3>
+          {dataError}
+          <Button color="failure" size="xs" onClick={refreshData} className="mt-2 ml-auto">
+            Try Again <IconRefresh size={14} className="ml-1"/>
+          </Button>
         </Alert>
       );
     }
@@ -574,97 +543,56 @@ const StartupDashboard = () => {
   const renderDashboardTabs = () => {
     const tabIds = ['overview', 'metrics', 'insights', 'funding', 'investors'];
     
-    return (
-      <Card className="p-0 overflow-hidden">
-        <Tabs aria-label="Dashboard tabs" className="mb-0" onActiveTabChange={(index: number) => {
-          setActiveTab(tabIds[index]);
-        }}>
-          <Tabs.Item 
-            active={activeTab === 'overview'} 
-            title={
-              <div className="flex items-center">
-                <IconBuilding size={18} className="mr-2 text-blue-500" />
-                <span>Overview</span>
+    if (activeTab === 'overview') {
+      return (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+              {renderDashboardSummary()} {/* This might contain KeyMetrics now */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                  {/* Column 1: Company Overview */}
+                  <div className="lg:col-span-1">
+                      <CompanyOverviewCard 
+                          startupData={startupData} 
+                          isLoading={dataLoading} 
+                          error={dataError}
+                      />
+                  </div>
+
+                  {/* Column 2: Key Metrics & AI Insights */}
+                  <div className="lg:col-span-1 flex flex-col gap-6">
+                      <KeyMetricsSection startupData={startupData} isLoading={dataLoading} />
+                      <AIInsightsSection 
+                          startupData={startupData} 
+                          isLoading={dataLoading} 
+                          onRefreshRequest={refreshData} // Pass refresh handler
+                      /> 
+                  </div>
+
+                  {/* Column 3: Funding Readiness & Investor Interest */}
+                  <div className="lg:col-span-1 flex flex-col gap-6">
+                      <FundingReadinessSection 
+                          startupData={startupData} 
+                          isLoading={dataLoading} 
+                          onRefreshRequest={refreshData} // Pass refresh handler
+                      />
+                      <InvestorInterestSection 
+                          startupData={startupData} 
+                          isLoading={dataLoading} 
+                          onRefreshRequest={refreshData} // Pass refresh handler
+                      />
+                  </div>
               </div>
-            }
-          >
-            <div className="p-4">
-              <CompanyOverviewCard 
-                startupData={startupData}
-                isLoading={dataLoading}
-                error={dataError}
-              />
-            </div>
-          </Tabs.Item>
-          
-          <Tabs.Item 
-            active={activeTab === 'metrics'} 
-            title={
-              <div className="flex items-center">
-                <IconChartPie size={18} className="mr-2 text-green-500" />
-                <span>Key Metrics</span>
-              </div>
-            }
-          >
-            <div className="p-4">
-              <KeyMetricsSection data={mockData.keyMetrics} />
-            </div>
-          </Tabs.Item>
-          
-          <Tabs.Item 
-            active={activeTab === 'insights'} 
-            title={
-              <div className="flex items-center">
-                <IconRobot size={18} className="mr-2 text-purple-500" />
-                <span>AI Insights</span>
-                <Badge color="purple" size="xs" className="ml-2">{mockData.aiInsights.length}</Badge>
-              </div>
-            }
-          >
-            <div className="p-4">
-              <AIInsightsSection insights={mockData.aiInsights} />
-            </div>
-          </Tabs.Item>
-          
-          <Tabs.Item 
-            active={activeTab === 'funding'} 
-            title={
-              <div className="flex items-center">
-                <IconFocus size={18} className="mr-2 text-amber-500" />
-                <span>Funding Readiness</span>
-              </div>
-            }
-          >
-            <div className="p-4">
-              <FundingReadinessSection data={mockData.fundingReadiness} />
-            </div>
-          </Tabs.Item>
-          
-          <Tabs.Item 
-            active={activeTab === 'investors'} 
-            title={
-              <div className="flex items-center">
-                <IconUsers size={18} className="mr-2 text-red-500" />
-                <span>Investor Interest</span>
-                <Badge color="gray" size="xs" className="ml-2">{mockData.investorInterest.profileViews}</Badge>
-              </div>
-            }
-          >
-            <div className="p-4">
-              <InvestorInterestSection data={mockData.investorInterest} />
-            </div>
-          </Tabs.Item>
-        </Tabs>
-      </Card>
-    );
+          </motion.div>
+      );
+    }
+    // ... other tabs ...
   };
 
   // Create a WelcomeModal component
   const WelcomeModal: React.FC<{
     show: boolean;
     onClose: () => void;
-    userName?: string;
-  }> = ({ show, onClose, userName }) => {
+    startupName?: string;
+  }> = ({ show, onClose, startupName }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const steps = [
       {
@@ -739,7 +667,7 @@ const StartupDashboard = () => {
                   {steps[currentStep].title}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-8">
-                  {steps[currentStep].description.replace('{userName}', userName || 'there')}
+                  {steps[currentStep].description.replace('{startupName}', startupName || 'there')}
                 </p>
                 
                 <div className="flex gap-3 w-full">
@@ -796,8 +724,6 @@ const StartupDashboard = () => {
         renderStatusIndicators()
       ) : (
         <>
-          {renderDashboardSummary()}
-          {renderActivitySection()}
           {renderDashboardTabs()}
         </>
       )}
@@ -806,7 +732,7 @@ const StartupDashboard = () => {
         <WelcomeModal
           show={showWelcomeModal}
           onClose={() => setShowWelcomeModal(false)}
-          userName={user?.user_metadata?.full_name || user?.email || 'Startup Dashboard'}
+          startupName={startupData?.name}
         />
       )}
     </div>

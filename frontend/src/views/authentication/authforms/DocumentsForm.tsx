@@ -423,6 +423,7 @@ const DocumentsForm: React.FC = () => {
             <div className="grid gap-6">
               <AnimatePresence>
                 <motion.div
+                  key="website-field"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -468,6 +469,7 @@ const DocumentsForm: React.FC = () => {
                 </motion.div>
                 
                 <motion.div
+                  key="linkedin-field"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
@@ -513,6 +515,7 @@ const DocumentsForm: React.FC = () => {
                 </motion.div>
                 
                 <motion.div
+                  key="twitter-field"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}

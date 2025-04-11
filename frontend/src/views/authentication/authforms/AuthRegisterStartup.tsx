@@ -255,153 +255,113 @@ const AuthRegisterStartup = () => {
     return 'pending';
   };
 
-  const uploadFile = async (file: File, bucket: string): Promise<string | null> => {
+  const uploadFile = async (file: File, bucketName: string): Promise<string | null> => {
+    if (!file) return null;
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `${fileName}`;
 
+    console.log(`Uploading ${filePath} to ${bucketName}...`);
     try {
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file);
+        const { data, error } = await supabase.storage
+            .from(bucketName)
+            .upload(filePath, file);
 
-      if (error) throw error;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error(`Error uploading ${bucket} file:`, error);
-      return null;
+        if (error) {
+            throw error;
+        }
+        console.log("Upload successful:", data);
+        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+        return urlData?.publicUrl || null;
+    } catch (error: any) {
+        console.error("Error uploading file:", error.message);
+        toast.error(`Failed to upload ${file.name}: ${error.message}`);
+        return null;
     }
   };
 
   const onSubmit = async (data: StartupRegistrationData) => {
-    if (!agreeTerms) {
-      setSubmissionError("You must agree to the terms and conditions.");
-      return;
-    }
-
     setSubmissionError(null);
-    
+    const loadingToastId = toast.loading('Registering your startup...');
+    console.log("Form Data Submitted:", data);
+
     try {
-      // 1. Register user with Supabase Auth
+      // 1. Sign up the user
+      console.log("Attempting user sign up...");
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.founderName || '',
-            role: 'startup',
-          },
-        },
+          email: data.email,
+          password: data.password,
+          options: {
+              data: {
+                  role: 'startup'
+              }
+          }
       });
 
-      if (authError) throw authError;
-      
+      if (authError) {
+        console.error("Auth Error:", authError);
+        throw new Error(`Signup failed: ${authError.message}`);
+      }
       if (!authData.user) {
-        throw new Error("Failed to create user account");
-      }
-      
-      // Handle file uploads
-      let logoUrl = null;
-      let pitchDeckUrl = null;
-      
-      if (data.companyLogo) {
-        logoUrl = await uploadFile(data.companyLogo, 'logos');
-      }
-      
-      if (data.pitchDeck) {
-        pitchDeckUrl = await uploadFile(data.pitchDeck, 'pitchdecks');
+        throw new Error("Signup successful but no user data returned.");
       }
 
-      // 2. Insert startup record in database
+      const userId = authData.user.id;
+      console.log("User signed up successfully:", userId);
+
+      // 2. Prepare profile data for insertion (Map form data to DB columns)
+      const profileData = {
+          user_id: userId,
+          name: data.startupName,
+          description: data.companyDescription,
+          industry: data.industry,
+          sector: data.sector || null,
+          operational_stage: data.operationalStage,
+          location_city: data.locationCity,
+          website: data.website || null,
+          linkedin_profile: data.linkedinProfile || null,
+          num_employees: data.numEmployees && !isNaN(Number(String(data.numEmployees))) ? parseInt(String(data.numEmployees), 10) : null,
+          num_customers: data.numCustomers && !isNaN(Number(String(data.numCustomers))) ? parseInt(String(data.numCustomers), 10) : null,
+          annual_revenue: data.annualRevenue && !isNaN(Number(String(data.annualRevenue))) ? parseFloat(String(data.annualRevenue)) : null,
+          annual_expenses: data.annualExpenses && !isNaN(Number(String(data.annualExpenses))) ? parseFloat(String(data.annualExpenses)) : null,
+          kpi_cac: data.kpi_cac && !isNaN(Number(String(data.kpi_cac))) ? parseFloat(String(data.kpi_cac)) : null,
+          kpi_clv: data.kpi_clv && !isNaN(Number(String(data.kpi_clv))) ? parseFloat(String(data.kpi_clv)) : null,
+          kpi_retention_rate: data.kpi_retention_rate && !isNaN(Number(String(data.kpi_retention_rate))) ? parseFloat(String(data.kpi_retention_rate)) : null,
+          kpi_conversion_rate: data.kpi_conversion_rate && !isNaN(Number(String(data.kpi_conversion_rate))) ? parseFloat(String(data.kpi_conversion_rate)) : null,
+      };
+
+      console.log("Prepared profile data for insert:", profileData);
+
+      // 3. Insert into 'startups' table
+      console.log("Inserting startup profile into database...");
       const { error: insertError } = await supabase
-        .from('startups')
-        .insert([
-          {
-            user_id: authData.user.id,
-            name: data.startupName,
-            description: data.companyDescription,
-            industry: data.industry,
-            sector: data.sector,
-            operational_stage: data.operationalStage,
-            location_city: data.locationCity,
-            country: data.countryOfOperation,
-            founding_date: data.foundingDate,
-            num_employees: data.numEmployees || null,
-            num_customers: data.numCustomers || null,
-            annual_revenue: data.annualRevenue || null,
-            annual_expenses: data.annualExpenses || null,
-            team_size: data.teamSize || null,
-            has_co_founder: data.hasCoFounder,
-            website: data.website || null,
-            linkedin_profile: data.linkedinProfile || null,
-            twitter_profile: data.twitterProfile || null,
-            logo_url: logoUrl,
-            pitch_deck_url: pitchDeckUrl,
-            kpi_cac: data.kpi_cac || null,
-            kpi_clv: data.kpi_clv || null,
-            kpi_retention_rate: data.kpi_retention_rate || null,
-            kpi_conversion_rate: data.kpi_conversion_rate || null,
-            kpi_monthly_growth: data.kpi_monthly_growth || null,
-            kpi_payback_period: data.kpi_payback_period || null,
-            kpi_churn_rate: data.kpi_churn_rate || null,
-            kpi_nps: data.kpi_nps || null,
-            kpi_tam_size: data.kpi_tam_size || null,
-            kpi_avg_order_value: data.kpi_avg_order_value || null,
-            kpi_market_share: data.kpi_market_share || null,
-            kpi_yoy_growth: data.kpi_yoy_growth || null,
-            market_growth_rate: data.marketGrowthRate || null,
-            market_key_trends: data.marketKeyTrends || null,
-            target_customer_profile: data.targetCustomerProfile || null,
-            customer_pain_points: data.customerPainPoints || null,
-            market_barriers: data.marketBarriers || null,
-            competitive_advantage: data.competitiveAdvantage || null,
-            current_funding: data.currentFunding || null,
-            seeking_investment: data.seekingInvestment || false,
-            target_raise_amount: data.targetRaiseAmount || null,
-            // Add competitor data if available
-            competitor_data: data.competitor1Name ? {
-              competitor1: {
-                name: data.competitor1Name,
-                size: data.competitor1Size,
-                threat: data.competitor1Threat,
-                differentiator: data.competitor1Differentiator
-              },
-              competitor2: data.competitor2Name ? {
-                name: data.competitor2Name,
-                size: data.competitor2Size,
-                threat: data.competitor2Threat,
-                differentiator: data.competitor2Differentiator
-              } : null,
-              competitor3: data.competitor3Name ? {
-                name: data.competitor3Name,
-                size: data.competitor3Size,
-                threat: data.competitor3Threat,
-                differentiator: data.competitor3Differentiator
-              } : null
-            } : null
-          }
-        ]);
+          .from('startups')
+          .insert(profileData);
 
-      if (insertError) throw insertError;
-      
-      // 3. Show success toast and redirect to dashboard
-      toast.success("Registration Successful! Welcome to RISE.");
-      
-      // Set a timestamp for the registration to show welcome experience
+      if (insertError) {
+          console.error("Insert Error:", insertError);
+          throw new Error(`Failed to save startup profile: ${insertError.message}`);
+      }
+
+      console.log("Startup profile inserted successfully.");
+      toast.dismiss(loadingToastId);
+      toast.success('Registration successful! Please check your email to verify your account.', { duration: 6000 });
+
       localStorage.setItem('registration_timestamp', Date.now().toString());
-      
-      // Redirect to dashboard immediately without waiting for email verification
-      // We'll handle the email verification status on the dashboard
-      navigate("/startup/dashboard");
+
+      navigate('/auth/check-email', { state: { email: data.email } });
+
     } catch (error: any) {
-      console.error("Error during registration:", error);
-      setSubmissionError(error.message || "An unexpected error occurred during registration.");
+      console.error("Registration process failed:", error);
+      toast.dismiss(loadingToastId);
+      let errorMessage = error.message || "An unexpected error occurred.";
+      if (errorMessage.includes("User already registered")) {
+          errorMessage = "This email address is already registered. Please try logging in.";
+      } else if (errorMessage.includes("Password should be at least 6 characters")) {
+          errorMessage = "Password must be at least 6 characters long.";
+      }
+      setSubmissionError(errorMessage);
+      toast.error(`Registration failed: ${errorMessage}`);
     }
   };
 
@@ -562,7 +522,11 @@ const AuthRegisterStartup = () => {
             <Checkbox 
               id="terms" 
               checked={agreeTerms}
-              onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+              onCheckedChange={(checked) => {
+                  const newState = checked as boolean;
+                  console.log("Terms agreed state changed:", newState);
+                  setAgreeTerms(newState);
+              }}
               className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
             />
             <label
@@ -602,24 +566,29 @@ const AuthRegisterStartup = () => {
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              type="submit"
-              disabled={isSubmitting || !agreeTerms}
-              className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed gap-2"
-            >
-              {isSubmitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30, delay: 0.1 }}
+            (() => {
+              console.log("Rendering final button - isSubmitting:", isSubmitting, "agreeTerms:", agreeTerms);
+              return (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !agreeTerms}
+                  className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed gap-2"
                 >
-                  <CheckCircle2 className="h-4 w-4" />
-                </motion.div>
-              )}
-              {isSubmitting ? "Registering..." : "Complete Registration"}
-            </Button>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30, delay: 0.1 }}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                    </motion.div>
+                  )}
+                  {isSubmitting ? "Registering..." : "Complete Registration"}
+                </Button>
+              );
+            })()
           )}
         </motion.div>
       </form>

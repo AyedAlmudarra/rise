@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "supabase": "https://esm.sh/@supabase/supabase-js@2",
+    "openai": "https://deno.land/x/openai@v4.24.1/mod.ts",
+    "std/": "https://deno.land/std@0.177.0/"
+  }
+}

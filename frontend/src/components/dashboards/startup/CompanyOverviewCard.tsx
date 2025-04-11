@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Badge, Button, Progress, Avatar, Modal, Tabs, Tooltip, Card as CardBox } from 'flowbite-react';
+import { Badge, Button, Progress, Avatar, Modal, Tabs, Tooltip, Card as CardBox, Spinner, Alert } from 'flowbite-react';
 import { 
   IconStar, IconStarFilled, IconUsers, IconBriefcase, IconArrowsRightLeft,
   IconFileAnalytics, IconClipboard, IconInfoCircle, IconBrandLinkedin, IconBrandTwitter,
@@ -7,17 +7,18 @@ import {
   IconMail, IconBell, IconChartPie, IconArrowNarrowUp, IconDeviceFloppy, IconDownload,
   IconCalendarEvent, IconCurrencyDollar, IconBooks, IconTrendingUp, IconUserCheck,
   IconTargetArrow, IconAward, IconBuildingSkyscraper, IconBrandGithub, IconDeviceAnalytics,
-  IconCloudUpload, IconArrowUpRight
+  IconCloudUpload, IconArrowUpRight, IconPresentation
 } from '@tabler/icons-react';
 import { StartupProfile } from 'src/types/database';
 
 interface CompanyOverviewCardProps {
   startupData: StartupProfile | null;
+  mockData?: any;
   isLoading: boolean;
   error: string | null;
 }
 
-const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, isLoading, error }) => {
+const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, mockData, isLoading, error }) => {
   const [isStarred, setIsStarred] = useState<boolean>(false);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('profile');
@@ -59,7 +60,22 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
   ]);
 
   if (isLoading) {
-    return <CardBox><div className="p-4 text-center">Loading company overview...</div></CardBox>;
+    return (
+      <CardBox className="animate-pulse">
+        <div className="flex items-center space-x-4 mb-4">
+          <div className="rounded-full bg-gray-300 dark:bg-gray-600 h-16 w-16"></div>
+          <div>
+            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
+          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-5/6"></div>
+          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-4/6"></div>
+        </div>
+      </CardBox>
+    );
   }
 
   if (error) {
@@ -67,12 +83,21 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
   }
 
   if (!startupData) {
-     return <CardBox><div className="p-4 text-center">No startup data available.</div></CardBox>;
+    return (
+      <CardBox>
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <IconInfoCircle size={48} className="text-gray-400 dark:text-gray-500 mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">
+            Company overview details are not available.
+          </p>
+        </div>
+      </CardBox>
+    );
   }
 
-  const logoUrl = startupData.logo_url || 'https://flowbite.com/docs/images/logo.svg';
-  const description = startupData.description || 'No company description available.';
-  
+  const { name, industry, sector, operational_stage, location_city, description, logo_url, website, linkedin_profile, pitch_deck_url } = startupData;
+
+  const logoUrlActual = logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`;
   const truncatedDescription = description.length > 120 && !showMore 
     ? `${description.substring(0, 120)}...` 
     : description;
@@ -124,8 +149,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
           <div className="px-4 pb-4 relative">
             <div className="flex flex-col sm:flex-row sm:items-end -mt-12 mb-4 gap-4">
               <Avatar
-                img={logoUrl}
-                alt={`${startupData.name || 'Company'} logo`}
+                img={logoUrlActual}
+                alt={`${name || 'Company'} logo`}
                 size="xl"
                 rounded
                 className="border-4 border-white dark:border-gray-800 shadow-md"
@@ -134,10 +159,10 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {startupData.name || 'Unnamed Company'}
+                      {name || 'Unnamed Company'}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {startupData.industry ? `${startupData.industry} company` : 'Technology startup'}
+                      {industry ? `${industry} company` : 'Technology startup'}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -151,19 +176,19 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
             </div>
             
             <div className="flex flex-wrap gap-2 mb-3">
-              {startupData.operational_stage && (
+              {operational_stage && (
                 <Badge color="indigo" size="sm" icon={IconBuildingSkyscraper}>
-                  {startupData.operational_stage}
+                  {operational_stage}
                 </Badge>
               )}
-              {startupData.sector && (
+              {sector && (
                 <Badge color="purple" size="sm" icon={IconCategory}>
-                  {startupData.sector}
+                  {sector}
                 </Badge>
               )}
-              {startupData.num_employees && (
-                <Badge color="success" size="sm" icon={IconUsers}>
-                  {startupData.num_employees}+ team members
+              {location_city && (
+                <Badge color="warning" size="sm" icon={IconMapPin}>
+                  {location_city}
                 </Badge>
               )}
               <Badge color="info" size="sm" icon={IconTargetArrow}>
@@ -207,18 +232,18 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               <div className="flex items-center text-gray-700 dark:text-gray-300">
                 <IconCategory size={18} className="mr-2 text-blue-500 flex-shrink-0" />
                 <span className="font-medium">Industry:</span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">{startupData.industry || 'N/A'}</span>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">{industry || 'N/A'}</span>
               </div>
               
               <div className="flex items-center text-gray-700 dark:text-gray-300">
                 <IconChartBar size={18} className="mr-2 text-blue-500 flex-shrink-0" />
                 <span className="font-medium">Stage:</span>
                 <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {startupData.operational_stage || 'N/A'}
-                  {startupData.operational_stage === 'Seed' && (
+                  {operational_stage || 'N/A'}
+                  {operational_stage === 'Seed' && (
                     <Badge color="purple" size="xs" className="ml-2">Early</Badge>
                   )}
-                  {startupData.operational_stage === 'Series A' && (
+                  {operational_stage === 'Series A' && (
                     <Badge color="indigo" size="xs" className="ml-2">Growing</Badge>
                   )}
                 </span>
@@ -227,84 +252,15 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               <div className="flex items-center text-gray-700 dark:text-gray-300">
                 <IconMapPin size={18} className="mr-2 text-blue-500 flex-shrink-0" />
                 <span className="font-medium">Location:</span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">{startupData.location_city || 'N/A'}</span>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">{location_city || 'N/A'}</span>
               </div>
               
               <div className="flex items-center text-gray-700 dark:text-gray-300">
                 <IconBuildingStore size={18} className="mr-2 text-blue-500 flex-shrink-0" />
                 <span className="font-medium">Sector:</span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">{startupData.sector || 'N/A'}</span>
-              </div>
-              
-              <div className="flex items-center text-gray-700 dark:text-gray-300">
-                <IconUsers size={18} className="mr-2 text-blue-500 flex-shrink-0" />
-                <span className="font-medium">Team size:</span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {startupData.num_employees || 'N/A'}
-                  {startupData.num_employees && startupData.num_employees > 10 && (
-                    <Badge color="green" size="xs" className="ml-2">Growing</Badge>
-                  )}
-                </span>
-                <Button 
-                  size="xs" 
-                  color="light" 
-                  className="ml-2" 
-                  onClick={() => setShowTeam(!showTeam)}
-                >
-                  {showTeam ? 'Hide team' : 'View team'}
-                </Button>
-              </div>
-              
-              <div className="flex items-center text-gray-700 dark:text-gray-300">
-                <IconCoin size={18} className="mr-2 text-blue-500 flex-shrink-0" />
-                <span className="font-medium">Revenue:</span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {startupData.annual_revenue ? `$${startupData.annual_revenue.toLocaleString()}` : 'N/A'}
-                </span>
-                <Tooltip content="Annual revenue from the most recent fiscal year">
-                  <IconInfoCircle size={14} className="ml-1 text-gray-400" />
-                </Tooltip>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">{sector || 'N/A'}</span>
               </div>
             </div>
-            
-            {showTeam && (
-              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-                <h4 className="text-sm font-semibold mb-2 flex items-center">
-                  <IconUserCheck size={16} className="mr-1.5 text-blue-500" />
-                  Leadership Team
-                </h4>
-                <div className="space-y-3">
-                  {teamMembers.map(member => (
-                    <div key={member.id} className="flex items-center gap-3">
-                      <Avatar img={member.avatar} size="sm" rounded />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {member.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {member.role}
-                        </p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Tooltip content="LinkedIn Profile">
-                          <button className="p-1 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <IconBrandLinkedin size={14} />
-                          </button>
-                        </Tooltip>
-                        <Tooltip content="GitHub Profile">
-                          <button className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <IconBrandGithub size={14} />
-                          </button>
-                        </Tooltip>
-                      </div>
-                    </div>
-                  ))}
-                  <Button size="xs" color="light" className="w-full">
-                    View All Team Members
-                  </Button>
-                </div>
-              </div>
-            )}
             
             <div className="grid grid-cols-2 gap-3 mt-4">
               <Button size="sm" color="light" className="w-full relative group overflow-hidden">
@@ -370,7 +326,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
           size="lg"
         >
           <Modal.Header>
-            {startupData.name || 'Company'} Profile
+            {name || 'Company'} Profile
           </Modal.Header>
           <Modal.Body>
             <Tabs
@@ -385,15 +341,15 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 <div className="space-y-4">
                   <div className="flex items-center mb-4">
                     <Avatar 
-                      img={logoUrl} 
-                      alt={`${startupData.name || 'Company'} logo`}
+                      img={logoUrlActual} 
+                      alt={`${name || 'Company'} logo`}
                       size="lg" 
                       rounded
                     />
                     <div className="ml-4">
-                      <h5 className="text-lg font-bold">{startupData.name || 'Unnamed Company'}</h5>
+                      <h5 className="text-lg font-bold">{name || 'Unnamed Company'}</h5>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {startupData.industry ? `${startupData.industry} company` : 'Technology startup'}
+                        {industry ? `${industry} company` : 'Technology startup'}
                       </p>
                     </div>
                   </div>
@@ -411,19 +367,19 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                       <ul className="space-y-2 text-sm">
                         <li className="flex">
                           <span className="font-medium w-24">Industry:</span>
-                          <span className="text-gray-600 dark:text-gray-400">{startupData.industry || 'N/A'}</span>
+                          <span className="text-gray-600 dark:text-gray-400">{industry || 'N/A'}</span>
                         </li>
                         <li className="flex">
                           <span className="font-medium w-24">Stage:</span>
-                          <span className="text-gray-600 dark:text-gray-400">{startupData.operational_stage || 'N/A'}</span>
+                          <span className="text-gray-600 dark:text-gray-400">{operational_stage || 'N/A'}</span>
                         </li>
                         <li className="flex">
                           <span className="font-medium w-24">Location:</span>
-                          <span className="text-gray-600 dark:text-gray-400">{startupData.location_city || 'N/A'}</span>
+                          <span className="text-gray-600 dark:text-gray-400">{location_city || 'N/A'}</span>
                         </li>
                         <li className="flex">
                           <span className="font-medium w-24">Sector:</span>
-                          <span className="text-gray-600 dark:text-gray-400">{startupData.sector || 'N/A'}</span>
+                          <span className="text-gray-600 dark:text-gray-400">{sector || 'N/A'}</span>
                         </li>
                       </ul>
                     </div>
@@ -528,4 +484,4 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
   );
 };
 
-export default CompanyOverviewCard; 
+export { CompanyOverviewCard }; 

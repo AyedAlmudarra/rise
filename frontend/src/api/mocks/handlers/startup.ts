@@ -40,6 +40,7 @@ const log = (message: string, data?: any) => {
 
 export const startupHandlers = [
   // Intercept GET requests to /rest/v1/startups for single record fetch by user_id
+  /* DISABLED for Task 10 to allow real profile fetching
   http.get(`${supabaseUrl}/rest/v1/startups`, ({ request }) => {
     const url = new URL(request.url);
     const selectParam = url.searchParams.get('select');
@@ -72,6 +73,7 @@ export const startupHandlers = [
     console.warn('MSW: Unmatched GET /startups request:', request.url);
     return HttpResponse.json({ error: 'MSW: Unhandled GET /startups request' }, { status: 400 });
   }),
+  */
 
   // Intercept POST requests to Supabase /rest/v1/startups
   http.post(`${supabaseUrl}/rest/v1/startups`, async ({ request }) => {

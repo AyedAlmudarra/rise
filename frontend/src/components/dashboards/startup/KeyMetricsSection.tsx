@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CardBox } from 'src/components/shared';
-import { MockKeyMetrics } from 'src/api/mocks/data/startupDashboardMockData';
+import { Card, Badge, Tooltip, Dropdown, Button, Spinner, Alert } from 'flowbite-react';
+import { StartupProfile } from '../../../types/database';
 import { 
   IconTrendingUp, IconTrendingDown, IconUser, IconTargetArrow, 
   IconUsers, IconCheck, IconEye, IconDots, IconCalendar, 
@@ -10,578 +10,189 @@ import {
 } from "@tabler/icons-react";
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
-import { Tooltip, Popover, Dropdown, Badge, Button } from 'flowbite-react';
 
-// Helper function to format numbers (moved here from dashboard)
-const formatCurrency = (value: number | null | undefined) => {
-  if (value == null) return 'N/A';
+// Helper function to format numbers
+const formatCurrency = (value: number | null | undefined): string => {
+  if (value == null || isNaN(value)) return 'N/A';
+  // Simple formatting, can enhance later (e.g., k/M for large numbers)
   return `$${value.toLocaleString()}`;
 };
 
-const formatPercentage = (value: number | null | undefined) => {
-    if (value == null) return 'N/A';
-    return `${value}%`;
+const formatNumber = (value: number | null | undefined): string => {
+  if (value == null || isNaN(value)) return 'N/A';
+  return value.toLocaleString();
+};
+
+const formatPercentage = (value: number | null | undefined): string => {
+    if (value == null || isNaN(value)) return 'N/A';
+    // Assuming value is stored as a whole number percentage (e.g., 15 for 15%)
+    return `${value.toFixed(1)}%`;
 }
 
-const KeyMetricsSection: React.FC<{ data: MockKeyMetrics }> = ({ data }) => {
-  const [timeRange, setTimeRange] = useState<'month' | 'quarter' | 'year' | 'all'>('year');
-  const [chartType, setChartType] = useState<'mixed' | 'area' | 'bar'>('mixed');
-  const [showProjections, setShowProjections] = useState(true);
-  const [expandedMetric, setExpandedMetric] = useState<string | null>(null);
-  
-  // Modern theme colors
-  const colors = {
-    primary: '#3B82F6', // Blue-500
-    success: '#10B981', // Green-500
-    danger: '#EF4444', // Red-500
-    warning: '#F59E0B', // Amber-500
-    info: '#6366F1', // Indigo-500
-    gray: {
-      light: '#F3F4F6', // Gray-100
-      medium: '#9CA3AF', // Gray-400
-      dark: '#4B5563', // Gray-600
-    },
-  };
+interface KeyMetricsSectionProps {
+    startupData: StartupProfile | null;
+    isLoading: boolean;
+}
 
-  // Enhanced mixed chart options (bar + line)
-  const mixedChartOptions: ApexOptions = {
-     chart: {
-       type: 'line',
-       fontFamily: 'Inter, system-ui, sans-serif',
-       foreColor: colors.gray.medium,
-       toolbar: { 
-         show: true,
-         tools: {
-           download: true,
-           selection: false,
-           zoom: false,
-           zoomin: false,
-           zoomout: false,
-           pan: false,
-           reset: false
-         }
-       },
-       zoom: { enabled: false },
-       height: 300,
-       stacked: false,
-       animations: {
-          enabled: true,
-          easing: 'easeinout',
-          speed: 800,
-          animateGradually: {
-              enabled: true,
-              delay: 150
-          },
-          dynamicAnimation: {
-              enabled: true,
-              speed: 350
-          }
-       },
-       dropShadow: {
-         enabled: true,
-         top: 0,
-         left: 0,
-         blur: 3,
-         opacity: 0.1,
-       },
-     },
-     colors: [colors.info, colors.danger, colors.success],
-     dataLabels: { 
-        enabled: false 
-     },
-     stroke: { 
-        curve: 'smooth', 
-        width: [4, 2, 4],
-        dashArray: [0, 0, 8]
-     },
-     grid: {
-         borderColor: 'rgba(0,0,0,0.05)',
-         strokeDashArray: 5,
-         xaxis: { lines: { show: false } },
-         yaxis: { lines: { show: true } },
-         padding: { top: 0, right: 0, bottom: 0, left: 10 },
-     },
-     legend: { 
-        show: true, 
-        position: 'top', 
-        horizontalAlign: 'right', 
-        offsetY: -10, 
-        fontSize: '12px',
-        markers: {
-          width: 10,
-          height: 10,
-          radius: 6,
-        },
-     },
-     markers: { 
-        size: 4,
-        strokeWidth: 0,
-        hover: {
-          size: 7,
-          sizeOffset: 3
-        }
-     },
-     xaxis: {
-       type: 'category',
-       categories: data.monthlyRevenue?.map(d => d.month) || [],
-       labels: {
-         style: {
-             fontSize: '12px',
-         },
-         rotateAlways: false
-       },
-       axisBorder: { show: false },
-       axisTicks: { show: false },
-     },
-     yaxis: [
-       {
-         seriesName: 'Revenue',
-         labels: {
-           style: {
-             fontSize: '12px',
-           },
-           formatter: (value) => `$${(value / 1000).toFixed(0)}k`,
-         },
-         title: {
-           text: "Revenue",
-           style: {
-             fontSize: '13px',
-             fontWeight: 500,
-             color: colors.info
-           }
-         }
-       },
-       {
-         seriesName: 'Expenses',
-         opposite: true,
-         labels: {
-           style: {
-             fontSize: '12px',
-           },
-           formatter: (value) => `$${(value / 1000).toFixed(0)}k`,
-         },
-         title: {
-           text: "Expenses",
-           style: {
-             fontSize: '13px',
-             fontWeight: 500,
-             color: colors.danger
-           }
-         }
-       }
-     ],
-     tooltip: {
-       theme: 'light',
-       x: { format: "MMM" },
-       y: { formatter: (value) => `$${value.toLocaleString()}`},
-       shared: true,
-       intersect: false,
-       marker: { show: true },
-     },
-     fill: {
-        type: ['gradient', 'solid', 'gradient'],
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.4,
-            opacityTo: 0.1,
-            stops: [0, 100]
-        }
-     },
-     plotOptions: {
-       bar: {
-         columnWidth: '50%',
-         borderRadius: 4
-       }
-     }
-   };
+const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ startupData, isLoading }) => {
+  const [timeRange, setTimeRange] = useState<'Last 30 Days' | 'Last Quarter' | 'Last Year' | 'All Time'>('Last Year');
+  // Chart state can be added later if needed
 
-  // Mixed Chart Series Data
-  const mixedChartSeries = [
+  if (isLoading) {
+      return (
+          <Card className="animate-pulse">
+              <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-4"></div>
+              <div className="grid grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, i) => (
+                      <div key={i} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 mb-2"></div>
+                          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
+                      </div>
+                  ))}
+              </div>
+          </Card>
+      );
+  }
+
+  // Although we have startupData, we might still use mockData for chart series
+  // until actual time-series data is available from the backend.
+  // For now, display direct values from startupData where available.
+
+  const metrics = [
     {
-      name: 'Revenue',
-      type: 'line',
-      data: data.monthlyRevenue?.map(d => d.value) || [],
+        title: 'Annual Revenue',
+        value: formatCurrency(startupData?.annual_revenue),
+        icon: <IconCurrencyDollar size={24} className="text-green-500" />,
+        tooltip: 'Total revenue generated in the last fiscal year.',
+        key: 'annual_revenue'
     },
     {
-      name: 'Expenses',
-      type: 'column',
-      data: data.monthlyExpenses?.map(d => d.value) || [],
+        title: 'Annual Expenses',
+        value: formatCurrency(startupData?.annual_expenses),
+        icon: <IconChartLine size={24} className="text-red-500" />,
+        tooltip: 'Total expenses incurred in the last fiscal year.',
+        key: 'annual_expenses'
     },
-    ...(showProjections ? [{
-      name: 'Projected Revenue',
-      type: 'line',
-      data: data.monthlyRevenue?.map((d, i) => {
-        // Create a projected revenue line that increases by a small percentage 
-        // each month after the current data
-        if (i < 7) return d.value;
-        return Math.round(d.value * (1 + (i-6) * 0.03));
-      }) || [],
-    }] : [])
-  ];
-
-  // Radial chart for conversion metrics
-  const conversionMetricsOptions: ApexOptions = {
-    chart: {
-      height: 200,
-      type: 'radialBar',
-      animations: {
-        enabled: true,
-        speed: 1000,
-        animateGradually: {
-          enabled: true,
-          delay: 150
-        }
-      },
-      dropShadow: {
-        enabled: true,
-        top: 0,
-        left: 0,
-        blur: 3,
-        opacity: 0.1,
-      }
+    {
+        title: 'Customer Acquisition Cost (CAC)',
+        value: formatCurrency(startupData?.kpi_cac),
+        icon: <IconTargetArrow size={24} className="text-blue-500" />,
+        tooltip: 'Average cost to acquire a new customer.',
+        key: 'kpi_cac'
     },
-    colors: [colors.success, colors.info, colors.warning],
-    plotOptions: {
-      radialBar: {
-        dataLabels: {
-          name: {
-            fontSize: '14px',
-            color: colors.gray.dark,
-            fontFamily: 'Inter, sans-serif',
-            offsetY: -10,
-          },
-          value: {
-            fontSize: '16px',
-            fontWeight: 600,
-            fontFamily: 'Inter, sans-serif',
-            formatter: function (val) {
-              return val + '%';
-            },
-          },
-          total: {
-            show: true,
-            label: 'Avg',
-            formatter: function (w) {
-              const values = w.globals.seriesTotals;
-              const avg = values.reduce((a: number, b: number) => a + b, 0) / values.length;
-              return avg.toFixed(1) + '%';
-            }
-          }
-        },
-        track: {
-          background: '#f1f5f9',
-          strokeWidth: '97%',
-          margin: 5,
-        },
-        hollow: {
-          size: '35%',
-        }
-      }
+    {
+        title: 'Customer Lifetime Value (CLV)',
+        value: formatCurrency(startupData?.kpi_clv),
+        icon: <IconUser size={24} className="text-purple-500" />,
+        tooltip: 'Predicted total profit generated from a single customer account.',
+        key: 'kpi_clv'
     },
-    labels: ['Retention', 'Conversion', 'Engagement'],
-    stroke: {
-      lineCap: 'round'
+    {
+        title: 'Customer Retention Rate',
+        value: formatPercentage(startupData?.kpi_retention_rate),
+        icon: <IconUsers size={24} className="text-teal-500" />,
+        tooltip: 'Percentage of customers retained over a specific period.',
+        key: 'kpi_retention_rate'
+    },
+    {
+        title: 'Conversion Rate',
+        value: formatPercentage(startupData?.kpi_conversion_rate),
+        icon: <IconArrowsExchange size={24} className="text-yellow-500" />,
+        tooltip: 'Percentage of users who complete a desired action (e.g., sign up, purchase).' ,
+        key: 'kpi_conversion_rate'
+    },
+     {
+        title: 'Total Customers',
+        value: formatNumber(startupData?.num_customers),
+        icon: <IconUsers size={24} className="text-cyan-500" />,
+        tooltip: 'Total number of active customers.',
+        key: 'num_customers'
+    },
+    {
+        title: 'Team Size',
+        value: formatNumber(startupData?.num_employees),
+        icon: <IconUser size={24} className="text-orange-500" />,
+        tooltip: 'Total number of full-time employees.',
+        key: 'num_employees'
     }
-  };
-
-  const conversionMetricsSeries = [
-    data.kpi_retention_rate ?? 0,
-    data.kpi_conversion_rate ?? 0,
-    ((data.kpi_retention_rate ?? 0) + (data.kpi_conversion_rate ?? 0)) / 2 // Mock engagement metric
   ];
 
-  // Function to render trend indicator with appropriate color
-  const renderTrendIndicator = (value: number | null | undefined) => {
-    if (!value) return null;
-    const isPositive = value > 0;
-    const color = isPositive ? "text-green-500" : "text-red-500";
-    const Icon = isPositive ? IconTrendingUp : IconTrendingDown;
-    return <Icon size={18} className={`ml-1 ${color}`} />;
-  };
+  const renderMetricCard = (metric: typeof metrics[0]) => {
+    const isNA = metric.value === 'N/A';
+    return (
+      <Tooltip content={metric.tooltip} placement="top" style="light">
+          <div key={metric.key} className={`p-4 rounded-lg border ${isNA ? 'border-dashed border-gray-300 dark:border-gray-600 opacity-70' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm'}`}>
+              <div className="flex items-center justify-between mb-1">
+                  <h6 className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{metric.title}</h6>
+                  {!isNA && metric.icon}
+              </div>
+              <p className={`text-2xl font-semibold ${isNA ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+                  {metric.value}
+              </p>
+              {/* Placeholder for trend/change indicator */}
+               {/* {!isNA && (
+                 <p className="text-xs text-green-500 flex items-center mt-1">
+                   <IconTrendingUp size={14} className="mr-1"/> +5.2% vs LY
+                 </p>
+               )} */}
+          </div>
+      </Tooltip>
+    );
+  }
 
-  // Time period selection menu
   const renderTimeRangeSelector = () => (
-    <div className="flex items-center">
-      <IconCalendar size={16} className="text-gray-500 mr-1.5" />
-      <select
-        value={timeRange}
-        onChange={(e) => setTimeRange(e.target.value as any)}
-        className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md text-sm px-2 py-1.5 focus:ring-blue-500 focus:border-blue-500"
-      >
-        <option value="month">This Month</option>
-        <option value="quarter">This Quarter</option>
-        <option value="year">This Year</option>
-        <option value="all">All Time</option>
-      </select>
-    </div>
+    <Dropdown label={timeRange} size="xs" color="light">
+      <Dropdown.Item onClick={() => setTimeRange('Last 30 Days')}>Last 30 Days</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTimeRange('Last Quarter')}>Last Quarter</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTimeRange('Last Year')}>Last Year</Dropdown.Item>
+      <Dropdown.Item onClick={() => setTimeRange('All Time')}>All Time</Dropdown.Item>
+    </Dropdown>
   );
 
-  // Function to render metric card with expandable details
-  const renderMetricCard = (
-    title: string, 
-    value: string | number, 
-    icon: JSX.Element,
-    trend?: number | null,
-    gradient: string = 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20',
-    details?: string
-  ) => {
-    const isExpanded = expandedMetric === title;
-    
-    return (
-      <div 
-        className={`col-span-4 bg-gradient-to-br ${gradient} rounded-xl p-4 relative transition-all duration-200 ${isExpanded ? 'shadow-md' : 'hover:shadow-md'} cursor-pointer`}
-        onClick={() => setExpandedMetric(isExpanded ? null : title)}
-      >
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-              {title}
-              {details && (
-                <Tooltip content={details}>
-                  <span><IconInfoCircle size={12} className="ml-1 text-gray-400" /></span>
-                </Tooltip>
-              )}
-            </p>
-            <p className="text-xl font-bold text-gray-800 dark:text-gray-100 mt-1 flex items-center">
-              {value}
-              {trend !== undefined && renderTrendIndicator(trend)}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-sm">
-            {icon}
-          </div>
-        </div>
-        
-        {isExpanded && details && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400">
-            <p>{details}</p>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
-    <CardBox className="md:col-span-2 relative overflow-hidden">
-      {/* Header with enhanced options */}
+    <Card>
       <div className="flex justify-between items-center mb-4">
+            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white flex items-center">
+              <IconChartBar size={20} className="mr-2 text-blue-500" /> Key Metrics
+            </h5>
         <div className="flex items-center">
-          <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center">
-            <IconChartBar size={20} className="mr-2 text-blue-500" />
-            Key Metrics
-          </h5>
-          <Badge className="ml-2" color="info" size="sm">
-            {timeRange}
-          </Badge>
-        </div>
-        
-        <div className="flex items-center space-x-3">
           {renderTimeRangeSelector()}
-          
           <Dropdown 
-            label=""
-            dismissOnClick={true}
+                    label="" // No label needed, using IconDots
+                    size="xs"
+                    placement="bottom-end"
             renderTrigger={() => (
-              <button className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                <IconDots size={18} />
-              </button>
-            )}
-          >
-            <Dropdown.Header>
-              <span className="block text-sm">Customize View</span>
-            </Dropdown.Header>
-            <Dropdown.Item onClick={() => setChartType('mixed')}>
-              {chartType === 'mixed' && "✓ "}Mixed Chart
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setChartType('area')}>
-              {chartType === 'area' && "✓ "}Area Chart
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setChartType('bar')}>
-              {chartType === 'bar' && "✓ "}Bar Chart
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => setShowProjections(!showProjections)}>
-              {showProjections ? "✓ " : ""} Show Projections
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item>
-              <IconDownload size={16} className="mr-2" />
-              Export Data
-            </Dropdown.Item>
-            <Dropdown.Item>
-              <IconMaximize size={16} className="mr-2" />
-              Full Screen
-            </Dropdown.Item>
+                        <Button size="xs" color="light" className="ml-2 p-1">
+                           <IconDots className="h-4 w-4" />
+                        </Button>
+                    )}
+                >
+                    <Dropdown.Item icon={IconDownload}>Export Data (CSV)</Dropdown.Item>
+                    <Dropdown.Item icon={IconMaximize}>View Full Report</Dropdown.Item>
+                    <Dropdown.Item icon={IconInfoCircle}>Metric Definitions</Dropdown.Item>
           </Dropdown>
         </div>
       </div>
 
-      {/* Financial summary cards */}
-      <div className="grid grid-cols-12 gap-4 mb-6">
-        {renderMetricCard(
-          'Annual Revenue', 
-          formatCurrency(data.annualRevenue), 
-          <IconCurrencyDollar size={16} className="text-blue-500" />,
-          data.revenueGrowthRate,
-          'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20',
-          'Total revenue generated over the past 12 months from all sources.'
+        {!startupData && !isLoading && (
+            <Alert color="info" icon={IconInfoCircle}>
+                Key metrics data is not yet available for this startup.
+            </Alert>
         )}
-        
-        {renderMetricCard(
-          'Customers', 
-          data.numCustomers || 'N/A', 
-          <IconUser size={16} className="text-green-500" />,
-          data.customerGrowthRate,
-          'from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20',
-          'Total number of active paying customers.'
-        )}
-        
-        {renderMetricCard(
-          'Growth Rate', 
-          formatPercentage(data.revenueGrowthRate), 
-          <IconTrendingUp size={16} className="text-purple-500" />,
-          data.revenueGrowthRate,
-          'from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20',
-          'Year-over-year revenue growth percentage.'
-        )}
-      </div>
 
-      {/* Enhanced Chart Section */}
-      <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm transition-shadow hover:shadow-md">
-        <div className="flex justify-between mb-4">
-          <div>
-            <h6 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-              <IconChartLine size={16} className="mr-1.5 text-blue-500" />
-              Revenue vs Expenses
-              <Badge color="gray" className="ml-2 px-2 py-0.5 text-xs" size="xs">
-                {timeRange === 'month' ? 'Monthly' : timeRange === 'quarter' ? 'Quarterly' : 'Annual'}
-              </Badge>
-            </h6>
-            <p className="text-xs text-gray-500 mt-1">
-              {showProjections ? 'Showing projections based on current growth trends' : 'Actual data only'}
-            </p>
-          </div>
-          
-          <div className="flex space-x-1">
-            <Button.Group>
-              <Button 
-                onClick={() => setChartType('mixed')}
-                color={chartType === 'mixed' ? 'info' : 'gray'}
-                size="xs"
-              >
-                Mixed
-              </Button>
-              <Button 
-                onClick={() => setChartType('area')}
-                color={chartType === 'area' ? 'info' : 'gray'}
-                size="xs"
-              >
-                Area
-              </Button>
-              <Button 
-                onClick={() => setChartType('bar')}
-                color={chartType === 'bar' ? 'info' : 'gray'}
-                size="xs"
-              >
-                Bar
-              </Button>
-            </Button.Group>
-          </div>
-        </div>
-        
-        <div className="p-1">
-          <Chart
-            options={mixedChartOptions}
-            series={mixedChartSeries}
-            type="line" 
-            height={300}
-            width="100%"
-          />
-        </div>
-        
-        <div className="flex justify-end mt-2">
-          <div className="inline-flex items-center text-xs text-gray-500 cursor-pointer hover:text-blue-500 transition-colors">
-            <IconArrowsExchange size={14} className="mr-1" />
-            <span onClick={() => setShowProjections(!showProjections)}>
-              {showProjections ? 'Hide Projections' : 'Show Projections'}
-            </span>
-          </div>
-        </div>
-      </div>
+        {startupData && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {metrics.map(renderMetricCard)}
+            </div>
+        )}
 
-      {/* Two-column layout for additional charts and metrics */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Left column - Conversion Metrics */}
-        <div className="col-span-12 md:col-span-5 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm transition-shadow hover:shadow-md">
-          <h6 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-            <IconChartPie size={16} className="mr-1.5 text-purple-500" />
-            Conversion Metrics
-          </h6>
-          
-          <Chart 
-            options={conversionMetricsOptions}
-            series={conversionMetricsSeries}
-            type="radialBar"
-            height={220}
-          />
-        </div>
-        
-        {/* Right column - Key Performance Indicators */}
-        <div className="col-span-12 md:col-span-7 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm transition-shadow hover:shadow-md">
-          <h6 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-            <IconTargetArrow size={16} className="mr-1.5 text-amber-500" />
-            Key Performance Indicators
-          </h6>
-          
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">CAC</p>
-                <Tooltip content="Customer Acquisition Cost - the cost to acquire a new customer">
-                  <span><IconInfoCircle size={12} className="text-gray-400" /></span>
-                </Tooltip>
-              </div>
-              <p className="font-semibold text-lg text-gray-800 dark:text-gray-200">{formatCurrency(data.kpi_cac)}</p>
-            </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">CLV</p>
-                <Tooltip content="Customer Lifetime Value - the total revenue expected from a customer">
-                  <span><IconInfoCircle size={12} className="text-gray-400" /></span>
-                </Tooltip>
-              </div>
-              <p className="font-semibold text-lg text-gray-800 dark:text-gray-200">{formatCurrency(data.kpi_clv)}</p>
-            </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">CLV:CAC Ratio</p>
-                <Tooltip content="The ratio between Customer Lifetime Value and Customer Acquisition Cost. A higher ratio is better, with 3:1 being ideal.">
-                  <span><IconInfoCircle size={12} className="text-gray-400" /></span>
-                </Tooltip>
-              </div>
-              <p className="font-semibold text-lg text-gray-800 dark:text-gray-200">
-                {data.kpi_clv && data.kpi_cac 
-                  ? ((data.kpi_clv / data.kpi_cac)).toFixed(1) + 'x'
-                  : 'N/A'}
-              </p>
-            </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">Customer Growth</p>
-                <Tooltip content="Month-over-month growth in your customer base">
-                  <span><IconInfoCircle size={12} className="text-gray-400" /></span>
-                </Tooltip>
-              </div>
-              <p className={`font-semibold text-lg flex items-center ${data.customerGrowthRate && data.customerGrowthRate > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPercentage(data.customerGrowthRate)}
-                {renderTrendIndicator(data.customerGrowthRate)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </CardBox>
+        {/* Placeholder for future charts */}
+        {/* <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h6 className="font-semibold mb-2">Revenue vs Expenses Trend</h6>
+            <Chart options={mixedChartOptions} series={mixedChartSeries} type="line" height={300} />
+        </div> */} 
+    </Card>
   );
 };
 
-export default KeyMetricsSection; 
+export { KeyMetricsSection }; 
