@@ -70,86 +70,137 @@ interface StartupRecord {
 
 // --- Helper to build the detailed analysis prompt ---
 function buildAnalysisPrompt(startupRecord: StartupRecord): string {
-    // --- This is the DETAILED prompt from analyze-startup ---
     const prompt = `
-You are an experienced Venture Capital analyst evaluating early-stage startups for potential seed investment, specifically within the Saudi Arabian market context (consider Vision 2030 alignment where applicable).
+You are an experienced Venture Capital analyst specializing in the Saudi Arabian market, evaluating early-stage startups for seed investment. Your analysis should be critical, insightful, and grounded in the provided data, considering the KSA market context (e.g., Vision 2030, local competition, user behavior) where applicable.
 
-Analyze the provided startup profile thoroughly. Based *only* on the information given, generate a structured JSON object containing the following detailed analysis components:
+Analyze the provided startup profile thoroughly. Based *only* on the information given, generate a structured JSON object containing the following detailed analysis components. Ensure the entire output is a single, valid JSON object with no surrounding text or markdown formatting:
 
-1.  **executive_summary**: A brief (2-3 sentences) paragraph summarizing the startup's core offering, target market, and overall potential from an investor's viewpoint.
-2.  **swot_analysis**: A concise SWOT analysis:
-    *   **strengths**: List 2-3 key strengths based on the profile.
-    *   **weaknesses**: List 2-3 key weaknesses or areas needing development.
-    *   **opportunities**: List 1-2 potential market or growth opportunities.
-    *   **threats**: List 1-2 potential external threats or challenges.
-3.  **funding_readiness**: An object assessing readiness for seed funding:
-    *   **score**: An overall numerical score from 0 (Not Ready) to 10 (Highly Ready).
-    *   **assessment**: A brief justification (1-2 sentences) for the score, highlighting key positive/negative factors.
-4.  **scalability_assessment**: An object assessing potential scalability:
+1.  **executive_summary**: A concise (3-4 sentences) paragraph summarizing the core problem addressed, the startup's solution, its target market within KSA, key differentiators, and overall investment potential or key concerns.
+2.  **swot_analysis**: A detailed SWOT analysis based *strictly* on the provided profile:
+    *   **strengths**: List 2-4 specific, internal strengths (string array).
+    *   **weaknesses**: List 2-4 specific, internal weaknesses or significant gaps (string array).
+    *   **opportunities**: List 2-3 specific, external market or strategic opportunities relevant to the KSA market (string array).
+    *   **threats**: List 2-3 specific, external threats or significant challenges (string array).
+3.  **market_positioning**: A brief assessment (2-3 sentences) describing the startup's current positioning within the KSA market, its target audience fit, and competitive standing based on the provided data (string).
+4.  **scalability_assessment**: An object providing a realistic assessment of scalability:
     *   **level**: Categorize potential as "Low", "Medium", or "High".
-    *   **justification**: Briefly explain the reasoning based on market size, business model, or other provided data.
-5.  **competitive_advantage_evaluation**: An object evaluating the competitive edge:
-    *   **assessment**: Briefly evaluate the described competitive advantage. Is it unique? Defensible?
-    *   **suggestion**: Offer one specific suggestion for strengthening or clarifying the competitive advantage.
-6.  **strategic_recommendations**: A list of 2-3 actionable, strategic recommendations for the startup to focus on over the next 6 months to improve its business and investor appeal.
-7.  **suggested_kpis**: A list of 2-3 specific, relevant Key Performance Indicators (KPIs) the startup should track closely at its current stage and industry, beyond any already listed.
+    *   **justification**: Explain the reasoning (2-3 sentences), referencing factors like target market size, business model, expansion potential, and operational complexity (string).
+5.  **competitive_advantage_evaluation**: An object critically evaluating the claimed competitive edge:
+    *   **assessment**: Evaluate the uniqueness, defensibility, and sustainability of the competitive advantage in the KSA context (2-3 sentences string).
+    *   **suggestion**: Offer one concrete, actionable suggestion for strengthening it (string).
+6.  **current_challenges**: List 2-4 specific, pressing challenges the startup likely faces *now* or in the *next 6 months* (string array).
+7.  **strategic_recommendations**: A list of 3 highly actionable, prioritized strategic recommendations for the *next 6 months* (string array).
+8.  **suggested_kpis**: A list of 2-3 specific, relevant KPIs the startup should track *obsessively*. Each item must be an object with:
+    *   **kpi**: The name of the Key Performance Indicator (string).
+    *   **justification**: A brief explanation (1 sentence) of *why* this KPI is critical for this specific startup at its current stage (string).
+9.  **key_risks**: List 3 significant risks (e.g., Market, Financial, Operational, Team, Competitive), briefly stating the potential impact (string array).
+10. **what_if_scenarios**: List 1-2 plausible, impactful "what if" scenarios (positive or negative) relevant to the near-term future (next 6-12 months). Each item must be an object with:
+    *   **scenario**: A specific event (string).
+    *   **outcome**: The likely positive or negative consequence (string).
+11. **growth_plan_phases**: A realistic high-level 12-month growth plan outline (4 phases: Months 1-3, 4-6, 7-9, 10-12), aligned with recommendations. Each item must be an object with:
+    *   **period**: Time period string.
+    *   **focus**: Primary strategic theme (string).
+    *   **description**: Brief key activities/goals (1-2 sentences string).
+12. **funding_outlook**: A brief commentary (2-3 sentences) on the startup's funding situation and outlook based on its profile, traction (if any), and stated needs. Comment on readiness or key milestones needed for the target raise (string).
 
-**Output MUST be a valid JSON object adhering strictly to this structure. Do not include any explanatory text outside the JSON object.**
+**Output MUST be ONLY the valid JSON object. Adhere strictly to this structure. Do not include any explanatory text or markdown formatting outside the JSON object.**
 
---- EXAMPLE START ---
-
-**Input Profile (Example):**
-
-Name: QuickBill SA
-Industry: FinTech
-Description: Mobile app for instant invoicing and payment collection for freelancers in Saudi Arabia.
-Operational Stage: MVP Launched
-Annual Revenue: 15000 SAR
-Team Size: 3
-Location: Riyadh, Saudi Arabia
-Key Metrics: CAC: 50 SAR, CLV: 300 SAR
-Founder Bio: Ex-banker with finance background.
-Competitive Advantage: First-mover focused solely on Saudi freelancer market needs.
-Funding Status: Bootstrapped (Seeking Investment: Yes)
-Target Raise: 500,000 SAR
-
-**Desired JSON Output (Example):**
-
+--- EXAMPLE JSON OUTPUT STRUCTURE START ---
 \`\`\`json
 {
-  "executive_summary": "QuickBill SA is a promising FinTech targeting the underserved Saudi freelancer market with a mobile invoicing solution. While early-stage with low revenue, its focused niche and first-mover status present potential if scalability and customer acquisition can be proven.",
+  "executive_summary": "QuickBill SA offers a mobile invoicing app for Saudi freelancers... Success hinges on rapidly proving user adoption and differentiating...",
   "swot_analysis": {
-    "strengths": ["First-mover advantage in Saudi freelancer niche", "Founder has relevant finance background", "Addresses a clear market need (invoicing/payments)"],
-    "weaknesses": ["Very low current revenue", "Small team size", "Scalability beyond freelancers unclear"],
-    "opportunities": ["Tap into growing Saudi gig economy", "Expand service offerings (e.g., expense tracking)", "Partnerships with freelance platforms"],
-    "threats": ["Competition from larger invoicing platforms expanding locally", "Regulatory changes affecting freelancers", "Slow adoption rate"]
+    "strengths": [
+      "Founder's prior finance experience",
+      "Specific focus on the underserved Saudi freelancer segment"
+    ],
+    "weaknesses": [
+      "Minimal reported revenue indicating very early traction",
+      "Small team size potentially limiting development speed"
+    ],
+    "opportunities": [
+      "Tap into the rapidly growing Saudi gig economy",
+      "Expand service offerings adjacently (e.g., expense management)"
+    ],
+    "threats": [
+      "Entry of established international invoicing platforms with localized KSA versions",
+      "Slow adoption by freelancers accustomed to traditional methods"
+    ]
   },
-  "funding_readiness": {
-    "score": 4,
-    "assessment": "Needs significant traction development. Low revenue and MVP stage indicate high risk, but clear market focus is a plus. Must demonstrate user growth and clearer financial projections."
-  },
+  "market_positioning": "QuickBill is positioning itself as a niche fintech player targeting Saudi freelancers, a growing but potentially price-sensitive market. Its success depends on proving superior value against informal methods and potential large competitors through hyper-localization.",
   "scalability_assessment": {
     "level": "Medium",
-    "justification": "The Saudi freelancer market is growing, offering medium scalability. Long-term scalability depends on expanding the product offering or geographical reach beyond the initial niche."
+    "justification": "The target Saudi freelancer market offers medium-term scalability. High scalability requires significant product evolution or expansion into adjacent SMB segments."
   },
   "competitive_advantage_evaluation": {
-    "assessment": "First-mover advantage is valuable but potentially short-lived. Needs clear differentiation beyond just being local.",
-    "suggestion": "Focus on building specific features tailored to Saudi regulations or payment methods that larger players might overlook."
+    "assessment": "The current 'first-mover' advantage in the specific Saudi freelancer niche is valuable but likely has low defensibility without deeper product features.",
+    "suggestion": "Integrate deeply with Saudi-specific payment gateways (Mada) or compliance requirements (ZATCA e-invoicing) to create a barrier to entry."
   },
+  "current_challenges": [
+    "Demonstrating significant user growth (MAU) and engagement beyond the MVP.",
+    "Converting usage into meaningful revenue streams.",
+    "Securing seed funding with limited traction."
+  ],
   "strategic_recommendations": [
-    "Focus intensely on user acquisition and demonstrating month-over-month growth in active users and transaction volume.",
-    "Develop a clear roadmap outlining product expansion beyond basic invoicing to increase CLV.",
-    "Gather detailed user feedback to validate product-market fit and identify key feature requests."
+    "Laser-focus on acquiring and retaining the first 100-500 active Saudi freelancers via local channels.",
+    "Implement robust analytics tracking key activation and retention metrics.",
+    "Develop one key feature addressing a major local pain point (e.g., simplified VAT calculation)."
   ],
   "suggested_kpis": [
-    "Monthly Active Users (MAU)",
-    "Average Revenue Per User (ARPU)",
-    "Payment Transaction Volume"
-  ]
+    {
+      "kpi": "Weekly Active Users (WAU)",
+      "justification": "Critical for tracking early engagement and product stickiness in a subscription/transaction model."
+    },
+    {
+      "kpi": "Activation Rate (% users sending first invoice within 7 days)",
+      "justification": "Measures effectiveness of onboarding and initial value proposition."
+    },
+    {
+      "kpi": "Customer Lifetime Value (CLV) to Customer Acquisition Cost (CAC) Ratio",
+      "justification": "Essential for proving a sustainable business model, needs to trend towards >3x."
+    }
+  ],
+  "key_risks": [
+    "Market Risk: Target users may be unwilling to pay or switch from existing methods.",
+    "Financial Risk: Inability to secure seed funding before bootstrapping funds are depleted.",
+    "Competitive Risk: Rapid entry by a well-funded competitor."
+  ],
+  "what_if_scenarios": [
+    {
+      "scenario": "Secures partnership with a major KSA freelance platform.",
+      "outcome": "Could significantly accelerate user acquisition and validation, boosting investor confidence."
+    },
+    {
+      "scenario": "KSA government mandates specific e-invoicing for freelancers sooner than expected.",
+      "outcome": "Major opportunity if QuickBill adapts quickly, threat if competitors are faster."
+    }
+  ],
+  "growth_plan_phases": [
+    {
+      "period": "Months 1-3",
+      "focus": "Product-Market Fit Validation",
+      "description": "Onboard initial 50-100 freelancers, gather detailed feedback, iterate core workflow."
+    },
+    {
+      "period": "Months 4-6",
+      "focus": "Initial Traction & Acquisition Testing",
+      "description": "Test 2-3 KSA-focused acquisition channels, aim for 20%+ MoM WAU growth."
+    },
+    {
+      "period": "Months 7-9",
+      "focus": "Revenue Model Validation & Funding Prep",
+      "description": "Introduce paid tier/fees, aim for first ~$1-2k MRR, finalize seed pitch deck."
+    },
+    {
+      "period": "Months 10-12",
+      "focus": "Scale Acquisition & Feature Expansion",
+      "description": "Double down on successful channels, scope/begin next key feature development."
+    }
+  ],
+  "funding_outlook": "Currently bootstrapped and actively seeking 500k SAR. With very limited traction reported, securing funding will be challenging. Needs to demonstrate significant user growth (MAU/WAU) and initial revenue validation in the next 3-6 months to improve prospects."
 }
 \`\`\`
-
---- EXAMPLE END ---
+--- EXAMPLE JSON OUTPUT STRUCTURE END ---
 
 --- CURRENT STARTUP PROFILE START ---
 
@@ -210,7 +261,7 @@ Funding Status:
 
 --- CURRENT STARTUP PROFILE END ---
 
-Now, provide the detailed JSON analysis object for the **CURRENT STARTUP PROFILE** above.
+Now, provide ONLY the valid JSON analysis object for the **CURRENT STARTUP PROFILE** above, adhering strictly to the specified structure.
 `;
     return prompt;
 }
@@ -283,7 +334,7 @@ serve(async (req: Request) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openAIKey}` },
             body: JSON.stringify({
-                model: 'gpt-3.5-turbo', // Or your preferred model
+                model: 'ft:gpt-3.5-turbo-0125:rise::BEN3P7nz', // Or your preferred model
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.5,
                 response_format: { type: "json_object" },
@@ -298,15 +349,27 @@ serve(async (req: Request) => {
         const analysisContent = aiResult.choices?.[0]?.message?.content;
         if (!analysisContent) throw new Error('No content received from OpenAI');
 
-        // 9. Parse AI Response
+        // 9. Parse AI Response (Simplified)
         let analysisJson;
         try {
-            const jsonMatch = analysisContent.match(/```json\n([\s\S]*?)\n```/);
-            const jsonString = jsonMatch ? jsonMatch[1] : analysisContent;
-            analysisJson = JSON.parse(jsonString);
+            // Directly parse the content assuming OpenAI returns valid JSON when requested
+            analysisJson = JSON.parse(analysisContent);
         } catch (parseError) {
-            console.error('Failed to parse OpenAI JSON:', analysisContent);
-            throw new Error('Failed to parse AI analysis JSON.');
+            console.error('Failed to parse OpenAI JSON response:', analysisContent);
+            console.error('Parse Error:', parseError);
+            // Attempt to extract JSON from markdown code block as a fallback
+            try {
+              const jsonMatch = analysisContent.match(/```json\n([\s\S]*?)\n```/);
+              if (jsonMatch && jsonMatch[1]) {
+                analysisJson = JSON.parse(jsonMatch[1]);
+                console.log('Successfully parsed JSON extracted from markdown.');
+              } else {
+                 throw new Error('AI response was not valid JSON and no JSON code block found.');
+              }
+            } catch (fallbackParseError) {
+               console.error('Fallback JSON extraction failed:', fallbackParseError);
+               throw new Error('Failed to parse AI analysis JSON, even after attempting extraction.');
+            }
         }
 
         // 10. Store Results in Supabase (using admin client)

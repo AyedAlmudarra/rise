@@ -35,7 +35,12 @@ import {
   IconBriefcase,
   IconTrendingUp,
   IconDotsVertical,
-  IconScale
+  IconScale,
+  IconListCheck,
+  IconMapPin,
+  IconCurrencyDollar,
+  IconTargetArrow,
+  IconAlertTriangle
 } from "@tabler/icons-react";
 
 // Import the refactored section components
@@ -44,7 +49,11 @@ import FundingReadinessSection from '../../components/dashboards/startup/Funding
 import {
     CompanyOverviewCard,
     KeyMetricsSection,
-    InvestorInterestSection
+    InvestorInterestSection,
+    FinancialPerformanceCard,
+    GrowthPlanCard,
+    // Removed imports for SwotDisplay, MarketPositioningDisplay, FundingOutlookDisplay,
+    // KpiSuggestionsDisplay, ChallengesRisksDisplay as they are now part of AIInsightsSection
 } from '../../components/dashboards/startup';
 
 // Remove Congratulations import for now unless we decide to use it
@@ -311,10 +320,10 @@ const StartupDashboard = () => {
           {/* Avatar and Name Section */}
           <div className="flex items-start md:items-center mb-4 md:mb-0">
             <div className="relative">
-              <Avatar
-                img={startupData?.logo_url || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(startupData?.name || user?.email || 'S')}&background=random&color=fff`}
-                rounded
-                size="lg"
+         <Avatar
+            img={startupData?.logo_url || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(startupData?.name || user?.email || 'S')}&background=random&color=fff`}
+            rounded
+            size="lg"
                 className="ring-4 ring-white/30 shadow-lg"
               />
               {startupData?.operational_stage && (
@@ -325,11 +334,11 @@ const StartupDashboard = () => {
             </div>
             <div className="ml-4">
               <h1 className="text-xl md:text-2xl font-bold text-white">
-                {startupData?.name || 'Startup Dashboard'}
-              </h1>
+             {startupData?.name || 'Startup Dashboard'}
+           </h1>
               <p className="text-sm text-blue-100 flex items-center">
                 {user?.user_metadata?.full_name || user?.email}
-                {!dataLoading && (
+             {!dataLoading && (
                   <span className="ml-3 flex items-center text-blue-200/70">
                     <IconRefresh 
                       size={14} 
@@ -338,10 +347,10 @@ const StartupDashboard = () => {
                     />
                     {lastUpdated.toLocaleTimeString()} 
                   </span>
-                )}
-              </p>
-            </div>
-          </div>
+             )}
+           </p>
+         </div>
+       </div>
           
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
@@ -355,20 +364,20 @@ const StartupDashboard = () => {
               <span className="hidden sm:inline">Refresh</span>
             </Button>
             
-            <div className="relative">
-              <Button
-                size="sm"
+         <div className="relative">
+                <Button
+                 size="sm"
                 className="bg-white/10 hover:bg-white/20 border-0 text-white"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
+                 onClick={() => setShowNotifications(!showNotifications)}
+                >
                 <IconBell size={15} className="mr-1" />
                 <span className="hidden sm:inline">Notifications</span>
-                {notificationCount > 0 && (
+                 {notificationCount > 0 && (
                   <div className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-semibold">
-                    {notificationCount}
-                  </div>
-                )}
-              </Button>
+                      {notificationCount}
+                    </div>
+                 )}
+                </Button>
             </div>
             
             <Dropdown 
@@ -377,15 +386,15 @@ const StartupDashboard = () => {
               renderTrigger={() => (
                 <Button size="sm" className="bg-white/10 hover:bg-white/20 border-0 text-white px-2">
                   <IconDotsVertical size={18} />
-                </Button>
-              )}
+                     </Button>
+                   )}
             >
               <Dropdown.Item icon={IconSettings}>Settings</Dropdown.Item>
               <Dropdown.Item icon={IconArrowRight}>View Profile</Dropdown.Item>
               <Dropdown.Item icon={IconDownload}>Export Data</Dropdown.Item>
             </Dropdown>
-          </div>
-        </div>
+                           </div>
+                         </div>
         
         {/* Quick Stats Row */}
         {startupData && !dataLoading && (
@@ -396,19 +405,19 @@ const StartupDashboard = () => {
                 <p className="text-lg text-white font-bold">
                   {startupData.operational_stage || 'N/A'}
                 </p>
-              </div>
+                       </div>
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-lg">
                 <p className="text-xs text-blue-100 font-medium">TEAM SIZE</p>
                 <p className="text-lg text-white font-bold">
                   {startupData.team_size || 'N/A'}
                 </p>
-              </div>
+                 </div>
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-lg">
                 <p className="text-xs text-blue-100 font-medium">CUSTOMERS</p>
                 <p className="text-lg text-white font-bold">
                   {startupData.num_customers || '0'}
                 </p>
-              </div>
+                 </div>
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-lg">
                 <p className="text-xs text-blue-100 font-medium">REVENUE</p>
                 <p className="text-lg text-white font-bold">
@@ -418,7 +427,7 @@ const StartupDashboard = () => {
             </div>
           </div>
         )}
-      </div>
+         </div>
       
       {/* Optional: Floating info/status cards */}
       {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 -mt-5 px-4">
@@ -426,7 +435,7 @@ const StartupDashboard = () => {
           <div className="flex items-center">
             <div className="mr-3 bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
               <IconChartBar size={24} className="text-blue-600 dark:text-blue-400" />
-            </div>
+       </div>
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">Funding Status</p>
               <p className="text-sm font-bold">Seeking Investment</p>
@@ -693,7 +702,7 @@ const StartupDashboard = () => {
   };
 
   // Render main UI
-  return (
+      return (
     <div className="p-4 md:p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {renderWelcomeHeader()}
 
@@ -718,8 +727,8 @@ const StartupDashboard = () => {
                   Mark all read
                 </Button>
               )}
-            </div>
-            
+                  </div>
+
             <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
               {notifications.length > 0 ? (
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -739,7 +748,7 @@ const StartupDashboard = () => {
                               notification.type === 'insight' ? 'warning' :
                               notification.type === 'funding' ? 'success' : 'gray'
                             } size="xs">{notification.type}</Badge>
-                          </div>
+                  </div>
                         </div>
                       </div>
                     </div>
@@ -758,20 +767,21 @@ const StartupDashboard = () => {
               <Button size="xs" color="light" href="#" className="w-full text-xs">
                 View all notifications <IconArrowRight size={12} className="ml-1 inline" />
               </Button>
-            </div>
+              </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Main Dashboard Content */}
       {dataLoading ? (
-        // Loading skeleton using the new DashboardCard component
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-          <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-          <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-          <DashboardCard loading={true} className="md:col-span-2 xl:col-span-1"><div /></DashboardCard>
-          <DashboardCard loading={true} className="md:col-span-2 xl:col-span-2"><div /></DashboardCard>
+        // Loading skeleton for tabs
+        <div className="grid grid-cols-1 gap-6">
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+          </div>
         </div>
       ) : dataError ? (
         <Alert color="failure" className="mb-6">
@@ -782,84 +792,216 @@ const StartupDashboard = () => {
           </Button>
         </Alert>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* Row 1 */}
-          <DashboardCard
-            title="Company Overview"
-            icon={<IconBuilding size={18} className="text-blue-500" />}
-            minHeight="min-h-[18rem]"
-            actions={
-              <Tooltip content="Edit Profile">
-                <Button size="xs" color="light" onClick={() => navigate('/startup/edit-profile')}>
-                  <IconSettings size={14} />
-                </Button>
-              </Tooltip>
-            }
-          >
-            <CompanyOverviewCard startupData={startupData} isLoading={false} error={null} />
-          </DashboardCard>
-
-          <DashboardCard
-            title="Funding Readiness"
-            icon={<IconScale size={18} className="text-indigo-500" />}
-            minHeight="min-h-[18rem]"
-            actions={
-              <Tooltip content="Recalculate Score">
-                <Button 
-                  size="xs" 
-                  color="light" 
-                  onClick={handleRefresh} 
-                  isProcessing={isRefreshing} 
-                  disabled={isRefreshing}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm">
+          <Tabs aria-label="Dashboard tabs">
+            {/* Tab 1: Overview */}
+            <Tabs.Item active title="Overview" icon={IconBuilding}>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                {/* Company Overview */}
+                <DashboardCard
+                  title="Company Overview"
+                  icon={<IconBuilding size={18} className="text-blue-500" />}
+                  minHeight="min-h-[18rem]"
+                  actions={
+                    <Tooltip content="Edit Profile">
+                      <Button size="xs" color="light" onClick={() => navigate('/startup/edit-profile')}>
+                        <IconSettings size={14} />
+                      </Button>
+                    </Tooltip>
+                  }
                 >
-                  <IconRefresh size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                </Button>
-              </Tooltip>
-            }
-          >
-            <FundingReadinessSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={handleRefresh} />
-          </DashboardCard>
+                  <CompanyOverviewCard startupData={startupData} isLoading={false} error={null} />
+                </DashboardCard>
 
-          <DashboardCard
-            title="AI Insights"
-            icon={<IconBulb size={18} className="text-yellow-500" />}
-            minHeight="min-h-[18rem]"
-            actions={
-              <Tooltip content="Request New Analysis">
-                <Button 
-                  size="xs" 
-                  color="light" 
-                  onClick={handleRefresh} 
-                  isProcessing={isRefreshing} 
-                  disabled={isRefreshing}
+                {/* 12-Month Growth Plan */}
+                <DashboardCard
+                  title="12-Month Growth Plan"
+                  icon={<IconCalendar size={18} className="text-teal-500" />}
+                  minHeight="min-h-[18rem]"
                 >
-                  <IconRefresh size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                </Button>
-              </Tooltip>
-            }
-          >
-            <AIInsightsSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={handleRefresh} />
-          </DashboardCard>
+                  <GrowthPlanCard startupData={startupData} isLoading={false} />
+                </DashboardCard>
+              </div>
+            </Tabs.Item>
 
-          {/* Row 2 */}
-          <DashboardCard
-            title="Key Metrics"
-            icon={<IconChartPie size={18} className="text-green-500" />}
-            className="md:col-span-2 xl:col-span-1"
-            minHeight="min-h-[20rem]"
-          >
-            <KeyMetricsSection startupData={startupData} isLoading={dataLoading} />
-          </DashboardCard>
+            {/* Tab 2: Analysis & AI */}
+            <Tabs.Item title="Analysis & AI" icon={IconRobot}>
+              {/* Render single card containing the consolidated AIInsightsSection */}
+              <div className="pt-4">
+                 <DashboardCard
+                    title="Comprehensive AI Analysis"
+                    icon={<IconRobot size={18} className="text-purple-500" />}
+                    minHeight="min-h-[30rem]" // Allow ample height
+                    actions={ /* Refresh button now controlled by AIInsightsSection if needed, or keep here */
+                      <Tooltip content="Request/Refresh Full Analysis">
+                        <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing}>
+                          <IconRefresh size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                        </Button>
+                      </Tooltip>
+                    }
+                  >
+                    {/* AIInsightsSection now renders everything */}
+                    <AIInsightsSection 
+                      startupData={startupData} 
+                      isLoading={dataLoading} // Pass main loading state
+                      onRefreshRequest={handleRefresh} // Allow triggering refresh
+                    />
+                  </DashboardCard>
+               </div>
+            </Tabs.Item>
 
-          {/* Row 3 */}
-          <DashboardCard
-            title="Investor Interest"
-            icon={<IconBriefcase size={18} className="text-purple-500" />}
-            className="md:col-span-2 xl:col-span-2"
-            minHeight="min-h-[20rem]"
-          >
-            <InvestorInterestSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={handleRefresh} />
-          </DashboardCard>
+            {/* Tab 3: Metrics & Performance */}
+            <Tabs.Item title="Metrics & Performance" icon={IconChartPie}>
+              {/* Use a 2-column grid for Financials and KPIs */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                 {/* Financial Performance */}
+                 <DashboardCard
+                    title="Financial Performance"
+                    icon={<IconChartBar size={18} className="text-cyan-500" />}
+                    minHeight="min-h-[20rem]"
+                 >
+                    <FinancialPerformanceCard startupData={startupData} isLoading={false} />
+                 </DashboardCard>
+
+                 {/* Key Metrics (KPIs) */}
+                 <DashboardCard
+                    title="Key Performance Indicators (KPIs)"
+                    icon={<IconChartPie size={18} className="text-green-500" />}
+                    minHeight="min-h-[20rem]"
+                 >
+                    <KeyMetricsSection startupData={startupData} isLoading={false} />
+                 </DashboardCard>
+                 {/* We can add additional metric sections here if needed */}
+            </div>
+            </Tabs.Item>
+
+            {/* Tab 4: Investor Relations */}
+            <Tabs.Item title="Investor Relations" icon={IconBriefcase}>
+              <div className="grid grid-cols-1 gap-6 pt-4">
+                <DashboardCard
+                  title="Investor Interest"
+                  icon={<IconBriefcase size={18} className="text-purple-500" />}
+                  minHeight="min-h-[20rem]"
+                >
+                  <InvestorInterestSection startupData={startupData} isLoading={false} onRefreshRequest={handleRefresh} />
+                </DashboardCard>
+                </div>
+            </Tabs.Item>
+
+            {/* Tab 5: Activity & Tasks */}
+            <Tabs.Item title="Activity & Tasks" icon={IconCalendar}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                {/* Recent Activity Timeline */}
+                <DashboardCard
+                  title="Recent Activity"
+                  icon={<IconRefresh size={18} className="text-blue-500" />}
+                  minHeight="min-h-[20rem]"
+                >
+                  <Timeline>
+                    {recentActivities.map((activity) => (
+                      <Timeline.Item key={activity.id}>
+                        <Timeline.Point />
+                        <Timeline.Content>
+                          <Timeline.Time>{activity.timestamp}</Timeline.Time>
+                          <Timeline.Title>{activity.action}</Timeline.Title>
+                          <Timeline.Body>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">By {activity.user}</span>
+                          </Timeline.Body>
+                        </Timeline.Content>
+                      </Timeline.Item>
+                    ))}
+                  </Timeline>
+                </DashboardCard>
+                
+                {/* Upcoming Tasks */}
+                <DashboardCard
+                  title="Upcoming Tasks"
+                  icon={<IconCalendar size={18} className="text-indigo-500" />}
+                  minHeight="min-h-[20rem]"
+                >
+                  <div className="space-y-3">
+                    {upcomingTasks.map((task) => (
+                      <div 
+                        key={task.id} 
+                        className={`p-3 rounded-lg border ${
+                          task.priority === 'high' 
+                            ? 'border-red-200 bg-red-50 dark:border-red-900/30 dark:bg-red-900/10' 
+                            : task.priority === 'medium'
+                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900/30 dark:bg-yellow-900/10'
+                            : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50'
+                        }`}
+                      >
+                        <div className="flex justify-between">
+                          <div>
+                            <h4 className="font-medium text-gray-800 dark:text-white text-sm">{task.title}</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{task.date}</p>
+                          </div>
+                          <div className="flex items-start">
+                            <Badge 
+                              color={task.priority === 'high' ? 'failure' : task.priority === 'medium' ? 'warning' : 'info'} 
+                              size="xs"
+                            >
+                              {task.priority}
+                            </Badge>
+                            <button className="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                              <IconCheck size={16} />
+                  </button>
+                </div>
+            </div>
+                      </div>
+                    ))}
+                    
+                    <button className="w-full py-2 text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center mt-2">
+                      <IconArrowRight size={14} className="mr-1" /> Add new task
+                    </button>
+              </div>
+                </DashboardCard>
+              </div>
+            </Tabs.Item>
+
+            {/* Tab 6: Settings */}
+            <Tabs.Item title="Settings" icon={IconSettings}>
+              <div className="grid grid-cols-1 gap-6 pt-4">
+                <DashboardCard
+                  title="Account Settings"
+                  icon={<IconSettings size={18} className="text-gray-500" />}
+                  minHeight="min-h-[20rem]"
+                >
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-800 dark:text-white">Profile Information</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Update your company details and profile</p>
+            </div>
+                      <Button size="sm" color="light" onClick={() => navigate('/startup/edit-profile')}>
+                        Edit Profile
+                      </Button>
+        </div>
+                    
+                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-800 dark:text-white">Documents</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your pitch deck and other documents</p>
+                      </div>
+                      <Button size="sm" color="light">
+                        Manage Documents
+                      </Button>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-800 dark:text-white">Account Security</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Update your password and security settings</p>
+                      </div>
+                      <Button size="sm" color="light">
+                        Security Settings
+                      </Button>
+                    </div>
+                  </div>
+                </DashboardCard>
+              </div>
+            </Tabs.Item>
+          </Tabs>
         </div>
       )}
     </div>

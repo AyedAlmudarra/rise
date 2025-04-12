@@ -79,14 +79,21 @@ export interface StartupProfile {
   seeking_investment: boolean | null;
   target_raise_amount: number | null; // Representing numeric as number
 
-  // AI/Platform Generated Fields (Optional)
-  // ai_insights?: string | null;
-  // funding_readiness_score?: number | null;
-
-  // --- NEW AI Analysis Fields ---
-  ai_analysis: Record<string, any> | null; // Use Record<string, any> for flexible JSONB
-  analysis_status: string | null;          // e.g., 'pending', 'processing', 'completed', 'failed'
+  // AI/Platform Generated Fields
+  ai_analysis: AIAnalysisData | null;        // Defined below
+  analysis_status: AnalysisStatus | null;    // Defined below
   analysis_timestamp: string | null;       // ISO 8601 timestamp string
+
+  // New fields from the code block
+  competitive_advantage_evaluation: CompetitiveAdvantageEvaluation;
+  strategic_recommendations: string[];
+  suggested_kpis: string[];
+  current_challenges?: string[];            // Added: Key challenges identified
+  what_if_scenarios?: WhatIfScenario[];   // Added: Hypothetical scenarios
+  key_risks?: string[];                    // Added: Specific risks identified
+  // Keep potentially missing older fields for backward compatibility if needed
+  // key_strengths?: string[]; // Example: Redundant if covered by SWOT
+  // market_positioning_summary?: string; // Example: Redundant if covered elsewhere
 }
 
 // Updated InvestorProfile interface to match the new SQL schema
@@ -108,7 +115,71 @@ export interface InvestorProfile {
   preferred_stage: string[] | null;      // Match SQL (text[] null)
 }
 
-// --- AI Insights Type ---
+// --- AI Analysis Structure Definitions ---
+
+// Enum for Analysis Status
+export type AnalysisStatus = 'pending' | 'processing' | 'completed' | 'failed' | null;
+
+// Structure for SWOT Analysis
+export interface SWOTAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+}
+
+// Structure for Growth Plan Phase (New)
+export interface GrowthPlanPhase {
+  period: string; // e.g., "Month 1-3"
+  focus: string; // e.g., "MVP Development & User Testing"
+  description: string; // Brief description of activities
+}
+
+// Structure for Scalability Assessment
+export interface ScalabilityAssessment {
+  level: 'Low' | 'Medium' | 'High';
+  justification: string;
+}
+
+// Structure for Competitive Advantage Evaluation
+export interface CompetitiveAdvantageEvaluation {
+  assessment: string;
+  suggestion: string;
+}
+
+// Structure for What If Scenario
+export interface WhatIfScenario {
+  scenario: string;
+  outcome: string;
+}
+
+// Structure for Suggested KPI Item (New)
+export interface SuggestedKpiItem {
+  kpi: string;
+  justification: string;
+}
+
+// Main AI Analysis Data structure (stored in startups.ai_analysis JSONB)
+export interface AIAnalysisData {
+  executive_summary?: string;
+  swot_analysis?: SWOTAnalysis;
+  growth_plan_phases?: GrowthPlanPhase[];
+  scalability_assessment?: ScalabilityAssessment;
+  competitive_advantage_evaluation?: CompetitiveAdvantageEvaluation;
+  market_positioning?: string;             // Added: Assessment of market fit/positioning
+  current_challenges?: string[];
+  strategic_recommendations?: string[];
+  suggested_kpis?: SuggestedKpiItem[];     // Modified: Array of objects with justification
+  key_risks?: string[];
+  what_if_scenarios?: WhatIfScenario[];
+  funding_outlook?: string;                // Added: Commentary on funding readiness/needs
+  // Add any other fields the AI function might return
+  [key: string]: any; // Allow for other potential fields
+}
+
+// --- Other Interface Definitions ---
+
+// AI Insight Type (Potentially for a separate insights table/view)
 // Matches the structure fetched/mocked in AIInsightsSection.tsx
 export interface AIInsight { 
     id: string; // uuid
@@ -137,4 +208,7 @@ export interface InterestedInvestor {
     has_viewed_deck: boolean;
     has_viewed_financials: boolean;
     profile_url?: string; 
-} 
+}
+
+// Combined Startup Profile (Database + potentially calculated/joined fields)
+// ... rest of the file ... 
