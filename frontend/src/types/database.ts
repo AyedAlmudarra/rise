@@ -1,56 +1,111 @@
 export interface StartupProfile {
-  // From Supabase (auto-generated)
-  id: number; // Assuming integer primary key
-  user_id: string; // Foreign key to auth.users.id (UUID)
-  created_at: string; // ISO 8601 timestamp string
+  // Core Fields
+  id: number; 
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 
-  // From AuthRegisterStartup form
+  // Basic Info
   name: string;
-  description: string;
   industry: string;
-  sector: string | null; // Optional field
-  operational_stage: string;
+  sector: string | null;
   location_city: string;
-  num_customers: number | null; // Stored as number, but can be null
+  country_of_operation: string;
+
+  // Company Details
+  description: string | null;
+  operational_stage: string | null;
   num_employees: number | null;
-  annual_revenue: number | null;
-  annual_expenses: number | null;
-  kpi_cac: number | null; // Customer Acquisition Cost
-  kpi_clv: number | null; // Customer Lifetime Value
-  kpi_retention_rate: number | null; // Percentage (0-100 or 0-1)
-  kpi_conversion_rate: number | null; // Percentage (0-100 or 0-1)
-  logo_url: string | null; // URL to Supabase Storage
-  pitch_deck_url: string | null; // URL to Supabase Storage
-  website: string | null; // Added
-  linkedin_profile: string | null; // Added
+  num_customers: number | null;
+  annual_revenue: number | null; // Representing numeric as number
+  annual_expenses: number | null; // Representing numeric as number
+  founding_date: string | null; // Representing date as string
 
-  // Add any other fields expected in the 'startups' table
-  // updated_at?: string; // Supabase might add this automatically
+  // Key Metrics
+  kpi_cac: number | null; // Representing numeric as number
+  kpi_clv: number | null; // Representing numeric as number
+  kpi_retention_rate: number | null; // Representing numeric as number
+  kpi_conversion_rate: number | null; // Representing numeric as number
+  kpi_monthly_growth: number | null; // Representing numeric as number
+  kpi_payback_period: number | null; // Representing numeric as number
+  kpi_churn_rate: number | null; // Representing numeric as number
+  kpi_nps: number | null; // Representing numeric as number
+  kpi_tam_size: string | null; // Representing text as string
+  kpi_avg_order_value: number | null; // Representing numeric as number
+  kpi_market_share: number | null; // Representing numeric as number
+  kpi_yoy_growth: number | null; // Representing numeric as number
 
-  // Fields populated by AI backend functions
-  ai_insights?: string | null; // Textual insights from OpenAI
-  funding_readiness_score?: number | null; // Calculated score (0-100)
-}
+  // Team Information
+  team_size: number | null;
+  has_co_founder: boolean | null;
 
-// You can add interfaces for other tables here as needed, e.g.:
-export interface InvestorProfile {
-  // From Supabase (auto-generated)
-  id: number; // Assuming integer primary key
-  user_id: string; // Foreign key to auth.users.id (UUID)
-  created_at: string; // ISO 8601 timestamp string
+  // Market Analysis
+  market_growth_rate: string | null;
+  market_key_trends: string | null;
+  target_customer_profile: string | null;
+  customer_pain_points: string | null;
+  market_barriers: string | null;
+  competitive_advantage: string | null;
+  competitor1_name: string | null;
+  competitor1_size: string | null;
+  competitor1_threat: string | null;
+  competitor1_differentiator: string | null;
+  competitor2_name: string | null;
+  competitor2_size: string | null;
+  competitor2_threat: string | null;
+  competitor2_differentiator: string | null;
+  competitor3_name: string | null;
+  competitor3_size: string | null;
+  competitor3_threat: string | null;
+  competitor3_differentiator: string | null;
 
-  // From AuthRegisterInvestor form
-  job_title: string | null;
-  company_name: string | null;
-  preferred_industries: string[]; // Array of strings
-  preferred_geography: string[]; // Array of strings
-  preferred_stage: string[]; // Array of strings
+  // Documents & Links
   website: string | null;
   linkedin_profile: string | null;
-  company_description: string | null; // Added from form
+  twitter_profile: string | null;
+  logo_url: string | null;
+  pitch_deck_url: string | null;
 
-  // Add any other fields expected in the 'investors' table
-  // updated_at?: string;
+  // ADDED: Founder Background Fields (using snake_case)
+  founder_name: string | null;
+  founder_title: string | null;
+  founder_education: string | null;
+  previous_startup_experience: string | null;
+  founder_bio: string | null;
+  tech_skills: Record<string, boolean> | null; // Representing jsonb as object
+
+  // Funding Status
+  current_funding: string | null;
+  seeking_investment: boolean | null;
+  target_raise_amount: number | null; // Representing numeric as number
+
+  // AI/Platform Generated Fields (Optional)
+  // ai_insights?: string | null;
+  // funding_readiness_score?: number | null;
+
+  // --- NEW AI Analysis Fields ---
+  ai_analysis: Record<string, any> | null; // Use Record<string, any> for flexible JSONB
+  analysis_status: string | null;          // e.g., 'pending', 'processing', 'completed', 'failed'
+  analysis_timestamp: string | null;       // ISO 8601 timestamp string
+}
+
+// Updated InvestorProfile interface to match the new SQL schema
+export interface InvestorProfile {
+  // Core Fields
+  id: number;
+  user_id: string;
+  created_at: string;
+  updated_at: string; // Added required field
+
+  // Profile Fields
+  job_title: string | null;
+  company_name: string | null;
+  company_description: string | null;
+  website: string | null;
+  linkedin_profile: string | null;
+  preferred_industries: string[] | null; // Match SQL (text[] null)
+  preferred_geography: string[] | null;  // Match SQL (text[] null)
+  preferred_stage: string[] | null;      // Match SQL (text[] null)
 }
 
 // --- AI Insights Type ---

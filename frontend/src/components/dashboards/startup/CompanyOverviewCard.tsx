@@ -98,9 +98,12 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
   const { name, industry, sector, operational_stage, location_city, description, logo_url, website, linkedin_profile, pitch_deck_url } = startupData;
 
   const logoUrlActual = logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`;
-  const truncatedDescription = description.length > 120 && !showMore 
-    ? `${description.substring(0, 120)}...` 
-    : description;
+  
+  const safeDescription = description ?? '';
+  const descriptionTooLong = safeDescription.length > 120;
+  const truncatedDescription = descriptionTooLong && !showMore 
+    ? `${safeDescription.substring(0, 120)}...` 
+    : safeDescription;
 
   const requiredFields: (keyof StartupProfile)[] = [
     'name', 'description', 'industry', 'sector', 'location_city', 
@@ -197,8 +200,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
             </div>
             
             <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              <p>{truncatedDescription}</p>
-              {description.length > 120 && (
+              <p>{truncatedDescription || 'No description provided.'}</p>
+              {descriptionTooLong && (
                 <button 
                   onClick={() => setShowMore(!showMore)} 
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium mt-1"
@@ -357,7 +360,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                   <div>
                     <h6 className="text-sm font-semibold mb-2">About</h6>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {description}
+                      {description || 'No description available.'}
                     </p>
                   </div>
                   

@@ -10,9 +10,9 @@ import { Calendar as CalendarComponent } from "../../../components/shadcn-ui/Def
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/shadcn-ui/Default-Ui/popover";
 import { Button } from "../../../components/shadcn-ui/Default-Ui/button";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
 import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
+import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
 
 // Define operational stages options
 const operationalStages = [
@@ -29,53 +29,17 @@ const CompanyDetailsForm: React.FC = () => {
   const { control, setValue, watch } = useFormContext<StartupRegistrationData>();
   const foundingDate = watch('foundingDate');
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
-  };
-
   return (
     <div>
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
+      <div className="mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Company Details</h2>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
           Help us understand your company's stage, operations, and growth trajectory.
         </p>
-      </motion.div>
+      </div>
       
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-8"
-      >
-        {/* Company Description Section */}
-        <motion.div 
-          variants={itemVariants}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 rounded-xl blur-md opacity-80"></div>
-          <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl border border-violet-100 dark:border-violet-900/30 p-6 shadow-sm">
+      <div className="space-y-8">
+        <Card className="relative bg-white dark:bg-gray-950 rounded-xl border border-violet-100 dark:border-violet-900/30 p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-violet-100 dark:bg-violet-900/30 rounded-full mr-3">
                 <FileText className="h-5 w-5 text-violet-600 dark:text-violet-400" />
@@ -102,25 +66,18 @@ const CompanyDetailsForm: React.FC = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    <div className="mt-2 flex items-start">
+                    <span className="mt-2 flex items-start text-sm">
                       <Info className="h-4 w-4 text-violet-500 mt-0.5 mr-2 flex-shrink-0" />
-                      <span className="text-sm">Share your company's vision, mission, and what sets you apart from competitors. This is your opportunity to make a compelling first impression. (20-500 characters)</span>
-                    </div>
+                      Share your company's vision, mission, and what sets you apart from competitors. This is your opportunity to make a compelling first impression. (20-500 characters)
+                    </span>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-        </motion.div>
+          </Card>
 
-        {/* Stage and Founding Details */}
-        <motion.div 
-          variants={itemVariants}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 rounded-xl blur-md opacity-80"></div>
-          <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl border border-indigo-100 dark:border-indigo-900/30 p-6 shadow-sm">
+        <Card className="relative bg-white dark:bg-gray-950 rounded-xl border border-indigo-100 dark:border-indigo-900/30 p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full mr-3">
                 <Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -212,16 +169,9 @@ const CompanyDetailsForm: React.FC = () => {
                 )}
               />
             </div>
-          </div>
-        </motion.div>
+          </Card>
 
-        {/* Company Size & Financials */}
-        <motion.div 
-          variants={itemVariants}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 rounded-xl blur-md opacity-80"></div>
-          <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl border border-blue-100 dark:border-blue-900/30 p-6 shadow-sm">
+        <Card className="relative bg-white dark:bg-gray-950 rounded-xl border border-blue-100 dark:border-blue-900/30 p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mr-3">
                 <LayoutGrid className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -367,7 +317,6 @@ const CompanyDetailsForm: React.FC = () => {
               />
             </div>
 
-            {/* Info note */}
             <div className="mt-5 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900/30">
               <div className="flex items-start">
                 <Info className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
@@ -376,9 +325,8 @@ const CompanyDetailsForm: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </motion.div>
-      </motion.div>
+          </Card>
+      </div>
     </div>
   );
 };

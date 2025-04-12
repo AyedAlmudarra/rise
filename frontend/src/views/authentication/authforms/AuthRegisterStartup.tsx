@@ -188,8 +188,8 @@ const AuthRegisterStartup = () => {
       website: '',
       linkedinProfile: '',
       twitterProfile: '',
-      companyLogo: null,
-      pitchDeck: null,
+      logo_url: null,
+      pitch_deck_url: null,
     }
   });
 
@@ -309,34 +309,77 @@ const AuthRegisterStartup = () => {
       const userId = authData.user.id;
       console.log("User signed up successfully:", userId);
 
-      // 2. Prepare profile data for insertion (Map form data to DB columns)
-      const profileData = {
+      // 2. Prepare profile data using EXACT database column names
+      const profileDataToInsert = {
           user_id: userId,
-          name: data.startupName,
-          description: data.companyDescription,
+          name: data.startupName, 
           industry: data.industry,
           sector: data.sector || null,
-          operational_stage: data.operationalStage,
           location_city: data.locationCity,
+          country_of_operation: data.countryOfOperation, 
+          description: data.companyDescription || null, 
+          operational_stage: data.operationalStage || null, 
+          founding_date: data.foundingDate || null, 
+          founder_name: data.founderName || null,
+          founder_title: data.founderTitle || null,
+          founder_education: data.founderEducation || null,
+          previous_startup_experience: data.previousStartupExperience || null,
+          founder_bio: data.founderBio || null,
+          tech_skills: data.techSkills || null, 
           website: data.website || null,
           linkedin_profile: data.linkedinProfile || null,
+          twitter_profile: data.twitterProfile || null,
+          logo_url: data.logo_url || null,
+          pitch_deck_url: data.pitch_deck_url || null, 
           num_employees: data.numEmployees && !isNaN(Number(String(data.numEmployees))) ? parseInt(String(data.numEmployees), 10) : null,
           num_customers: data.numCustomers && !isNaN(Number(String(data.numCustomers))) ? parseInt(String(data.numCustomers), 10) : null,
+          team_size: data.teamSize && !isNaN(Number(String(data.teamSize))) ? parseInt(String(data.teamSize), 10) : null, 
+          has_co_founder: data.hasCoFounder ?? null, 
           annual_revenue: data.annualRevenue && !isNaN(Number(String(data.annualRevenue))) ? parseFloat(String(data.annualRevenue)) : null,
           annual_expenses: data.annualExpenses && !isNaN(Number(String(data.annualExpenses))) ? parseFloat(String(data.annualExpenses)) : null,
           kpi_cac: data.kpi_cac && !isNaN(Number(String(data.kpi_cac))) ? parseFloat(String(data.kpi_cac)) : null,
           kpi_clv: data.kpi_clv && !isNaN(Number(String(data.kpi_clv))) ? parseFloat(String(data.kpi_clv)) : null,
           kpi_retention_rate: data.kpi_retention_rate && !isNaN(Number(String(data.kpi_retention_rate))) ? parseFloat(String(data.kpi_retention_rate)) : null,
           kpi_conversion_rate: data.kpi_conversion_rate && !isNaN(Number(String(data.kpi_conversion_rate))) ? parseFloat(String(data.kpi_conversion_rate)) : null,
+          kpi_monthly_growth: data.kpi_monthly_growth && !isNaN(Number(String(data.kpi_monthly_growth))) ? parseFloat(String(data.kpi_monthly_growth)) : null, 
+          kpi_payback_period: data.kpi_payback_period && !isNaN(Number(String(data.kpi_payback_period))) ? parseFloat(String(data.kpi_payback_period)) : null, 
+          kpi_churn_rate: data.kpi_churn_rate && !isNaN(Number(String(data.kpi_churn_rate))) ? parseFloat(String(data.kpi_churn_rate)) : null, 
+          kpi_nps: data.kpi_nps && !isNaN(Number(String(data.kpi_nps))) ? parseFloat(String(data.kpi_nps)) : null, 
+          kpi_tam_size: data.kpi_tam_size || null, 
+          kpi_avg_order_value: data.kpi_avg_order_value && !isNaN(Number(String(data.kpi_avg_order_value))) ? parseFloat(String(data.kpi_avg_order_value)) : null, 
+          kpi_market_share: data.kpi_market_share && !isNaN(Number(String(data.kpi_market_share))) ? parseFloat(String(data.kpi_market_share)) : null, 
+          kpi_yoy_growth: data.kpi_yoy_growth && !isNaN(Number(String(data.kpi_yoy_growth))) ? parseFloat(String(data.kpi_yoy_growth)) : null, 
+          market_growth_rate: data.marketGrowthRate || null, 
+          market_key_trends: data.marketKeyTrends || null, 
+          target_customer_profile: data.targetCustomerProfile || null, 
+          customer_pain_points: data.customerPainPoints || null, 
+          market_barriers: data.marketBarriers || null, 
+          competitive_advantage: data.competitiveAdvantage || null, 
+          competitor1_name: data.competitor1Name || null, 
+          competitor1_size: data.competitor1Size || null, 
+          competitor1_threat: data.competitor1Threat || null, 
+          competitor1_differentiator: data.competitor1Differentiator || null, 
+          competitor2_name: data.competitor2Name || null, 
+          competitor2_size: data.competitor2Size || null, 
+          competitor2_threat: data.competitor2Threat || null, 
+          competitor2_differentiator: data.competitor2Differentiator || null, 
+          competitor3_name: data.competitor3Name || null, 
+          competitor3_size: data.competitor3Size || null, 
+          competitor3_threat: data.competitor3Threat || null, 
+          competitor3_differentiator: data.competitor3Differentiator || null, 
+          current_funding: data.currentFunding || null, 
+          seeking_investment: data.seekingInvestment ?? null, 
+          target_raise_amount: data.targetRaiseAmount && !isNaN(Number(String(data.targetRaiseAmount))) ? parseFloat(String(data.targetRaiseAmount)) : null,
       };
 
-      console.log("Prepared profile data for insert:", profileData);
+      console.log("Prepared profile data for insert (using DB keys):", profileDataToInsert);
 
-      // 3. Insert into 'startups' table
+      // 3. Insert into 'startups' table using the prepared data and selecting columns
       console.log("Inserting startup profile into database...");
-      const { error: insertError } = await supabase
+      const { data: insertedData, error: insertError } = await supabase
           .from('startups')
-          .insert(profileData);
+          .insert(profileDataToInsert)
+          .select('id'); // Select at least one column to confirm insert
 
       if (insertError) {
           console.error("Insert Error:", insertError);

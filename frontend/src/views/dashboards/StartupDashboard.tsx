@@ -58,6 +58,12 @@ import {
 // const FundingReadinessSection = ...
 // const InvestorInterestSection = ...
 
+// Helper CardBox component (optional, for consistent card styling)
+const CardBox: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 h-full ${className}`}>
+        {children}
+    </div>
+);
 
 // --- Main StartupDashboard Component ---
 
@@ -137,7 +143,13 @@ const StartupDashboard = () => {
     try {
       const { data, error, status } = await supabase
         .from('startups')
-        .select('*')
+        // Explicitly select all needed columns, including the new AI ones
+        .select(`
+          *,
+          ai_analysis,
+          analysis_status,
+          analysis_timestamp 
+        `)
         .eq('user_id', user.id)
         .single();
 
@@ -193,7 +205,7 @@ const StartupDashboard = () => {
 
   // Enhanced welcome message with notification center
   const renderWelcomeHeader = () => (
-    <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+    <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
        <div className="flex items-center mb-3 sm:mb-0">
          <Avatar
             img={startupData?.logo_url || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(startupData?.name || user?.email || 'S')}&background=random&color=fff`}
@@ -297,21 +309,18 @@ const StartupDashboard = () => {
   const renderStatusIndicators = () => {
     if (dataLoading) {
       return (
-        <div className="flex justify-center items-center h-64">
-          <Spinner size="xl" color="info" aria-label="Loading dashboard data..." />
-          <p className="ml-3 text-gray-600 dark:text-gray-300">Loading dashboard...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardBox className="animate-pulse"><div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div></CardBox>
+          <CardBox className="animate-pulse"><div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div></CardBox>
+          <CardBox className="animate-pulse"><div className="h-48 bg-gray-300 dark:bg-gray-700 rounded"></div></CardBox>
+          <CardBox className="animate-pulse"><div className="h-48 bg-gray-300 dark:bg-gray-700 rounded"></div></CardBox>
+          <CardBox className="animate-pulse md:col-span-2"><div className="h-56 bg-gray-300 dark:bg-gray-700 rounded"></div></CardBox>
         </div>
       );
     }
     if (dataError) {
       return (
-        <Alert color="failure" icon={IconInfoCircle}>
-          <h3 className="font-medium">Error Loading Dashboard</h3>
-          {dataError}
-          <Button color="failure" size="xs" onClick={refreshData} className="mt-2 ml-auto">
-            Try Again <IconRefresh size={14} className="ml-1"/>
-          </Button>
-        </Alert>
+        <Alert color="failure">Error loading dashboard: {dataError}</Alert>
       );
     }
     return null;
@@ -539,181 +548,6 @@ const StartupDashboard = () => {
     );
   };
 
-  // Render the dashboard content with tabs
-  const renderDashboardTabs = () => {
-    const tabIds = ['overview', 'metrics', 'insights', 'funding', 'investors'];
-    
-    if (activeTab === 'overview') {
-      return (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-              {renderDashboardSummary()} {/* This might contain KeyMetrics now */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                  {/* Column 1: Company Overview */}
-                  <div className="lg:col-span-1">
-                      <CompanyOverviewCard 
-                          startupData={startupData} 
-                          isLoading={dataLoading} 
-                          error={dataError}
-                      />
-                  </div>
-
-                  {/* Column 2: Key Metrics & AI Insights */}
-                  <div className="lg:col-span-1 flex flex-col gap-6">
-                      <KeyMetricsSection startupData={startupData} isLoading={dataLoading} />
-                      <AIInsightsSection 
-                          startupData={startupData} 
-                          isLoading={dataLoading} 
-                          onRefreshRequest={refreshData} // Pass refresh handler
-                      /> 
-                  </div>
-
-                  {/* Column 3: Funding Readiness & Investor Interest */}
-                  <div className="lg:col-span-1 flex flex-col gap-6">
-                      <FundingReadinessSection 
-                          startupData={startupData} 
-                          isLoading={dataLoading} 
-                          onRefreshRequest={refreshData} // Pass refresh handler
-                      />
-                      <InvestorInterestSection 
-                          startupData={startupData} 
-                          isLoading={dataLoading} 
-                          onRefreshRequest={refreshData} // Pass refresh handler
-                      />
-                  </div>
-              </div>
-          </motion.div>
-      );
-    }
-    // ... other tabs ...
-  };
-
-  // Create a WelcomeModal component
-  const WelcomeModal: React.FC<{
-    show: boolean;
-    onClose: () => void;
-    startupName?: string;
-  }> = ({ show, onClose, startupName }) => {
-    const [currentStep, setCurrentStep] = useState(0);
-    const steps = [
-      {
-        title: "Welcome to Your Startup Dashboard",
-        description: "We're excited to have you on board! Let's get you started with a quick tour of your new dashboard.",
-        icon: <IconBulb size={40} className="text-yellow-500" />
-      },
-      {
-        title: "Your Company Profile",
-        description: "View and update your startup information. A complete profile attracts more investor interest.",
-        icon: <IconBuilding size={40} className="text-blue-500" />
-      },
-      {
-        title: "Performance Metrics",
-        description: "Track your key business metrics and visualize your growth over time.",
-        icon: <IconChartPie size={40} className="text-green-500" />
-      },
-      {
-        title: "AI Insights & Recommendations",
-        description: "Get personalized AI-powered insights to help grow your business.",
-        icon: <IconRobot size={40} className="text-purple-500" />
-      },
-      {
-        title: "Ready to Go!",
-        description: "Your dashboard is all set up. Explore and make the most of the RISE platform!",
-        icon: <IconArrowUp size={40} className="text-indigo-500" />
-      }
-    ];
-
-    const handleNext = () => {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        onClose();
-      }
-    };
-
-    if (!show) return null;
-
-    return (
-      <AnimatePresence>
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div 
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full overflow-hidden"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          >
-            <div className="relative h-1.5 bg-gray-100 dark:bg-gray-700">
-              <motion.div 
-                className="absolute top-0 left-0 h-full bg-blue-600 dark:bg-blue-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-            
-            <div className="px-6 pt-8 pb-6">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col items-center text-center"
-              >
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-4">
-                  {steps[currentStep].icon}
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  {steps[currentStep].title}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-8">
-                  {steps[currentStep].description.replace('{startupName}', startupName || 'there')}
-                </p>
-                
-                <div className="flex gap-3 w-full">
-                  {currentStep > 0 && (
-                    <button
-                      onClick={() => setCurrentStep(currentStep - 1)}
-                      className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-800 dark:text-gray-200 font-medium transition-colors"
-                    >
-                      Back
-                    </button>
-                  )}
-                  <button
-                    onClick={handleNext}
-                    className={`${currentStep > 0 ? 'flex-1' : 'w-full'} px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg`}
-                  >
-                    {currentStep < steps.length - 1 ? 'Next' : 'Get Started'}
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-            
-            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 flex justify-between items-center border-t border-gray-200 dark:border-gray-700">
-              <div className="flex space-x-1">
-                {steps.map((_, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => setCurrentStep(index)}
-                    className={`w-2 h-2 rounded-full ${currentStep === index ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={onClose}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
-                Skip tour
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </AnimatePresence>
-    );
-  };
-
   return (
     <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {renderWelcomeHeader()}
@@ -724,16 +558,33 @@ const StartupDashboard = () => {
         renderStatusIndicators()
       ) : (
         <>
-          {renderDashboardTabs()}
-        </>
-      )}
+          {renderDashboardSummary()}
+          {renderActivitySection()}
 
-      {showWelcomeModal && (
-        <WelcomeModal
-          show={showWelcomeModal}
-          onClose={() => setShowWelcomeModal(false)}
-          startupName={startupData?.name}
-        />
+          {/* Remove Tabs.Group and render components in a grid */}
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Row 1 */}
+              <div className="md:col-span-1">
+                  <CompanyOverviewCard startupData={startupData} isLoading={dataLoading} error={dataError} />
+              </div>
+              <div className="md:col-span-1 h-full">
+                  <FundingReadinessSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={refreshData} />
+              </div>
+
+              {/* Row 2 */}
+              <div className="md:col-span-1">
+                  <KeyMetricsSection startupData={startupData} isLoading={dataLoading} />
+              </div>
+              <div className="md:col-span-1 h-full">
+                  <AIInsightsSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={refreshData} />
+              </div>
+
+              {/* Row 3 */}
+              <div className="md:col-span-2">
+                 <InvestorInterestSection startupData={startupData} isLoading={dataLoading} onRefreshRequest={refreshData} />
+              </div>
+          </div>
+        </>
       )}
     </div>
   );

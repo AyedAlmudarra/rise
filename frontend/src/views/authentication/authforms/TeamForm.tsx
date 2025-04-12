@@ -5,7 +5,6 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { StartupRegistrationData } from '../../../types/startupRegistration';
 import { Switch } from "../../../components/shadcn-ui/Default-Ui/switch";
 import { Users, UserPlus, LightbulbIcon, AlertTriangle, User, Puzzle, Cpu, BarChart2, BadgePercent, Briefcase, Info, LucideIcon } from 'lucide-react';
-import { motion } from "framer-motion";
 import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
 import { Card, CardContent } from "../../../components/shadcn-ui/Default-Ui/card";
 
@@ -17,14 +16,8 @@ interface TeamRoleCardProps {
 }
 
 const TeamRoleCard: React.FC<TeamRoleCardProps> = ({ title, description, icon, color }) => (
-  <motion.div 
+  <div 
     className={`bg-white dark:bg-gray-900 border border-${color}-100 dark:border-${color}-900/30 rounded-lg p-3 shadow-sm`}
-    whileHover={{ 
-      scale: 1.02, 
-      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-      borderColor: `rgb(var(--${color}-400))` 
-    }}
-    transition={{ duration: 0.2 }}
   >
     <div className="flex items-start space-x-3">
       <div className={`p-2 bg-${color}-50 dark:bg-${color}-900/20 rounded-full`}>
@@ -35,31 +28,11 @@ const TeamRoleCard: React.FC<TeamRoleCardProps> = ({ title, description, icon, c
         <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
       </div>
     </div>
-  </motion.div>
+  </div>
 );
 
 const TeamForm: React.FC = () => {
   const { control } = useFormContext<StartupRegistrationData>();
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
-  };
 
   // Team roles data
   const teamRoles = [
@@ -91,31 +64,15 @@ const TeamForm: React.FC = () => {
 
   return (
     <div>
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
+      <div className="mb-8">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Team Information</h2>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
           Investors value strong teams. Tell us about the people behind your startup.
         </p>
-      </motion.div>
+      </div>
       
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-8"
-      >
-        {/* Team Size & Structure */}
-        <motion.div 
-          variants={itemVariants}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-xl blur-md opacity-80"></div>
-          <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl border border-purple-100 dark:border-purple-900/30 p-6 shadow-sm">
+      <div className="space-y-8">
+        <Card className="relative bg-white dark:bg-gray-950 rounded-xl border border-purple-100 dark:border-purple-900/30 p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
                 <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -184,16 +141,9 @@ const TeamForm: React.FC = () => {
                 )}
               />
             </div>
-          </div>
-        </motion.div>
+        </Card>
 
-        {/* Team Composition Info */}
-        <motion.div 
-          variants={itemVariants}
-          className="relative"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 rounded-xl blur-md opacity-80"></div>
-          <div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl border border-indigo-100 dark:border-indigo-900/30 p-6 shadow-sm">
+        <Card className="relative bg-white dark:bg-gray-950 rounded-xl border border-indigo-100 dark:border-indigo-900/30 p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-full mr-3">
                 <Puzzle className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
@@ -218,12 +168,7 @@ const TeamForm: React.FC = () => {
                 ))}
               </div>
               
-              <motion.div 
-                className="mt-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30 border border-yellow-200 dark:border-yellow-800/50 p-4 rounded-lg"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.4 }}
-              >
+              <div className="mt-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30 border border-yellow-200 dark:border-yellow-800/50 p-4 rounded-lg">
                 <div className="flex items-start">
                   <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-3 flex-shrink-0" />
                   <div>
@@ -233,7 +178,7 @@ const TeamForm: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
               
               <div className="flex items-start mt-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
                 <Info className="h-5 w-5 text-indigo-500 mt-0.5 mr-2 flex-shrink-0" />
@@ -242,9 +187,8 @@ const TeamForm: React.FC = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </motion.div>
-      </motion.div>
+        </Card>
+      </div>
     </div>
   );
 };

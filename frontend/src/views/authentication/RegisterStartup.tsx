@@ -11,7 +11,7 @@ import KeyMetricsForm from './authforms/KeyMetricsForm';
 import FundingForm from './authforms/FundingForm';
 import AuthInfoForm from './authforms/AuthInfoForm'; // Import new AuthInfoForm
 import { Button } from '../../components/shadcn-ui/Default-Ui/button';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, SubmitHandler, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { startupRegistrationSchema, StartupRegistrationData } from '../../types/startupRegistration'; // Import schema and type
 import { supabase } from '../../lib/supabaseClient';
@@ -141,8 +141,6 @@ const RegisterStartup = () => {
       website: '',
       linkedinProfile: '',
       twitterProfile: '',
-      companyLogo: null,
-      pitchDeck: null,
     },
   });
 
@@ -205,7 +203,7 @@ const RegisterStartup = () => {
     }
   };
 
-  const onSubmit = async (data: StartupRegistrationData) => {
+  const onSubmit: SubmitHandler<StartupRegistrationData> = async (data) => {
     setSubmissionError(null);
     
     console.log('Form Submitted', data);
@@ -223,70 +221,111 @@ const RegisterStartup = () => {
         throw new Error("Failed to create user account");
       }
       
-      // Handle file uploads (placeholders for now)
-      let logoUrl = null;
-      let pitchDeckUrl = null;
-      
-      // TODO: Implement actual file upload to Supabase Storage
-      if (data.companyLogo) {
-        // Example: logoUrl = await uploadFile(data.companyLogo, 'logos');
-        console.log('Logo file to upload:', data.companyLogo);
-      }
-      
-      if (data.pitchDeck) {
-        // Example: pitchDeckUrl = await uploadFile(data.pitchDeck, 'pitchdecks');
-        console.log('Pitch deck file to upload:', data.pitchDeck);
-      }
+      const userId = authData.user.id; // Get the new user ID
 
-      // 2. Insert startup record in database
-      const { error: insertError } = await supabase
-        .from('startups')
-        .insert([
-          {
-            user_id: authData.user.id,
-            name: data.startupName,
-            description: data.companyDescription,
-            industry: data.industry,
-            sector: data.sector,
-            operational_stage: data.operationalStage,
-            location_city: data.locationCity,
-            country: data.countryOfOperation,
-            founding_date: data.foundingDate,
-            num_employees: data.numEmployees || null,
-            num_customers: data.numCustomers || null,
-            annual_revenue: data.annualRevenue || null,
-            annual_expenses: data.annualExpenses || null,
-            team_size: data.teamSize || null,
-            has_co_founder: data.hasCoFounder,
-            website: data.website || null,
-            linkedin_profile: data.linkedinProfile || null,
-            twitter_profile: data.twitterProfile || null,
-            logo_url: logoUrl,
-            pitch_deck_url: pitchDeckUrl,
-            kpi_cac: data.kpi_cac || null,
-            kpi_clv: data.kpi_clv || null,
-            kpi_retention_rate: data.kpi_retention_rate || null,
-            kpi_conversion_rate: data.kpi_conversion_rate || null,
-            kpi_monthly_growth: data.kpi_monthly_growth || null,
-            kpi_payback_period: data.kpi_payback_period || null,
-            kpi_churn_rate: data.kpi_churn_rate || null,
-            kpi_nps: data.kpi_nps || null,
-            kpi_tam_size: data.kpi_tam_size || null,
-            kpi_avg_order_value: data.kpi_avg_order_value || null,
-            kpi_market_share: data.kpi_market_share || null,
-            kpi_yoy_growth: data.kpi_yoy_growth || null,
-            current_funding: data.currentFunding || null,
-            seeking_investment: data.seekingInvestment,
-            target_raise_amount: data.targetRaiseAmount || null,
+      // Get URLs from form data (set by DocumentsForm)
+      const logoUrl = methods.getValues('logo_url'); 
+      const pitchDeckUrl = methods.getValues('pitch_deck_url');
+
+      // --- Prepare the data object FOR THE RPC FUNCTION ---
+      const profileDataForRPC = {
+          // Basic Info
+          name: data.startupName,
+          industry: data.industry,
+          sector: data.sector || null,
+          location_city: data.locationCity,
+          country_of_operation: data.countryOfOperation,
+          // Company Details
+          description: data.companyDescription || null,
+          operational_stage: data.operationalStage || null,
+          founding_date: data.foundingDate || null, // Ensure valid date string or null
+          // Founder Background
+          founder_name: data.founderName || null,
+          founder_title: data.founderTitle || null,
+          founder_education: data.founderEducation || null,
+          previous_startup_experience: data.previousStartupExperience || null,
+          founder_bio: data.founderBio || null,
+          tech_skills: data.techSkills || null, // Pass as object
+          // Team Information
+          team_size: data.teamSize && !isNaN(Number(String(data.teamSize))) ? parseInt(String(data.teamSize), 10) : null,
+          has_co_founder: data.hasCoFounder ?? null,
+          // Documents & Links
+          website: data.website || null,
+          linkedin_profile: data.linkedinProfile || null,
+          twitter_profile: data.twitterProfile || null,
+          logo_url: logoUrl, // From getValues
+          pitch_deck_url: pitchDeckUrl, // From getValues
+          // Company Size/Financials (Parsed)
+          num_employees: data.numEmployees && !isNaN(Number(String(data.numEmployees))) ? parseInt(String(data.numEmployees), 10) : null,
+          num_customers: data.numCustomers && !isNaN(Number(String(data.numCustomers))) ? parseInt(String(data.numCustomers), 10) : null,
+          annual_revenue: data.annualRevenue && !isNaN(Number(String(data.annualRevenue))) ? parseFloat(String(data.annualRevenue)) : null,
+          annual_expenses: data.annualExpenses && !isNaN(Number(String(data.annualExpenses))) ? parseFloat(String(data.annualExpenses)) : null,
+          // Key Metrics (Parsed)
+          kpi_cac: data.kpi_cac && !isNaN(Number(String(data.kpi_cac))) ? parseFloat(String(data.kpi_cac)) : null,
+          kpi_clv: data.kpi_clv && !isNaN(Number(String(data.kpi_clv))) ? parseFloat(String(data.kpi_clv)) : null,
+          kpi_retention_rate: data.kpi_retention_rate && !isNaN(Number(String(data.kpi_retention_rate))) ? parseFloat(String(data.kpi_retention_rate)) : null,
+          kpi_conversion_rate: data.kpi_conversion_rate && !isNaN(Number(String(data.kpi_conversion_rate))) ? parseFloat(String(data.kpi_conversion_rate)) : null,
+          kpi_monthly_growth: data.kpi_monthly_growth && !isNaN(Number(String(data.kpi_monthly_growth))) ? parseFloat(String(data.kpi_monthly_growth)) : null,
+          kpi_payback_period: data.kpi_payback_period && !isNaN(Number(String(data.kpi_payback_period))) ? parseFloat(String(data.kpi_payback_period)) : null,
+          kpi_churn_rate: data.kpi_churn_rate && !isNaN(Number(String(data.kpi_churn_rate))) ? parseFloat(String(data.kpi_churn_rate)) : null,
+          kpi_nps: data.kpi_nps && !isNaN(Number(String(data.kpi_nps))) ? parseFloat(String(data.kpi_nps)) : null,
+          kpi_tam_size: data.kpi_tam_size || null,
+          kpi_avg_order_value: data.kpi_avg_order_value && !isNaN(Number(String(data.kpi_avg_order_value))) ? parseFloat(String(data.kpi_avg_order_value)) : null,
+          kpi_market_share: data.kpi_market_share && !isNaN(Number(String(data.kpi_market_share))) ? parseFloat(String(data.kpi_market_share)) : null,
+          kpi_yoy_growth: data.kpi_yoy_growth && !isNaN(Number(String(data.kpi_yoy_growth))) ? parseFloat(String(data.kpi_yoy_growth)) : null,
+          // Market Analysis
+          market_growth_rate: data.marketGrowthRate || null,
+          market_key_trends: data.marketKeyTrends || null,
+          target_customer_profile: data.targetCustomerProfile || null,
+          customer_pain_points: data.customerPainPoints || null,
+          market_barriers: data.marketBarriers || null,
+          competitive_advantage: data.competitiveAdvantage || null,
+          // Competitors
+          competitor1_name: data.competitor1Name || null,
+          competitor1_size: data.competitor1Size || null,
+          competitor1_threat: data.competitor1Threat || null,
+          competitor1_differentiator: data.competitor1Differentiator || null,
+           // Add other competitors
+          // Funding Status
+          current_funding: data.currentFunding || null,
+          seeking_investment: data.seekingInvestment ?? null,
+          target_raise_amount: data.targetRaiseAmount && !isNaN(Number(String(data.targetRaiseAmount))) ? parseFloat(String(data.targetRaiseAmount)) : null,
+      };
+
+      console.log("Calling RPC function with:", { user_id: userId, profile_data: profileDataForRPC });
+
+      // --- REPLACE the direct .insert() call with .rpc() ---
+      // const { error: insertError } = await supabase
+      //   .from('startups')
+      //   .insert([ ... profileData object ... ]); 
+      // 
+      // if (insertError) {
+      //   throw insertError;
+      // }
+      const { error: rpcError } = await supabase.rpc('register_startup_profile', {
+         p_user_id: userId,
+         profile_data: profileDataForRPC
+      });
+
+       // Check for errors from the RPC call
+       if (rpcError) {
+          console.error("RPC Error:", rpcError); // Log the specific RPC error
+           // Attempt to provide a more specific error message if possible
+          let errorMessage = `Registration failed during profile creation: ${rpcError.message}`;
+          if (rpcError.details) {
+              errorMessage += ` Details: ${rpcError.details}`;
           }
-        ]);
+          if (rpcError.hint) {
+               errorMessage += ` Hint: ${rpcError.hint}`;
+          }
+          // You might also check rpcError.code here for specific handling
+           setSubmissionError(errorMessage);
+           // Stop execution here, do not proceed to success message/redirect
+           return; 
+       }
 
-      if (insertError) {
-        throw insertError;
-      }
+      console.log('Startup registered successfully via RPC!'); // Updated log
 
-      console.log('Startup registered successfully!');
-      
       // Show success message before redirecting
       setTimeout(() => {
         navigate('/auth/auth1/login');

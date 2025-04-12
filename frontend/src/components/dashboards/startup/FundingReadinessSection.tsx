@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tooltip, Badge, Progress, Button, Accordion, Spinner, Alert } from 'flowbite-react';
 import { StartupProfile } from '../../../types/database'; // Adjust path if necessary
+import { supabase } from '../../../lib/supabaseClient'; // Import supabase client
+import { toast } from 'react-hot-toast'; // Import toast
 import {
   IconInfoCircle,
   IconFileReport,
@@ -44,13 +46,6 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
     const [readinessScore, setReadinessScore] = useState<number>(0);
     const [isRefreshing, setIsRefreshing] = useState(false); // Renamed from isRecomputing
 
-    // Update the score when startupData changes
-    useEffect(() => {
-      // Use funding_readiness_score if available, otherwise default to 0 or indicate pending
-      const score = startupData?.funding_readiness_score ?? null; // Use null to differentiate between 0 and not-yet-calculated
-      setReadinessScore(score === null ? 0 : score); // Use 0 for display if null, but logic can check for null
-    }, [startupData?.funding_readiness_score]);
-
     // --- Moved helper functions/objects INSIDE the component --- 
 
     // Define colors for the gauge chart
@@ -82,8 +77,14 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
                         offsetY: 5,
                         fontSize: '22px',
                         fontWeight: 600,
-                        // Handle null score case in formatter
-                        formatter: (val) => startupData?.funding_readiness_score === null ? '--' : `${Math.round(val)}%` 
+                        // Handle null/pending score case in formatter - use ai_analysis
+                        formatter: (val) => {
+                            const score = startupData?.ai_analysis?.funding_readiness_score;
+                            if (startupData?.analysis_status === 'completed' && typeof score === 'number') {
+                                return `${Math.round(val)}%`; // val should be the score here
+                            } 
+                            return '--%'; // Show placeholder if not completed or no score
+                        }
                     }
                 }
             }
@@ -111,9 +112,6 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
         if (score < 70) return { level: 'Medium', color: 'warning', icon: () => <IconExclamationCircle className="mr-1" size={14}/> };
         return { level: 'High', color: 'success', icon: () => <IconCheck className="mr-1" size={14}/> };
     };
-
-    // Use state for readiness level details
-    const { level: readinessLevel, color: readinessColor, icon: ReadinessIcon } = getReadinessLevel(readinessScore);
 
     // Get title and description for pitch deck status based on URL presence
     const getPitchDeckStatus = (pitchDeckUrl: string | null | undefined): { title: string; description: string; color: "failure" | "success"; icon: JSX.Element } => {
@@ -147,13 +145,39 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
 
     // Updated refresh handler to use parent function
     const handleRefresh = async () => {
-        if (onRefreshRequest) {
-            setIsRefreshing(true);
-            try {
-                await onRefreshRequest();
-            } finally {
-                setIsRefreshing(false);
+        if (!startupData?.id) {
+            toast.error("Cannot trigger analysis: Startup ID missing.");
+            return;
+        }
+
+        setIsRefreshing(true); 
+        toast.loading("Requesting new analysis & score..."); 
+
+        try {
+            const { error } = await supabase.functions.invoke('request-analysis', {
+                body: { startup_id: startupData.id },
+            });
+
+            if (error) {
+                throw error;
             }
+
+            toast.dismiss();
+            toast.success("Re-analysis requested! Score will update shortly.");
+
+            // Optional: Trigger parent refresh AFTER a short delay 
+            if (onRefreshRequest) {
+                setTimeout(() => {
+                    onRefreshRequest();
+                }, 1500); 
+            }
+
+        } catch (error: any) {
+            toast.dismiss();
+            console.error("Error requesting analysis:", error);
+            toast.error(`Failed to request score re-calculation: ${error.message || 'Unknown error'}`);
+        } finally {
+            setIsRefreshing(false); 
         }
     };
 
@@ -182,30 +206,146 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
     }
 
     const renderScoreDisplay = () => {
-        if (startupData?.funding_readiness_score === null) {
+        // Handle overall loading first
+        if (isLoading) {
             return (
-                <div className="text-center py-8">
-                    <Spinner size="md" color="info" />
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Calculating Score...</p>
+                <div className="text-center py-8 animate-pulse">
+                    <div className="h-24 w-24 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-3"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 mx-auto"></div>
                 </div>
             );
         }
-        return (
-            <div className="relative flex flex-col items-center justify-center mb-1">
-                <Chart options={gaugeOptions} series={gaugeSeries} type="radialBar" height={180} />
-                <div className="absolute bottom-4 text-center">
-                    <Badge 
-                        color={readinessColor} 
-                        icon={ReadinessIcon}
-                        size="sm"
-                        className="inline-flex items-center"
-                    >
-                        {readinessLevel} Readiness
-                    </Badge>
+        
+        // Handle no startup data
+        if (!startupData) {
+             return (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <IconInfoCircle size={32} className="mx-auto mb-2" />
+                    <p className="text-sm font-medium">No Profile Data</p>
                 </div>
-            </div>
-        );
+            );
+        }
+
+        // Handle analysis status
+        switch (startupData.analysis_status) {
+            case 'completed':
+                const score = startupData.ai_analysis?.funding_readiness_score;
+                if (typeof score === 'number') {
+                    // Recalculate gauge options/series based on the score from ai_analysis
+                    const currentReadinessScore = Math.max(0, Math.min(100, score)); // Clamp score 0-100
+                    const { level, color, icon: ReadinessIcon } = getReadinessLevel(currentReadinessScore);
+                    const currentGaugeOptions: ApexOptions = {
+                        ...gaugeOptions, // Spread base options
+                        fill: { ...gaugeOptions.fill, gradient: { ...gaugeOptions.fill?.gradient, gradientToColors: [getGaugeColor(currentReadinessScore)] } },
+                        colors: [getGaugeColor(currentReadinessScore)]
+                    };
+                    const currentGaugeSeries = [currentReadinessScore];
+
+                    return (
+                        <div className="relative flex flex-col items-center justify-center mb-1">
+                            <Chart options={currentGaugeOptions} series={currentGaugeSeries} type="radialBar" height={180} />
+                            <div className="absolute bottom-4 text-center">
+                                <Badge color={color} icon={ReadinessIcon} size="sm" className="inline-flex items-center">
+                                    {level} Readiness
+                                </Badge>
+                            </div>
+                        </div>
+                    );
+                } else {
+                    // Completed but score missing in analysis data
+                    return (
+                        <div className="text-center py-8 text-orange-500 dark:text-orange-400">
+                            <IconInfoCircle size={32} className="mx-auto mb-2" />
+                            <p className="text-sm font-medium">Score Data Missing</p>
+                            <p className="text-xs">Analysis complete, but score is unavailable.</p>
+                        </div>
+                    );
+                }
+            case 'processing':
+            case 'pending':
+                return (
+                    <div className="text-center py-8">
+                        <Spinner size="md" color="info" />
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Calculating Score...</p>
+                        {onRefreshRequest && (
+                            <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing} className="mt-3">
+                                <IconRefresh size={14} className={`mr-1 ${isRefreshing ? 'animate-spin' : ''}`}/>
+                                Check Status
+                            </Button>
+                        )}
+                    </div>
+                );
+            case 'failed':
+                 return (
+                    <div className="text-center py-8 text-red-500 dark:text-red-400">
+                        <IconX size={32} className="mx-auto mb-2" />
+                        <p className="text-sm font-medium">Score Calculation Failed</p>
+                        {onRefreshRequest && (
+                            <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing} className="mt-3">
+                                <IconRefresh size={14} className={`mr-1 ${isRefreshing ? 'animate-spin' : ''}`}/>
+                                Retry Calculation
+                            </Button>
+                        )}
+                    </div>
+                 );
+            default: // Includes null or unexpected status values
+                return (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <IconScale size={32} className="mx-auto mb-2" />
+                        <p className="text-sm font-medium">Score Not Calculated</p>
+                        <p className="text-xs">Score will be generated after initial analysis.</p>
+                        {onRefreshRequest && (
+                          <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing} className="mt-3">
+                            <IconRefresh size={14} className={`mr-1 ${isRefreshing ? 'animate-spin' : ''}`}/>
+                            Check for Score
+                          </Button>
+                        )}
+                    </div>
+                 );
+        }
     }
+
+    // Update Summary Text logic
+    const renderSummaryText = () => {
+        if (isLoading || !startupData) return null; // Don't show text if loading or no data
+
+        switch (startupData.analysis_status) {
+            case 'completed':
+                const score = startupData.ai_analysis?.funding_readiness_score;
+                if (typeof score === 'number') {
+                    return (
+                        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4 px-2">
+                           {getReadinessSummary(Math.max(0, Math.min(100, score)))}
+                        </p>
+                    );
+                } else {
+                     return (
+                        <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-4 px-2 italic">
+                           Score data missing from analysis.
+                        </p>
+                    );
+                }
+            case 'processing':
+            case 'pending':
+                 return (
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4 px-2">
+                       Score analysis is in progress...
+                    </p>
+                );
+             case 'failed':
+                  return (
+                    <p className="text-center text-sm text-red-500 dark:text-red-400 mb-4 px-2">
+                       Failed to calculate score.
+                    </p>
+                );
+            default:
+                 return (
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4 px-2">
+                       Readiness score will be calculated soon.
+                    </p>
+                );
+        }
+    };
 
     return (
         <Card className="h-full flex flex-col">
@@ -215,10 +355,10 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
                   <IconScale size={18} className="mr-2 text-indigo-500" /> Funding Readiness
                 </h5>
                 {onRefreshRequest && (
-                    <Tooltip content="Refresh Score and Data">
-                        <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing}>
+                    <Tooltip content="Request New Analysis & Score">
+                        <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing || isLoading}>
                             <IconRefresh size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                            <span className="ml-1 hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                            <span className="ml-1 hidden sm:inline">{isRefreshing ? 'Requesting...' : 'Re-Analyze'}</span>
                         </Button>
                     </Tooltip>
                 )}
@@ -230,13 +370,8 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
                 {/* Score Display */} 
                 {renderScoreDisplay()}
 
-                {/* Summary Text */} 
-                <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4 px-2">
-                    {startupData?.funding_readiness_score === null 
-                        ? "Score analysis is in progress based on your profile data."
-                        : getReadinessSummary(readinessScore)
-                    }
-                </p>
+                {/* Summary Text - Use the new render function */}
+                {renderSummaryText()}
 
                 {/* Readiness Checklist/Recommendations */} 
                 <div className="mt-auto">
@@ -248,16 +383,15 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
                             <Accordion.Content className="pt-2 pb-0 px-2">
                                 <ul className="divide-y divide-gray-200 dark:divide-gray-700 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                                     {recommendations.map((item) => (
-                                        <li key={item.id} className="py-2 flex justify-between items-center">
+                                        <li key={item.id} className="py-2.5 flex items-center justify-between">
                                             <div className="flex items-center">
                                                 {item.completed ? 
-                                                    <IconCheck size={16} className="text-green-500 mr-2" /> : 
-                                                    <IconX size={16} className="text-red-500 mr-2" />
+                                                    <IconCheck size={16} className="text-green-500 mr-2 flex-shrink-0" /> : 
+                                                    <IconListCheck size={16} className="text-gray-400 mr-2 flex-shrink-0" />
                                                 }
-                                                <span className={`text-xs ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-gray-300'}`}>{item.title}</span>
+                                                <span className={`text-xs ${item.completed ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-800 dark:text-gray-200'}`}>{item.title}</span>
                                             </div>
-                                            {/* Optionally add links/buttons later */} 
-                                            {/* <Button size="xs" color="light" href={item.link} target="_blank" rel="noopener noreferrer">View</Button> */} 
+                                            <Badge color={item.priority === 'High' ? 'failure' : item.priority === 'Medium' ? 'warning' : 'gray'} size="xs">{item.priority}</Badge>
                                         </li>
                                     ))}
                                 </ul>

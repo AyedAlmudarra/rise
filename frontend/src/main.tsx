@@ -9,12 +9,20 @@ import { DashboardContextProvider } from './context/DashboardContext/DashboardCo
 import { AuthProvider } from './context/AuthContext';
 
 async function deferRender(){
-  const {worker} = await import("./api/mocks/browser.ts");
-  return worker.start({
-    onUnhandledRequest: 'bypass',
-  });
+  // Check environment variable
+  if (import.meta.env.VITE_ENABLE_MOCKS === 'true') { 
+    console.log("Mocking enabled, starting MSW worker...");
+    const { worker } = await import("./api/mocks/browser.ts");
+    // Start the worker and return its promise
+    return worker.start({
+      onUnhandledRequest: 'bypass',
+    });
+  } else {
+    // If mocks are not enabled, return a resolved promise immediately
+    console.log("Mocking disabled.");
+    return Promise.resolve(); 
+  }
 }
-
 
 deferRender().then(() => {
   createRoot(document.getElementById('root')!).render(
