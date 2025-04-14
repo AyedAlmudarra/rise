@@ -40,21 +40,15 @@ import {
   IconMapPin,
   IconCurrencyDollar,
   IconTargetArrow,
-  IconAlertTriangle
+  IconAlertTriangle,
+  IconCalendarEvent
 } from "@tabler/icons-react";
 
 // Import the refactored section components
-import AIInsightsSection from '../../components/dashboards/startup/AIInsightsSection';
-import FundingReadinessSection from '../../components/dashboards/startup/FundingReadinessSection';
 import {
-    CompanyOverviewCard,
-    KeyMetricsSection,
-    InvestorInterestSection,
-    FinancialPerformanceCard,
-    GrowthPlanCard,
-    // Removed imports for SwotDisplay, MarketPositioningDisplay, FundingOutlookDisplay,
-    // KpiSuggestionsDisplay, ChallengesRisksDisplay as they are now part of AIInsightsSection
-} from '../../components/dashboards/startup';
+  CompanyOverviewCard,
+  InvestorInterestSection,
+} from "../../components/dashboards/startup";
 
 // Remove Congratulations import for now unless we decide to use it
 // import Congratulations from '../../components/dashboards/analytics/Congratulations';
@@ -144,11 +138,13 @@ const StartupDashboard = () => {
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   
   // Generate dynamic mock data based on the fetched startup profile
   const [mockData, setMockData] = useState(mockStartupData);
   
+  // ++ Add State for Parsed Analysis Data ++
+  // const [parsedAnalysisData, setParsedAnalysisData] = useState<any | null>(null); // <-- Removed
+
   // Update mock data whenever startupData changes
   useEffect(() => {
     if (startupData) {
@@ -195,6 +191,37 @@ const StartupDashboard = () => {
     }
   }, [user]);
 
+  // ++ Add useEffect to parse analysis data when startupData changes ++
+  // useEffect(() => { // <-- Removed Block Start
+  //   if (startupData && startupData.ai_analysis) {
+  //     try {
+  //       // Check if ai_analysis is already an object (it might be if fetched directly)
+  //       if (typeof startupData.ai_analysis === 'object') {
+  //         setParsedAnalysisData(startupData.ai_analysis);
+  //         console.log("AI Analysis data is already an object:", startupData.ai_analysis); // Debug log
+  //       } else if (typeof startupData.ai_analysis === 'string') {
+  //         // Attempt to parse if it's a string
+  //         const parsed = JSON.parse(startupData.ai_analysis);
+  //         setParsedAnalysisData(parsed);
+  //         console.log("Successfully parsed AI Analysis JSON string:", parsed); // Debug log
+  //       } else {
+  //         // Handle unexpected type
+  //         console.warn("ai_analysis is neither object nor string:", typeof startupData.ai_analysis);
+  //         setParsedAnalysisData({ error: "Unexpected analysis data format." });
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to parse ai_analysis JSON:", error);
+  //       console.error("Raw data received:", startupData.ai_analysis); // Log raw data on error
+  //       // Store the error state or specific error message
+  //       const errorMessage = error instanceof Error ? error.message : "Unknown parsing error";
+  //       setParsedAnalysisData({ error: `Failed to parse analysis data. Details: ${errorMessage}` }); 
+  //     }
+  //   } else {
+  //     // console.log("No startupData or ai_analysis field found, clearing parsed data."); // Debug log - can be verbose
+  //     setParsedAnalysisData(null); // Clear if no analysis data
+  //   }
+  // }, [startupData]); // <-- Removed Block End
+
   const fetchStartupData = async () => {
     if (!user) {
       setDataLoading(false);
@@ -205,15 +232,10 @@ const StartupDashboard = () => {
     setDataError(null);
 
     try {
+      // Simplified select, no longer need AI fields here
       const { data, error, status } = await supabase
         .from('startups')
-        // Explicitly select all needed columns, including the new AI ones
-        .select(`
-          *,
-          ai_analysis,
-          analysis_status,
-          analysis_timestamp 
-        `)
+        .select('*') 
         .eq('user_id', user.id)
         .single();
 
@@ -223,17 +245,12 @@ const StartupDashboard = () => {
 
       if (data) {
         setStartupData(data);
-        // If this is the first time fetching data after registration
-        // Set isNewUser flag for welcome experience
         if (isNewUser) {
-          toast.success("Welcome to your RISE dashboard!", {
-            icon: "🚀"
-          });
+          toast.success("Welcome to your RISE dashboard!", { icon: "🚀" });
         }
       } else {
         setStartupData(null);
         if (isNewUser) {
-          // Handle case where startup profile was created but not found
           toast.error("There was an issue loading your profile. Please contact support.");
         }
       }
@@ -249,15 +266,13 @@ const StartupDashboard = () => {
   };
 
   const refreshData = useCallback(async () => {
-    // Show loading toast
     toast.loading("Refreshing dashboard data...");
-    
     try {
       await fetchStartupData();
-      toast.dismiss(); // Clear loading toast
+      toast.dismiss();
       toast.success("Dashboard data refreshed!", { id: 'refresh-success' });
     } catch (error) {
-      toast.dismiss(); // Clear loading toast
+      toast.dismiss();
       toast.error("Failed to refresh data");
     }
   }, []);
@@ -268,41 +283,41 @@ const StartupDashboard = () => {
   };
 
   // Handling refresh requests from child components
-  const handleRefresh = async () => {
-    // Called by child components to request a new analysis
-    if (!startupData?.id) {
-      toast.error("Cannot trigger analysis: Startup ID missing.");
-      return;
-    }
+  // const handleRefresh = async () => { // <-- Removed Block Start
+  //   // Called by child components to request a new analysis
+  //   if (!startupData?.id) {
+  //     toast.error("Cannot trigger analysis: Startup ID missing.");
+  //     return;
+  //   }
 
-    setIsRefreshing(true);
-    toast.loading("Requesting new AI analysis...");
+  //   setIsRefreshing(true);
+  //   toast.loading("Requesting new AI analysis...");
 
-    try {
-      const { error } = await supabase.functions.invoke('request-analysis', {
-        body: { startup_id: startupData.id },
-      });
+  //   try {
+  //     const { error } = await supabase.functions.invoke('request-analysis', {
+  //       body: { startup_id: startupData.id },
+  //     });
 
-      if (error) {
-        throw error;
-      }
+  //     if (error) {
+  //       throw error;
+  //     }
 
-      toast.dismiss();
-      toast.success("Analysis requested! Check back shortly.");
+  //     toast.dismiss();
+  //     toast.success("Analysis requested! Check back shortly.");
 
-      // Refresh data after a short delay
-      setTimeout(() => {
-        refreshData();
-      }, 1500);
+  //     // Refresh data after a short delay
+  //     setTimeout(() => {
+  //       refreshData();
+  //     }, 1500);
 
-    } catch (error: any) {
-      toast.dismiss();
-      console.error("Error requesting analysis:", error);
-      toast.error(`Failed to request analysis: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  //   } catch (error: any) {
+  //     toast.dismiss();
+  //     console.error("Error requesting analysis:", error);
+  //     toast.error(`Failed to request analysis: ${error.message || 'Unknown error'}`);
+  //   } finally {
+  //     setIsRefreshing(false);
+  //   }
+  // }; // <-- Removed Block End
 
   // Enhanced welcome message with quick stats
   const renderWelcomeHeader = () => (
@@ -701,8 +716,91 @@ const StartupDashboard = () => {
     );
   };
 
-  // Render main UI
+  const renderDashboardContent = () => {
+    if (dataLoading && !startupData) {
       return (
+         <div className="grid grid-cols-1 gap-6">
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
+          </div>
+        </div>
+      );
+    }
+
+    if (dataError) {
+      return (
+        <Alert color="failure" className="mb-6">
+          <div className="font-medium">Error loading dashboard data</div>
+          <div className="mt-1 text-sm">{dataError}</div>
+          <Button color="failure" size="xs" onClick={refreshData} className="mt-2">
+            Try Again <IconRefresh size={14} className="ml-1"/>
+          </Button>
+        </Alert>
+      );
+    }
+
+    if (!startupData) {
+      return (
+        <div className="text-center py-10">
+          <p className="text-gray-500 dark:text-gray-400">No startup profile data found.</p>
+          {/* Optionally add a button to create profile or contact support */}
+        </div>
+      );
+    }
+
+    return (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm">
+          <Tabs aria-label="Dashboard tabs">
+             {/* Tab 1: Overview */}
+            <Tabs.Item active={activeTab === 'overview'} title="Overview" icon={IconBuilding}>
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                 <DashboardCard title="Company Overview" icon={<IconBuilding size={18} />} minHeight="min-h-[18rem]">
+                    <CompanyOverviewCard 
+                      startupData={startupData} 
+                      isLoading={dataLoading} 
+                      error={dataError} 
+                    />
+                 </DashboardCard>
+                 <div className="lg:col-span-2">
+                    <DashboardCard title="Investor Interest" icon={<IconBriefcase size={18} />} minHeight="min-h-[18rem]">
+                        <InvestorInterestSection startupData={startupData} isLoading={dataLoading} />
+                    </DashboardCard>
+                </div>
+              </div>
+            </Tabs.Item>
+
+            {/* Tab 3: Metrics & Performance */}  
+            <Tabs.Item active={activeTab === 'metrics'} title="Metrics & Performance" icon={IconChartPie}>
+              <div className="pt-4 text-center text-gray-500">
+                Metrics & Performance data coming soon...
+              </div>
+            </Tabs.Item>
+             {/* Tab 4: Investor Relations */}  
+            <Tabs.Item active={activeTab === 'investors'} title="Investor Relations" icon={IconBriefcase}>
+              <div className="pt-4 text-center text-gray-500">
+                Investor Relations tools coming soon...
+              </div>
+            </Tabs.Item>
+             {/* Tab 5: Activity & Tasks */}  
+            <Tabs.Item active={activeTab === 'activity'} title="Activity & Tasks" icon={IconCalendarEvent}>
+              {renderActivitySection()} 
+            </Tabs.Item>
+             {/* Tab 6: Settings */}  
+            <Tabs.Item active={activeTab === 'settings'} title="Settings" icon={IconSettings}>
+              <div className="pt-4 text-center text-gray-500">
+                Settings page coming soon...
+              </div>
+            </Tabs.Item>
+
+          </Tabs>
+        </div>
+    );
+  };
+
+  return (
     <div className="p-4 md:p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {renderWelcomeHeader()}
 
@@ -727,7 +825,7 @@ const StartupDashboard = () => {
                   Mark all read
                 </Button>
               )}
-                  </div>
+            </div>
 
             <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
               {notifications.length > 0 ? (
@@ -748,7 +846,7 @@ const StartupDashboard = () => {
                               notification.type === 'insight' ? 'warning' :
                               notification.type === 'funding' ? 'success' : 'gray'
                             } size="xs">{notification.type}</Badge>
-                  </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -767,243 +865,20 @@ const StartupDashboard = () => {
               <Button size="xs" color="light" href="#" className="w-full text-xs">
                 View all notifications <IconArrowRight size={12} className="ml-1 inline" />
               </Button>
-              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main Dashboard Content */}
-      {dataLoading ? (
-        // Loading skeleton for tabs
-        <div className="grid grid-cols-1 gap-6">
-          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-            <DashboardCard loading={true} minHeight="min-h-[18rem]"><div /></DashboardCard>
-          </div>
-        </div>
-      ) : dataError ? (
-        <Alert color="failure" className="mb-6">
-          <div className="font-medium">Error loading dashboard data</div>
-          <div className="mt-1 text-sm">{dataError}</div>
-          <Button color="failure" size="xs" onClick={refreshData} className="mt-2">
-            Try Again <IconRefresh size={14} className="ml-1"/>
-          </Button>
-        </Alert>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm">
-          <Tabs aria-label="Dashboard tabs">
-            {/* Tab 1: Overview */}
-            <Tabs.Item active title="Overview" icon={IconBuilding}>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                {/* Company Overview */}
-                <DashboardCard
-                  title="Company Overview"
-                  icon={<IconBuilding size={18} className="text-blue-500" />}
-                  minHeight="min-h-[18rem]"
-                  actions={
-                    <Tooltip content="Edit Profile">
-                      <Button size="xs" color="light" onClick={() => navigate('/startup/edit-profile')}>
-                        <IconSettings size={14} />
-                      </Button>
-                    </Tooltip>
-                  }
-                >
-                  <CompanyOverviewCard startupData={startupData} isLoading={false} error={null} />
-                </DashboardCard>
+      {/* Quick Actions */} 
+      {renderQuickActions()}
 
-                {/* 12-Month Growth Plan */}
-                <DashboardCard
-                  title="12-Month Growth Plan"
-                  icon={<IconCalendar size={18} className="text-teal-500" />}
-                  minHeight="min-h-[18rem]"
-                >
-                  <GrowthPlanCard startupData={startupData} isLoading={false} />
-                </DashboardCard>
-              </div>
-            </Tabs.Item>
+      {/* Dashboard Summary Cards */} 
+      {renderDashboardSummary()}
 
-            {/* Tab 2: Analysis & AI */}
-            <Tabs.Item title="Analysis & AI" icon={IconRobot}>
-              {/* Render single card containing the consolidated AIInsightsSection */}
-              <div className="pt-4">
-                 <DashboardCard
-                    title="Comprehensive AI Analysis"
-                    icon={<IconRobot size={18} className="text-purple-500" />}
-                    minHeight="min-h-[30rem]" // Allow ample height
-                    actions={ /* Refresh button now controlled by AIInsightsSection if needed, or keep here */
-                      <Tooltip content="Request/Refresh Full Analysis">
-                        <Button size="xs" color="light" onClick={handleRefresh} isProcessing={isRefreshing} disabled={isRefreshing}>
-                          <IconRefresh size={14} className={isRefreshing ? 'animate-spin' : ''} />
-                        </Button>
-                      </Tooltip>
-                    }
-                  >
-                    {/* AIInsightsSection now renders everything */}
-                    <AIInsightsSection 
-                      startupData={startupData} 
-                      isLoading={dataLoading} // Pass main loading state
-                      onRefreshRequest={handleRefresh} // Allow triggering refresh
-                    />
-                  </DashboardCard>
-               </div>
-            </Tabs.Item>
+      {/* Main Dashboard Content (Tabs) */}
+      {renderDashboardContent()}
 
-            {/* Tab 3: Metrics & Performance */}
-            <Tabs.Item title="Metrics & Performance" icon={IconChartPie}>
-              {/* Use a 2-column grid for Financials and KPIs */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                 {/* Financial Performance */}
-                 <DashboardCard
-                    title="Financial Performance"
-                    icon={<IconChartBar size={18} className="text-cyan-500" />}
-                    minHeight="min-h-[20rem]"
-                 >
-                    <FinancialPerformanceCard startupData={startupData} isLoading={false} />
-                 </DashboardCard>
-
-                 {/* Key Metrics (KPIs) */}
-                 <DashboardCard
-                    title="Key Performance Indicators (KPIs)"
-                    icon={<IconChartPie size={18} className="text-green-500" />}
-                    minHeight="min-h-[20rem]"
-                 >
-                    <KeyMetricsSection startupData={startupData} isLoading={false} />
-                 </DashboardCard>
-                 {/* We can add additional metric sections here if needed */}
-            </div>
-            </Tabs.Item>
-
-            {/* Tab 4: Investor Relations */}
-            <Tabs.Item title="Investor Relations" icon={IconBriefcase}>
-              <div className="grid grid-cols-1 gap-6 pt-4">
-                <DashboardCard
-                  title="Investor Interest"
-                  icon={<IconBriefcase size={18} className="text-purple-500" />}
-                  minHeight="min-h-[20rem]"
-                >
-                  <InvestorInterestSection startupData={startupData} isLoading={false} onRefreshRequest={handleRefresh} />
-                </DashboardCard>
-                </div>
-            </Tabs.Item>
-
-            {/* Tab 5: Activity & Tasks */}
-            <Tabs.Item title="Activity & Tasks" icon={IconCalendar}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                {/* Recent Activity Timeline */}
-                <DashboardCard
-                  title="Recent Activity"
-                  icon={<IconRefresh size={18} className="text-blue-500" />}
-                  minHeight="min-h-[20rem]"
-                >
-                  <Timeline>
-                    {recentActivities.map((activity) => (
-                      <Timeline.Item key={activity.id}>
-                        <Timeline.Point />
-                        <Timeline.Content>
-                          <Timeline.Time>{activity.timestamp}</Timeline.Time>
-                          <Timeline.Title>{activity.action}</Timeline.Title>
-                          <Timeline.Body>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">By {activity.user}</span>
-                          </Timeline.Body>
-                        </Timeline.Content>
-                      </Timeline.Item>
-                    ))}
-                  </Timeline>
-                </DashboardCard>
-                
-                {/* Upcoming Tasks */}
-                <DashboardCard
-                  title="Upcoming Tasks"
-                  icon={<IconCalendar size={18} className="text-indigo-500" />}
-                  minHeight="min-h-[20rem]"
-                >
-                  <div className="space-y-3">
-                    {upcomingTasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className={`p-3 rounded-lg border ${
-                          task.priority === 'high' 
-                            ? 'border-red-200 bg-red-50 dark:border-red-900/30 dark:bg-red-900/10' 
-                            : task.priority === 'medium'
-                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900/30 dark:bg-yellow-900/10'
-                            : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50'
-                        }`}
-                      >
-                        <div className="flex justify-between">
-                          <div>
-                            <h4 className="font-medium text-gray-800 dark:text-white text-sm">{task.title}</h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{task.date}</p>
-                          </div>
-                          <div className="flex items-start">
-                            <Badge 
-                              color={task.priority === 'high' ? 'failure' : task.priority === 'medium' ? 'warning' : 'info'} 
-                              size="xs"
-                            >
-                              {task.priority}
-                            </Badge>
-                            <button className="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                              <IconCheck size={16} />
-                  </button>
-                </div>
-            </div>
-                      </div>
-                    ))}
-                    
-                    <button className="w-full py-2 text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center mt-2">
-                      <IconArrowRight size={14} className="mr-1" /> Add new task
-                    </button>
-              </div>
-                </DashboardCard>
-              </div>
-            </Tabs.Item>
-
-            {/* Tab 6: Settings */}
-            <Tabs.Item title="Settings" icon={IconSettings}>
-              <div className="grid grid-cols-1 gap-6 pt-4">
-                <DashboardCard
-                  title="Account Settings"
-                  icon={<IconSettings size={18} className="text-gray-500" />}
-                  minHeight="min-h-[20rem]"
-                >
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-800 dark:text-white">Profile Information</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Update your company details and profile</p>
-            </div>
-                      <Button size="sm" color="light" onClick={() => navigate('/startup/edit-profile')}>
-                        Edit Profile
-                      </Button>
-        </div>
-                    
-                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-800 dark:text-white">Documents</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your pitch deck and other documents</p>
-                      </div>
-                      <Button size="sm" color="light">
-                        Manage Documents
-                      </Button>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-800 dark:text-white">Account Security</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Update your password and security settings</p>
-                      </div>
-                      <Button size="sm" color="light">
-                        Security Settings
-                      </Button>
-                    </div>
-                  </div>
-                </DashboardCard>
-              </div>
-            </Tabs.Item>
-          </Tabs>
-        </div>
-      )}
     </div>
   );
 };

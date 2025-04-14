@@ -1,88 +1,110 @@
 import { Icon } from "@iconify/react";
-import { Button, Dropdown } from "flowbite-react";
+import { Button, Dropdown, Avatar } from "flowbite-react";
 import * as profileData from "../../header/Data";
 import SimpleBar from "simplebar-react";
-import user from "/src/assets//images/profile/user-1.jpg"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "src/context/AuthContext";
+import { useState, useEffect } from "react";
+import { supabase } from "src/lib/supabaseClient";
+import { StartupProfile, InvestorProfile } from "src/types/database";
 
 const SideProfile = () => {
+  const { user, userRole, signOut } = useAuth();
+  const [profileName, setProfileName] = useState("User");
+  const [profileRole, setProfileRole] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        let name = user.email?.split('@')[0] ?? "User";
+        let roleDisplay = userRole ? (userRole.charAt(0).toUpperCase() + userRole.slice(1)) : "User";
+        
+        if (userRole === 'startup') {
+          const { data, error } = await supabase
+            .from('startups')
+            .select('name')
+            .eq('user_id', user.id)
+            .single();
+          if (data) name = data.name;
+        } else if (userRole === 'investor') {
+          const { data, error } = await supabase
+            .from('investors')
+            .select('company_name')
+            .eq('user_id', user.id)
+            .single();
+          if (data) name = data.company_name;
+        }
+        setProfileName(name);
+        setProfileRole(roleDisplay);
+      };
+      fetchProfile();
+    } else {
+      setProfileName("Guest");
+      setProfileRole(null);
+    }
+  }, [user, userRole]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth/auth1/login');
+  };
 
   return (
     <>
-      <div className="relative group/menu">
+      <div className="relative group/menu mt-auto mb-4">
         <Dropdown
           label=""
           className="w-screen sm:w-[360px] py-6 !shadow-lg rounded-sm"
-          dismissOnClick={false}
+          dismissOnClick={true}
           renderTrigger={() => (
-            <span className="h-10 w-10  mx-auto  hover:text-primary hover:bg-lightprimary rounded-full flex justify-center items-center cursor-pointer group-hover/menu:bg-lightprimary group-hover/menu:text-primary">
-              <img
-                src={user}
-                alt="logo"
-                height="40"
-                width="40"
-                className="rounded-full mx-auto cursor-pointer border border-dashed border-transparent  hover:border-primary p-0.5"
-              />
+            <span className="h-10 w-10 mx-auto hover:text-primary hover:bg-lightprimary rounded-full flex justify-center items-center cursor-pointer group-hover/menu:bg-lightprimary group-hover/menu:text-primary">
+              <Avatar rounded size="sm" />
             </span>
           )}
         >
           <div className="px-6">
             <h3 className="text-lg font-semibold text-ld">User Profile</h3>
             <div className="flex items-center gap-6 pb-5 border-b dark:border-darkborder mt-5 mb-3">
-              <img
-                src={user}
-                alt="logo"
-                height="80"
-                width="80"
-                className="rounded-full"
-              />
+              <Avatar rounded size="md" />
               <div>
-                <h5 className="card-title">Jonathan Deo</h5>
-                <span className="card-subtitle">Admin</span>
-                <p className="card-subtitle mb-0 mt-1 flex items-center">
-                  <Icon
-                    icon="solar:mailbox-line-duotone"
-                    className="text-base me-1"
-                  />
-                  info@Materialm.com
-                </p>
+                <h5 className="card-title">{profileName}</h5>
+                {profileRole && <span className="card-subtitle text-xs text-gray-500 dark:text-gray-400">{profileRole}</span>}
+                {user?.email && 
+                  <p className="card-subtitle text-xs text-gray-500 dark:text-gray-400 mb-0 mt-1 flex items-center">
+                    <Icon
+                      icon="solar:mailbox-line-duotone"
+                      className="text-base me-1"
+                    />
+                    {user.email}
+                  </p>
+                }
               </div>
             </div>
           </div>
-           <SimpleBar>
-          {profileData.profileDD.map((items, index) => (
+          <SimpleBar className="max-h-[150px]">
             <Dropdown.Item
               as={Link}
-              to="#"
-              className="px-6 py-3 flex justify-between items-center bg-hover group/link w-full"
-              key={index}
+              to="/profile/view"
+              className="px-6 py-3 flex items-center gap-3 bg-hover group/link w-full"
             >
-              <div className="flex items-center w-full">
-                <div
-                  className={`h-11 w-11 flex-shrink-0 rounded-md flex justify-center items-center ${items.bgcolor}`}
-                >
-                  <Icon icon={items.icon} height={20} className={items.color} />
-                </div>
-                <div className="ps-4 flex justify-between w-full">
-                  <div className="w-3/4 ">
-                    <h5 className="mb-1 text-sm  group-hover/link:text-primary">
-                      {items.title}
-                    </h5>
-                    <div className="text-xs  text-darklink">
-                      {items.subtitle}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Icon icon="solar:user-circle-line-duotone" height={20} />
+              <span>My Profile</span>
             </Dropdown.Item>
-          ))}
+            <Dropdown.Item
+              as={Link}
+              to="/settings/account"
+              className="px-6 py-3 flex items-center gap-3 bg-hover group/link w-full"
+            >
+              <Icon icon="solar:settings-minimalistic-line-duotone" height={20} />
+              <span>Settings</span>
+            </Dropdown.Item>
           </SimpleBar>
 
           <div className="pt-6 px-6">
             <Button
               color={"primary"}
-              as={Link}
-              to="/auth/auth1/login"
+              onClick={handleSignOut}
               className="w-full"
             >
               Logout

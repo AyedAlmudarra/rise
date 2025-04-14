@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Badge, Tooltip, Dropdown, Button, Spinner, Alert } from 'flowbite-react';
 import { StartupProfile } from '../../../types/database';
+import { AIAnalysisData, SuggestedKpiItem } from '../../../types/database';
 import { 
   IconTrendingUp, IconTrendingDown, IconUser, IconTargetArrow, 
   IconUsers, IconCheck, IconEye, IconDots, IconCalendar, 
@@ -30,11 +31,11 @@ const formatPercentage = (value: number | null | undefined): string => {
 }
 
 interface KeyMetricsSectionProps {
-    startupData: StartupProfile | null;
+    analysisData: AIAnalysisData | null;
     isLoading: boolean;
 }
 
-const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ startupData, isLoading }) => {
+const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, isLoading }) => {
   const [timeRange, setTimeRange] = useState<'Last 30 Days' | 'Last Quarter' | 'Last Year' | 'All Time'>('Last Year');
   // Chart state can be added later if needed
 
@@ -54,89 +55,25 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ startupData, isLo
       );
   }
 
-  // Although we have startupData, we might still use mockData for chart series
-  // until actual time-series data is available from the backend.
-  // For now, display direct values from startupData where available.
+  // Get suggested KPIs from analysis data
+  const suggestedKpis = analysisData?.suggested_kpis || [];
+  const hasKpis = Array.isArray(suggestedKpis) && suggestedKpis.length > 0;
 
-  const metrics = [
-    {
-        title: 'Annual Revenue',
-        value: formatCurrency(startupData?.annual_revenue),
-        icon: <IconCurrencyDollar size={24} className="text-green-500" />,
-        tooltip: 'Total revenue generated in the last fiscal year.',
-        key: 'annual_revenue'
-    },
-    {
-        title: 'Annual Expenses',
-        value: formatCurrency(startupData?.annual_expenses),
-        icon: <IconChartLine size={24} className="text-red-500" />,
-        tooltip: 'Total expenses incurred in the last fiscal year.',
-        key: 'annual_expenses'
-    },
-    {
-        title: 'Customer Acquisition Cost (CAC)',
-        value: formatCurrency(startupData?.kpi_cac),
-        icon: <IconTargetArrow size={24} className="text-blue-500" />,
-        tooltip: 'Average cost to acquire a new customer.',
-        key: 'kpi_cac'
-    },
-    {
-        title: 'Customer Lifetime Value (CLV)',
-        value: formatCurrency(startupData?.kpi_clv),
-        icon: <IconUser size={24} className="text-purple-500" />,
-        tooltip: 'Predicted total profit generated from a single customer account.',
-        key: 'kpi_clv'
-    },
-    {
-        title: 'Customer Retention Rate',
-        value: formatPercentage(startupData?.kpi_retention_rate),
-        icon: <IconUsers size={24} className="text-teal-500" />,
-        tooltip: 'Percentage of customers retained over a specific period.',
-        key: 'kpi_retention_rate'
-    },
-    {
-        title: 'Conversion Rate',
-        value: formatPercentage(startupData?.kpi_conversion_rate),
-        icon: <IconArrowsExchange size={24} className="text-yellow-500" />,
-        tooltip: 'Percentage of users who complete a desired action (e.g., sign up, purchase).' ,
-        key: 'kpi_conversion_rate'
-    },
-     {
-        title: 'Total Customers',
-        value: formatNumber(startupData?.num_customers),
-        icon: <IconUsers size={24} className="text-cyan-500" />,
-        tooltip: 'Total number of active customers.',
-        key: 'num_customers'
-    },
-    {
-        title: 'Team Size',
-        value: formatNumber(startupData?.num_employees),
-        icon: <IconUser size={24} className="text-orange-500" />,
-        tooltip: 'Total number of full-time employees.',
-        key: 'num_employees'
-    }
-  ];
-
-  const renderMetricCard = (metric: typeof metrics[0]) => {
-    const isNA = metric.value === 'N/A';
+  // Render function for individual AI suggested KPI
+  const renderSuggestedKpi = (kpiItem: SuggestedKpiItem, index: number) => {
     return (
-      <Tooltip content={metric.tooltip} placement="top" style="light">
-          <div key={metric.key} className={`p-4 rounded-lg border ${isNA ? 'border-dashed border-gray-300 dark:border-gray-600 opacity-70' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm'}`}>
-              <div className="flex items-center justify-between mb-1">
-                  <h6 className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{metric.title}</h6>
-                  {!isNA && metric.icon}
-              </div>
-              <p className={`text-2xl font-semibold ${isNA ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
-                  {metric.value}
+      <div key={`kpi-${index}`} className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+          <h6 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">{kpiItem.kpi || 'Unnamed KPI'}</h6>
+          <Tooltip content={kpiItem.justification || 'No justification provided.'} placement="top" style="light">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate hover:whitespace-normal cursor-help">
+                  {kpiItem.justification || 'No justification provided.'}
               </p>
-              {/* Placeholder for trend/change indicator */}
-               {/* {!isNA && (
-                 <p className="text-xs text-green-500 flex items-center mt-1">
-                   <IconTrendingUp size={14} className="mr-1"/> +5.2% vs LY
-                 </p>
-               )} */}
-          </div>
-      </Tooltip>
+          </Tooltip>
+          {/* Placeholder for showing actual value if available/relevant */}
+          <p className="text-xl font-semibold text-gray-900 dark:text-white mt-2">N/A</p> 
+           {/* We might need to fetch the actual value for these suggested KPIs later */}
+           {/* Or display trend icons based on some other data source */}
+      </div>
     );
   }
 
@@ -153,10 +90,10 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ startupData, isLo
     <Card>
       <div className="flex justify-between items-center mb-4">
             <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white flex items-center">
-              <IconChartBar size={20} className="mr-2 text-blue-500" /> Key Metrics
+              <IconChartPie size={20} className="mr-2 text-lime-500" /> AI Suggested KPIs
             </h5>
         <div className="flex items-center">
-          {renderTimeRangeSelector()}
+          {/* <renderTimeRangeSelector /> */} {/* Comment out time range for now */}
           <Dropdown 
                     label="" // No label needed, using IconDots
                     size="xs"
@@ -174,15 +111,22 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ startupData, isLo
         </div>
       </div>
 
-        {!startupData && !isLoading && (
+        {!analysisData && !isLoading && (
             <Alert color="info" icon={IconInfoCircle}>
-                Key metrics data is not yet available for this startup.
+                 AI analysis data is not available. Request analysis to see suggested KPIs.
             </Alert>
         )}
 
-        {startupData && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {metrics.map(renderMetricCard)}
+        {analysisData && !hasKpis && (
+             <Alert color="info" icon={IconInfoCircle}>
+                 No KPIs were suggested in the latest AI analysis.
+            </Alert>
+        )}
+
+        {analysisData && hasKpis && (
+            // Adjust grid columns based on number of KPIs, maybe max 4?
+            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${Math.min(suggestedKpis.length, 4)} gap-4`}>
+                {suggestedKpis.map(renderSuggestedKpi)}
             </div>
         )}
 

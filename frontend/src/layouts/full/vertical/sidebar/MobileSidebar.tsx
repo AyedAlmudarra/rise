@@ -1,19 +1,30 @@
-
-import  { useContext } from "react";
+import React, { useContext } from "react";
 import { Sidebar } from "flowbite-react";
 import { IconSidebar } from "./IconSidebar";
-import SidebarContent from "./Sidebaritems";
+import SidebarContent, { MenuItem, ChildItem } from "./Sidebaritems";
 import NavItems from "./NavItems";
 import NavCollapse from "./NavCollapse";
 import SimpleBar from "simplebar-react";
 import { CustomizerContext } from "../../../../context/CustomizerContext";
-import React from "react";
+import { useAuth } from "src/context/AuthContext";
 
 const MobileSidebar = () => {
   const { selectedIconId } = useContext(CustomizerContext) || {};
-  const selectedContent = SidebarContent.find(
+  const { userRole } = useAuth();
+
+  const filterByRole = <T extends { roles?: ('startup' | 'investor' | 'all')[] }>(item: T): boolean => {
+    if (!item.roles) return true;
+    if (item.roles.includes('all')) return true;
+    if (userRole && (userRole === 'startup' || userRole === 'investor') && item.roles.includes(userRole)) return true;
+    return false;
+  };
+
+  const roleFilteredSidebarContent = SidebarContent.filter(filterByRole);
+
+  const selectedContent = roleFilteredSidebarContent.find(
     (data) => data.id === selectedIconId
   );
+
   return (
     <>
       <div>
@@ -28,22 +39,26 @@ const MobileSidebar = () => {
             <Sidebar.Items className="ps-4 pe-4">
               <Sidebar.ItemGroup className="sidebar-nav">
                 {selectedContent &&
-                  selectedContent.items?.map((item, index) => (
-                    <React.Fragment key={index}>
-                      <h5 className="text-link font-semibold text-sm caption">
-                        {item.heading}
-                      </h5>
-                      {item.children?.map((child, index) => (
-                        <React.Fragment key={child.id && index}>
-                          {child.children ? (
-                            <NavCollapse item={child} />
-                          ) : (
-                            <NavItems item={child} />
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </React.Fragment>
-                  ))}
+                  selectedContent.items
+                    ?.filter(filterByRole)
+                    .map((item, index) => (
+                      <React.Fragment key={item.heading ?? index}>
+                        <h5 className="text-link font-semibold text-sm caption">
+                          {item.heading}
+                        </h5>
+                        {item.children
+                          ?.filter(filterByRole)
+                          .map((child) => (
+                            <React.Fragment key={child.id ?? child.name}>
+                              {child.children ? (
+                                <NavCollapse item={child} />
+                              ) : (
+                                <NavItems item={child} />
+                              )}
+                            </React.Fragment>
+                          ))}
+                      </React.Fragment>
+                    ))}
               </Sidebar.ItemGroup>
             </Sidebar.Items>
           </SimpleBar>

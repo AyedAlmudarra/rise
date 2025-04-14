@@ -1,63 +1,73 @@
-//  Profile Data
+import { uniqueId } from "lodash";
+
+// Define unique IDs for each icon/section
+export const DASHBOARD_ID = uniqueId('dashboard_');
+export const PROFILE_ID = uniqueId('profile_');
+export const RELATIONS_ID = uniqueId('relations_'); // Startup only
+export const DEALFLOW_ID = uniqueId('dealflow_');   // Investor only
+export const PORTFOLIO_ID = uniqueId('portfolio_'); // Investor only
+export const SETTINGS_ID = uniqueId('settings_');
+export const HELP_ID = uniqueId('help_');         // New Help Section ID
+export const RESOURCES_ID = uniqueId('resources_'); // New Resources Section ID
+
+// Define the type for MiniSidebar icons, including roles
 interface MiniiconsType {
-  id: number;
+  id: string; // Use explicit string IDs
   icon: string;
   tooltip: string;
+  roles: ('startup' | 'investor' | 'all')[];
 }
 
-const Miniicons: MiniiconsType[] = [
+// Define the main navigation icons for RISE using explicit IDs
+const MiniSidebarIcons: MiniiconsType[] = [
   {
-    id: 1,
-    icon: "solar:layers-line-duotone",
-    tooltip: "Dashboards",
+    id: DASHBOARD_ID,
+    tooltip: "Dashboard",
+    icon: "solar:layers-minimalistic-line-duotone",
+    roles: ['all'],
   },
   {
-    id: 2,
-    icon: "solar:notes-line-duotone",
-    tooltip: "Pages",
+    id: PROFILE_ID,
+    tooltip: "My Profile",
+    icon: "solar:user-circle-line-duotone",
+    roles: ['all'],
   },
   {
-    id: 3,
-    icon: "solar:palette-round-line-duotone",
-    tooltip: "Ui Components",
+    id: RELATIONS_ID,
+    tooltip: "Investor Relations",
+    icon: "solar:users-group-two-rounded-line-duotone",
+    roles: ['startup'], // Specific to startups
   },
   {
-    id: 4,
-    icon: "solar:tuning-square-2-line-duotone",
-    tooltip: "Tables",
+    id: DEALFLOW_ID,
+    tooltip: "Deal Flow",
+    icon: "solar:filter-line-duotone",
+    roles: ['investor'], // Specific to investors
   },
   {
-    id: 5,
-    icon: "solar:chart-line-duotone",
-    tooltip: "Charts",
+    id: PORTFOLIO_ID,
+    tooltip: "My Portfolio",
+    icon: "solar:pie-chart-2-line-duotone",
+    roles: ['investor'], // Specific to investors
   },
   {
-    id: 6,
-    icon: "solar:widget-6-line-duotone",
-    tooltip: "Forms",
-  },
-
-  {
-    id: 7,
-    icon: "solar:adhesive-plaster-outline",
-    tooltip: "Shadcn UI",
+    id: SETTINGS_ID,
+    tooltip: "Settings",
+    icon: "solar:settings-line-duotone",
+    roles: ['all'],
   },
   {
-    id: 8,
-    icon: "solar:text-underline-cross-broken",
-    tooltip: "Headless UI",
-  },
-
-  {
-    id: 9,
-    icon: "solar:lock-keyhole-line-duotone",
-    tooltip: "Authentiction Pages",
+    id: HELP_ID,
+    tooltip: "Help",
+    icon: "solar:question-square-line-duotone",
+    roles: ['all']
   },
   {
-    id: 10,
-    icon: "solar:mirror-left-line-duotone",
-    tooltip: "Docs & Others",
-  },
+    id: RESOURCES_ID,
+    tooltip: "Resources",
+    icon: "solar:bookmark-square-minimalistic-line-duotone",
+    roles: ['all']
+  }
 ];
 
-export default Miniicons;
+export default MiniSidebarIcons;

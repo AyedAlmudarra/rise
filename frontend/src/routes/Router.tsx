@@ -21,6 +21,9 @@ const Crm = Loadable(lazy(() => import('src/views/dashboards/Crm'))); // Correct
 const StartupDashboard = Loadable(lazy(() => import('src/views/dashboards/StartupDashboard'))); // Kept as is, assuming correct
 const InvestorDashboard = Loadable(lazy(() => import('src/views/dashboards/InvestorDashboard'))); // Kept as is, assuming correct
 
+// +++ Add AI Insights Page +++
+const AIInsightsPage = Loadable(lazy(() => import('src/views/ai/AIInsightsPage')));
+
 /* ****Apps***** */ // Corrected Paths
 const Contact = Loadable(lazy(() => import('src/views/apps/contact/Contact'))); // Corrected path (lowercase folder)
 const Ecommerce = Loadable(lazy(() => import('src/views/apps/eCommerce/Ecommerce'))); // Corrected casing (eCommerce folder)
@@ -166,6 +169,22 @@ const PagePricing = Loadable(lazy(() => import('src/views/pages/frontend-pages/P
 const BlogPage = Loadable(lazy(() => import('src/views/pages/frontend-pages/Blog')));
 const BlogPost = Loadable(lazy(() => import('src/views/pages/frontend-pages/BlogPost')));
 
+// --- RISE Specific Views --- 
+const SettingsPage = Loadable(lazy(() => import('src/views/settings/SettingsPage')));
+const ViewProfilePage = Loadable(lazy(() => import('src/views/profile/ViewProfilePage')));
+const EditProfilePage = Loadable(lazy(() => import('src/views/profile/EditProfilePage')));
+const ManageDocumentsPage = Loadable(lazy(() => import('src/views/profile/ManageDocumentsPage')));
+
+// --- RISE Dashboard Sub-Pages --- //
+const StartupMetricsPage = Loadable(lazy(() => import('src/views/dashboards/startup/StartupMetricsPage')));
+const StartupActivityPage = Loadable(lazy(() => import('src/views/dashboards/startup/StartupActivityPage')));
+// Placeholder for Investor pages if needed later
+// const InvestorSuggestionsPage = Loadable(lazy(() => import('src/views/dashboards/investor/InvestorSuggestionsPage')));
+// const InvestorActivityPage = Loadable(lazy(() => import('src/views/dashboards/investor/InvestorActivityPage')));
+
+// Import the new Calendar Page
+const CalendarPage = Loadable(lazy(() => import('src/views/calendar/CalendarPage')));
+
 const Router = [
   {
     path: '/',
@@ -174,14 +193,34 @@ const Router = [
       {
         element: <FullLayout />,
         children: [
-          // Set Homepage as the default route after login
-          { path: '/', element: <Homepage /> }, 
+          // Default route - Redirect based on role?
+          // For now, point to startup dashboard as a default logged-in view
+          { path: '/', element: <Navigate to="/startup/dashboard" replace /> },
           { path: '/dashboards/ecommerce', element: <EcommerceDashboard /> }, // Keep others accessible
           { path: '/dashboards/analytics', element: <Analytics /> },
           { path: '/dashboards/crm', element: <Crm /> },
-          { path: '/startup/dashboard', element: <StartupDashboard /> },
-          { path: '/investor/dashboard', element: <InvestorDashboard /> },
-          // ... other routes inside FullLayout ...
+
+          // --- Core Dashboards (Role determined internally or by access) ---
+          { path: '/startup/dashboard', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <StartupDashboard /> }] },
+          { path: '/investor/dashboard', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <InvestorDashboard /> }] },
+
+          // --- Add Calendar Route (Protected, accessible to all roles) ---
+          { path: '/calendar', element: <CalendarPage /> }, // Protected by the parent <ProtectedRoute />
+
+          // --- RISE Specific Routes (General Access, Role handled internally or unprotected) ---
+          { path: '/settings/:tab?', element: <SettingsPage /> },
+          { path: '/profile/view', element: <ViewProfilePage /> },
+          { path: '/profile/edit', element: <EditProfilePage /> },
+
+          // --- Role-Protected Routes ---
+          { path: '/profile/documents', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <ManageDocumentsPage /> }] },
+          { path: '/startup/metrics', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <StartupMetricsPage /> }] },
+          { path: '/startup/activity', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <StartupActivityPage /> }] },
+          // Add investor sub-pages routes here later using the same pattern
+          // { path: '/investor/ai-suggestions', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <InvestorSuggestionsPage /> }] },
+          // { path: '/investor/activity', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <InvestorActivityPage /> }] },
+
+          // ... other existing routes inside FullLayout ...
           { path: '/sample-page', element: <SamplePage /> },
         ]
       }
@@ -209,7 +248,7 @@ const Router = [
     element: <Landingpage />,
   },
   {
-    path: '/home', // This top-level path might conflict/be redundant if Homepage is under '/' now
+    path: '/home', // This might need review - consider if needed with / route
     element: <FrontendPageLayout />,
     children: [
       { path: '', element: <Homepage /> }, // Default for /home

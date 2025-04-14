@@ -25,7 +25,6 @@ import {
 import {
   InvestorProfileCard,
   DealFlowSection,
-  AISuggestionsSection,
   WatchlistSection,
   MarketInsightsSection
 } from '../../components/dashboards/investor';
@@ -435,13 +434,7 @@ const InvestorDashboard = () => {
               isLoading={dataLoading}
             />
             
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <AISuggestionsSection 
-                suggestions={mockData.aiSuggestions}
-                isLoading={dataLoading}
-                onRefresh={refreshData}
-              />
-              
+            <div className="grid grid-cols-1 xl:grid-cols-1 gap-6">
               <WatchlistSection 
                 watchlistData={mockData.watchlist}
                 isLoading={dataLoading}
@@ -464,11 +457,7 @@ const InvestorDashboard = () => {
     
     if (activeTab === 'suggestions') {
       return (
-        <AISuggestionsSection 
-          suggestions={mockData.aiSuggestions}
-          isLoading={dataLoading}
-          onRefresh={refreshData}
-        />
+        <Alert color="info">AI Suggestions have moved to the dedicated AI Insights page.</Alert>
       );
     }
     

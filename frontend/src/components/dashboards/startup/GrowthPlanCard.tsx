@@ -1,68 +1,66 @@
 import React from 'react';
-import { StartupProfile, AIAnalysisData, GrowthPlanPhase } from '../../../types/database';
-import { Spinner, Alert } from 'flowbite-react';
-import { IconCalendarEvent, IconRocket, IconInfoCircle } from '@tabler/icons-react';
+import { Card, Button } from 'flowbite-react';
+import { IconCalendarEvent, IconCircleCheck, IconRobot } from '@tabler/icons-react';
+import { AIAnalysisData } from '../../../types/database';
 
 interface GrowthPlanCardProps {
-  startupData: StartupProfile | null;
+  analysisData: AIAnalysisData | null;
   isLoading: boolean;
 }
 
-const GrowthPlanCard: React.FC<GrowthPlanCardProps> = ({ startupData, isLoading }) => {
-
+const GrowthPlanCard: React.FC<GrowthPlanCardProps> = ({ 
+  analysisData, 
+  isLoading,
+}) => {
   if (isLoading) {
-    return <Spinner aria-label="Loading growth plan..." />;
-  }
-
-  // Check for startup data first
-  if (!startupData) {
-    return <Alert color="info" icon={IconInfoCircle}>Growth plan requires startup profile data.</Alert>;
-  }
-
-  // Get growth plan data from AI analysis
-  const aiAnalysis = startupData.ai_analysis as AIAnalysisData | null;
-  const growthPlanPhases = aiAnalysis?.growth_plan_phases;
-
-  // Handle cases where AI data or the specific field is missing or not an array
-  if (!Array.isArray(growthPlanPhases) || growthPlanPhases.length === 0) {
     return (
-      <Alert color="gray" icon={IconInfoCircle}>
-        AI-generated growth plan details are not available.
-      </Alert>
+      <Card className="animate-pulse">
+        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2.5"></div>
+        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-full my-2.5"></div>
+        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-5/6 my-2.5"></div>
+      </Card>
     );
   }
 
+  // Get growth plan phases from AI analysis
+  const growthPlanPhases = analysisData?.growth_plan_phases || [];
+  const hasGrowthPlan = Array.isArray(growthPlanPhases) && growthPlanPhases.length > 0;
+
   return (
-    <div className="space-y-3">
-      {growthPlanPhases.map((phase: GrowthPlanPhase | null, index: number) => {
-        // Validate each phase object
-        if (!phase || typeof phase !== 'object') {
-          console.warn(`Invalid growth plan phase structure at index ${index}:`, phase);
-          return (
-              <div key={`invalid-${index}`} className="p-3 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700/50">
-                 <p className="text-xs text-gray-500 italic">Invalid phase data received from analysis.</p>
-             </div>
-          ); 
-        }
+    <Card>
+      <div className="flex items-center mb-4">
+        <IconCalendarEvent className="mr-2 text-teal-500" size={20} />
+        <h5 className="text-base font-semibold text-gray-900 dark:text-white">
+          12-Month Growth Plan
+        </h5>
+      </div>
 
-        const period = typeof phase.period === 'string' ? phase.period : '[Missing Period]';
-        const focus = typeof phase.focus === 'string' ? phase.focus : '[Missing Focus]';
-        const description = typeof phase.description === 'string' ? phase.description : '[Missing Description]';
-
-        return (
-          <div key={index} className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-            <div className="flex items-center mb-1">
-              <IconCalendarEvent size={15} className="mr-1.5 text-teal-500 flex-shrink-0 mt-0.5" />
-              <span className="text-sm font-semibold text-teal-600 dark:text-teal-400 mr-2">{period}:</span>
-              <span className="text-sm font-medium text-gray-800 dark:text-white truncate" title={focus}>{focus}</span>
+      {hasGrowthPlan ? (
+        <div className="space-y-4">
+          {growthPlanPhases.map((phase, index) => (
+            <div key={`phase-${index}`} className="border-l-2 border-teal-300 dark:border-teal-700 pl-4 py-2">
+              <div className="flex items-center mb-1">
+                <IconCircleCheck size={16} className="text-teal-500 mr-2 flex-shrink-0" />
+                <p className="font-medium text-gray-800 dark:text-white text-sm">
+                  <span className="text-teal-600 dark:text-teal-400">{phase.period}:</span> {phase.focus}
+                </p>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 ml-6">
+                {phase.description}
+              </p>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 pl-[21px] leading-relaxed">
-              {description}
-            </p>
-          </div>
-        );
-      })}
-    </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-6">
+          <IconRobot size={32} className="mx-auto mb-3 text-gray-400" />
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">No Growth Plan Data Available</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            Request an AI analysis using the main refresh button to generate a customized growth plan.
+          </p>
+        </div>
+      )}
+    </Card>
   );
 };
 

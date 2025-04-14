@@ -1,5 +1,3 @@
-
-
 //Apps Links Type & Data
 interface appsLinkType {
   href: string;
@@ -140,7 +138,8 @@ const SearchLinks: SearchType[] = [
   },
 ];
 
-//   Message Data
+//   Message Data (REMOVED - Handled dynamically)
+/*
 interface MessageType {
   title: string;
   avatar: any;
@@ -148,52 +147,18 @@ interface MessageType {
   color: string;
   time: string;
 }
-
 import avatar1 from "/src/assets/images/profile/user-6.jpg";
 import avatar2 from "/src/assets/images/profile/user-2.jpg";
 import avatar3 from "/src/assets/images/profile/user-3.jpg";
 import avatar4 from "/src/assets/images/profile/user-4.jpg";
 import avatar5 from "/src/assets/images/profile/user-5.jpg";
-
 const MessagesLink: MessageType[] = [
-  {
-    avatar: avatar1,
-    color: "bg-info",
-    title: "Michell Flintoff",
-    subtitle: "You: Yesterdy was great...",
-    time: "just now",
-  },
-  {
-    avatar: avatar2,
-    color: "bg-primary",
-    title: "Bianca Anderson",
-    subtitle: "Nice looking dress you...",
-    time: "5 mins ago",
-  },
-  {
-    avatar: avatar3,
-    color: "bg-secondary",
-    title: "Andrew Johnson",
-    subtitle: "Sent a photo",
-    time: "10 mins ago",
-  },
-  {
-    avatar: avatar4,
-    color: "bg-warning",
-    title: "Jolly Cummins",
-    subtitle: "If I don’t like something",
-    time: "5 days ago",
-  },
-  {
-    avatar: avatar5,
-    color: "bg-success",
-    title: "Josh Macklow",
-    subtitle: "$230 deducted from account",
-    time: "year ago",
-  },
+  // ... data removed ...
 ];
+*/
 
-//   Notification Data
+//   Notification Data (REMOVED - Handled dynamically)
+/*
 interface NotificationType {
   title: string;
   icon: any;
@@ -202,59 +167,13 @@ interface NotificationType {
   color:string;
   time: string;
 }
-
 const Notification: NotificationType[] = [
-  {
-    icon: "solar:widget-3-line-duotone",
-    bgcolor: "bg-lighterror dark:bg-lighterror",
-    color:'text-error',
-    title: "Launch Admin",
-    subtitle: "Just see the my new admin!",
-    time: "9:30 AM",
-  },
-  {
-    icon: "solar:calendar-line-duotone",
-    bgcolor: "bg-lightprimary dark:bg-lightprimary",
-    color:'text-primary',
-    title: "Event Today",
-    subtitle: "Just a reminder that you have event",
-    time: "9:15 AM",
-  },
-  {
-    icon: "solar:settings-line-duotone",
-    bgcolor: "bg-lightsecondary dark:bg-lightsecondary",
-    color:'text-secondary',
-    title: "Settings",
-    subtitle: "You can customize this template as you want",
-    time: "4:36 PM",
-  },
-  {
-    icon: "solar:widget-4-line-duotone",
-    bgcolor: "bg-lightwarning dark:bg-lightwarning ",
-    color:'text-warning',
-    title: "Launch Admin",
-    subtitle: "Just see the my new admin!",
-    time: "9:30 AM",
-  },
-  {
-    icon: "solar:calendar-line-duotone",
-    bgcolor: "bg-lightprimary dark:bg-lightprimary",
-    color:'text-primary',
-    title: "Event Today",
-    subtitle: "Just a reminder that you have event",
-    time: "9:15 AM",
-  },
-  {
-    icon: "solar:settings-line-duotone",
-    bgcolor: "bg-lightsecondary dark:bg-lightsecondary",
-    color:'text-secondary',
-    title: "Settings",
-    subtitle: "You can customize this template as you want",
-    time: "4:36 PM",
-  },
+  // ... data removed ...
 ];
+*/
 
-//  Profile Data
+//  Profile Data (REMOVED - Handled dynamically)
+/*
 interface ProfileType {
   title: string;
   icon: any;
@@ -263,39 +182,18 @@ interface ProfileType {
   bgcolor: string;
   url: string;
 }
-
 const profileDD: ProfileType[] = [
-  {
-    icon: "solar:wallet-2-line-duotone",
-    bgcolor: "bg-lightprimary dark:bg-lightprimary",
-    color: "text-primary",
-    title: "My Profile",
-    subtitle: "Account settings",
-    url: "/apps/user-profile/profile",
-  },
-  {
-    icon: "solar:inbox-line-duotone",
-    color: "text-success",
-    bgcolor: "bg-lightsuccess dark:bg-lightsuccess",
-    title: "My Notes",
-    subtitle: "My Daily Notes",
-    url: "/apps/notes",
-  },
-  {
-    icon: "solar:checklist-minimalistic-line-duotone",
-    color: "text-error",
-    bgcolor: "bg-lighterror dark:bg-lighterror",
-    title: "My Tasks",
-    subtitle: "To-do and Daily tasks",
-    url: "/apps/kanban",
-  },
+ // ... data removed ...
 ];
+*/
+
+// Language Data was already removed/handled in Language.tsx
 
 export {
   appsLink,
   pageLinks,
   SearchLinks,
-  MessagesLink,
-  Notification,
-  profileDD,
+  // MessagesLink, // Removed export
+  // Notification, // Removed export
+  // profileDD, // Removed export
 };

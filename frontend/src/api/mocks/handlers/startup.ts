@@ -76,6 +76,7 @@ export const startupHandlers = [
   */
 
   // Intercept POST requests to Supabase /rest/v1/startups
+  /* --- DISABLED: Task 9 connects registration directly to Supabase --- 
   http.post(`${supabaseUrl}/rest/v1/startups`, async ({ request }) => {
     try {
       const requestBody = await request.json();
@@ -112,6 +113,7 @@ export const startupHandlers = [
       );
     }
   }),
+  */
 
   // --- Add other startup-related handlers here if needed (e.g., PUT) ---
 ]; 

@@ -7,7 +7,7 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react";
 import CardBox from "src/components/shared/CardBox";
-import AccountTab from "./AccountTab";
+import AccountTab from "./GeneralSettingsTab";
 import BillsTabs from "./BillsTab";
 import NotificationTab from "./NotificationTab";
 import SecurityTab from "./SecurityTab";

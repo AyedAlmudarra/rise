@@ -1,1206 +1,404 @@
+import { uniqueId } from "lodash";
+// Import explicit IDs and the icon data (though we mainly need the IDs)
+import MiniSidebarIcons, {
+  DASHBOARD_ID,
+  PROFILE_ID,
+  RELATIONS_ID,
+  DEALFLOW_ID,
+  PORTFOLIO_ID,
+  SETTINGS_ID,
+  HELP_ID,
+  RESOURCES_ID
+} from './MiniSidebar'; 
+// Remove Tabler icon import as we will use solar strings
+// import { IconChartPie, IconBriefcase, IconCalendarEvent, IconSettings } from "@tabler/icons-react";
+
+// Define allowed roles explicitly
+type UserRole = 'startup' | 'investor' | 'all';
+
+// Updated interfaces with 'roles' using the specific type
 export interface ChildItem {
-  id?: number | string;
+  id?: string; // Use string for unique IDs
   name?: string;
   icon?: any;
   children?: ChildItem[];
   item?: any;
   url?: any;
   color?: string;
+  roles?: UserRole[]; // Use the specific type
 }
 
 export interface MenuItem {
   heading?: string;
   name?: string;
   icon?: any;
-  id?: number;
+  id?: string; // Use string for unique IDs
   to?: string;
   items?: MenuItem[];
   children?: ChildItem[];
   url?: any;
+  roles?: UserRole[]; // Use the specific type
 }
 
-import { uniqueId } from "lodash";
+// Helper function to explicitly type roles array
+const roles = (r: UserRole[]): UserRole[] => r;
 
 const SidebarContent: MenuItem[] = [
   {
-    id: 1,
+    // === Dashboard ===
+    id: DASHBOARD_ID, // Use imported constant
     name: "Dashboard",
+    roles: roles(['all']),
     items: [
       {
-        heading: "Dashboards",
+        roles: roles(['all']),
         children: [
           {
-            name: "eCommerce",
-            icon: "solar:widget-add-line-duotone",
-            id: uniqueId(),
-            url: "/",
+            id: uniqueId('link-'),
+            name: "AI Insights",
+            icon: "solar:lightbulb-bolt-line-duotone",
+            url: "/ai-insights",
+            roles: roles(['all']),
           },
           {
-            name: "Analytics",
+            id: uniqueId('link-'),
+            name: "Calendar",
+            icon: "solar:calendar-line-duotone",
+            url: "/calendar",
+            roles: roles(['all']),
+          },
+        ]
+      },
+      {
+        roles: roles(['startup']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Overview",
+            icon: "solar:home-smile-angle-line-duotone",
+            url: "/startup/dashboard",
+            roles: roles(['startup']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Metrics & Performance",
             icon: "solar:chart-line-duotone",
-            id: uniqueId(),
-            url: "/dashboards/analytics",
+            url: "/startup/metrics",
+            roles: roles(['startup']),
           },
           {
-            name: "CRM",
-            icon: "solar:layers-line-duotone",
-            id: uniqueId(),
-            url: "/dashboards/crm",
-          },
-          {
-            name: "Front Pages",
-            id: uniqueId(),
-            icon: "solar:home-angle-linear",
-            children: [
-              {
-                name: "Homepage",
-                id: uniqueId(),
-                url: "/frontend-pages/homepage",
-              },
-              {
-                name: "About Us",
-                id: uniqueId(),
-                url: "/frontend-pages/aboutus",
-              },
-              {
-                name: "Blog",
-                id: uniqueId(),
-                url: "/frontend-pages/blog",
-              },
-              {
-                name: "Blog Details",
-                id: uniqueId(),
-                url: "/frontend-pages/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow",
-              },
-              {
-                name: "Contact Us",
-                id: uniqueId(),
-                url: "/frontend-pages/contact",
-              },
-              {
-                name: "Portfolio",
-                id: uniqueId(),
-                url: "/frontend-pages/portfolio",
-              },
-              {
-                name: "Pricing",
-                id: uniqueId(),
-                url: "/frontend-pages/pricing",
-              },
-            ],
+            id: uniqueId('link-'),
+            name: "Activity & Tasks",
+            icon: "solar:checklist-minimalistic-line-duotone",
+            url: "/startup/activity",
+            roles: roles(['startup']),
           },
         ],
       },
       {
-        heading: "Apps",
+        roles: roles(['investor']),
         children: [
           {
-            id: uniqueId(),
-            name: "Contacts",
-            icon: "solar:phone-line-duotone",
-            url: "/apps/contacts",
+            id: uniqueId('link-'),
+            name: "Overview",
+            icon: "solar:home-smile-angle-line-duotone",
+            url: "/investor/dashboard",
+            roles: roles(['investor']),
           },
           {
-            name: "Ecommerce",
-            id: uniqueId(),
-            icon: "solar:cart-3-line-duotone",
-            children: [
-              {
-                id: uniqueId(),
-                name: "Shop",
-                url: "/apps/ecommerce/shop",
-              },
-              {
-                id: uniqueId(),
-                name: "Details",
-                url: '/apps/ecommerce/detail/3'
-              },
-              {
-                id: uniqueId(),
-                name: "List",
-                url: "/apps/ecommerce/list",
-              },
-              {
-                id: uniqueId(),
-                name: "Checkout",
-                url: "/apps/ecommerce/checkout",
-              },
-              {
-                id: uniqueId(),
-                name: "Add Product",
-                url: "/apps/ecommerce/addproduct",
-              },
-              {
-                id: uniqueId(),
-                name: "Edit Product",
-                url: "/apps/ecommerce/editproduct",
-              },
-            ],
+            id: uniqueId('link-'),
+            name: "AI Suggestions",
+            icon: "solar:chat-bot-line-duotone",
+            url: "/investor/ai-suggestions",
+            roles: roles(['investor']),
           },
-          {
-            name: "Blogs",
-            id: uniqueId(),
-            icon: "solar:widget-add-line-duotone",
-            children: [
-              {
-                id: uniqueId(),
-                name: "Blog Post",
-                url: "/apps/blog/post",
-              },
-              {
-                id: uniqueId(),
-                name: "Blog Detail",
-                url: "/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow",
-              },
-            ],
-          },
-          {
-            id: uniqueId(),
-            name: "Chats",
-            icon: "solar:chat-round-line-line-duotone",
-            url: "/apps/chats",
-          },
-          {
-            name: "User Profile",
-            id: uniqueId(),
-            icon: "solar:shield-user-outline",
-            children: [
-              {
-                id: uniqueId(),
-                name: "Profile",
-                url: "/apps/user-profile/profile",
-              },
-              {
-                id: uniqueId(),
-                name: "Followers",
-                url: "/apps/user-profile/followers",
-              },
-              {
-                id: uniqueId(),
-                name: "Friends",
-                url: "/apps/user-profile/friends",
-              },
-              {
-                id: uniqueId(),
-                name: "Gallery",
-                url: "/apps/user-profile/gallery",
-              },
-            ],
-          },
-
-          {
-            name: "Invoice",
-            id: uniqueId(),
-            icon: "solar:bill-check-outline",
-            children: [
-              {
-                id: uniqueId(),
-                name: "List",
-                url: "/apps/invoice/list",
-              },
-              {
-                id: uniqueId(),
-                name: "Details",
-                url: "/apps/invoice/detail/PineappleInc",
-              },
-              {
-                id: uniqueId(),
-                name: "Create",
-                url: "/apps/invoice/create",
-              },
-              {
-                id: uniqueId(),
-                name: "Edit",
-                url: "/apps/invoice/edit/PineappleInc",
-              },
-            ],
-          },
-
-          {
-            id: uniqueId(),
-            name: "Notes",
-            icon: "solar:document-text-outline",
-            url: "/apps/notes",
-          },
-          {
-            id: uniqueId(),
-            name: "Calendar",
-            icon: "solar:calendar-mark-line-duotone",
-            url: "/apps/calendar",
-          },
-          {
-            id: uniqueId(),
-            name: "Email",
-            icon: "solar:letter-linear",
-            url: "/apps/email",
-          },
-          {
-            id: uniqueId(),
-            name: "Tickets",
-            icon: "solar:ticker-star-outline",
-            url: "/apps/tickets",
-          },
-          {
-            id: uniqueId(),
-            name: 'Kanban',
-            icon: 'solar:notebook-linear',
-            url: '/apps/kanban'
-          },
-
         ],
       },
     ],
   },
-
   {
-    id: 2,
-    name: "Pages",
+    // === Profile ===
+    id: PROFILE_ID, // Use imported constant
+    name: "Profile",
+    roles: roles(['all']),
     items: [
       {
-        heading: "Pages",
+        heading: "Profile Management",
+        roles: roles(['all']),
         children: [
           {
-            name: "Account Setting",
-            icon: "solar:settings-minimalistic-line-duotone",
-            id: uniqueId(),
-            url: "/theme-pages/account-settings",
+            id: uniqueId('link-'),
+            name: "View Profile",
+            icon: "solar:user-id-line-duotone",
+            url: "/profile/view", // Needs role-specific target or logic
+            roles: roles(['all']),
           },
           {
+            id: uniqueId('link-'),
+            name: "Edit Profile",
+            icon: "solar:document-add-line-duotone",
+            url: "/profile/edit", // Needs role-specific target or logic
+            roles: roles(['all']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Manage Documents",
+            icon: "solar:folder-with-files-line-duotone",
+            url: "/profile/documents",
+            roles: roles(['startup']), // Only for startups
+          },
+        ],
+      },
+    ],
+  },
+  {
+    // === Investor Relations (Startup Only) ===
+    id: RELATIONS_ID, // Use imported constant
+    name: "Investor Relations",
+    roles: roles(['startup']),
+    items: [
+      {
+        heading: "Fundraising",
+        roles: roles(['startup']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Find Investors",
+            icon: "solar:magnifer-zoom-in-line-duotone",
+            url: "/startup/find-investors",
+            roles: roles(['startup']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Track Outreach",
+            icon: "solar:notebook-line-duotone",
+            url: "/startup/investor-outreach",
+            roles: roles(['startup']),
+          },
+        ],
+      },
+    ],
+  },
+  {
+    // === Deal Flow (Investor Only) - Enhanced ===
+    id: DEALFLOW_ID, // Use imported constant
+    name: "Deal Flow",
+    roles: roles(['investor']),
+    items: [
+      {
+        heading: "Discover Startups",
+        roles: roles(['investor']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Browse All",
+            icon: "solar:list-check-minimalistic-line-duotone",
+            url: "/investor/browse-startups",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "AI Recommendations",
+            icon: "solar:lightbulb-minimalistic-line-duotone", // Updated icon
+            url: "/investor/ai-recommendations",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Saved Searches", // New
+            icon: "solar:bookmark-circle-line-duotone", 
+            url: "/investor/saved-searches",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "My Watchlist",
+            icon: "solar:eye-line-duotone", // Updated icon
+            url: "/investor/watchlist",
+            roles: roles(['investor']),
+          },
+        ],
+      },
+      {
+        heading: "Due Diligence", // New Section
+        roles: roles(['investor']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Active Deals",
+            icon: "solar:clipboard-text-line-duotone",
+            url: "/investor/active-deals",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Data Rooms",
+            icon: "solar:archive-check-line-duotone",
+            url: "/investor/data-rooms",
+            roles: roles(['investor']),
+          },
+        ]
+      }
+    ],
+  },
+  {
+    // === My Portfolio (Investor Only) - NEW ===
+    id: PORTFOLIO_ID, // Use imported constant
+    name: "My Portfolio",
+    roles: roles(['investor']),
+    items: [
+      {
+        heading: "Portfolio Overview",
+        roles: roles(['investor']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Summary",
+            icon: "solar:pie-chart-2-line-duotone",
+            url: "/investor/portfolio/summary",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Performance",
+            icon: "solar:graph-up-line-duotone",
+            url: "/investor/portfolio/performance",
+            roles: roles(['investor']),
+          },
+        ],
+      },
+      {
+        heading: "Investments",
+        roles: roles(['investor']),
+        children: [
+          // Potentially list invested companies dynamically here later,
+          // or provide links to manage them.
+          {
+            id: uniqueId('link-'),
+            name: "Manage Companies",
+            icon: "solar:buildings-2-line-duotone",
+            url: "/investor/portfolio/manage",
+            roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Reporting",
+            icon: "solar:document-text-line-duotone",
+            url: "/investor/portfolio/reporting",
+            roles: roles(['investor']),
+          },
+        ],
+      },
+    ],
+  },
+  {
+    // === Settings ===
+    id: SETTINGS_ID, // Use imported constant
+    name: "Settings",
+    roles: roles(['all']),
+    items: [
+      {
+        heading: "Application Settings",
+        roles: roles(['all']),
+        children: [
+          {
+            id: uniqueId('link-'),
+            name: "Account",
+            icon: "solar:shield-user-line-duotone",
+            url: "/settings/account",
+            roles: roles(['all']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Notifications",
+            icon: "solar:bell-bing-line-duotone",
+            url: "/settings/notifications",
+            roles: roles(['all']),
+          },
+          // Add more settings links here
+        ],
+      },
+    ],
+  },
+  {
+    // === Help Section (New) ===
+    id: HELP_ID, // Use imported constant
+    name: "Help",
+    roles: roles(['all']),
+    items: [
+      {
+        heading: "Support Resources",
+        roles: roles(['all']),
+        children: [
+          {
+            id: uniqueId('link-'),
             name: "FAQ",
             icon: "solar:question-circle-line-duotone",
-            id: uniqueId(),
-            url: "/theme-pages/faq",
+            url: "/help/faq",
+            roles: roles(['all'])
           },
           {
-            name: "Pricing",
-            icon: "solar:dollar-minimalistic-linear",
-            id: uniqueId(),
-            url: "/theme-pages/pricing",
+            id: uniqueId('link-'),
+            name: "Knowledge Base",
+            icon: "solar:notebook-minimalistic-line-duotone",
+            url: "/help/docs",
+            roles: roles(['all'])
           },
           {
-            name: "Landingpage",
-            icon: "solar:bill-list-line-duotone",
-            id: uniqueId(),
-            url: "/landingpage",
+            id: uniqueId('link-'),
+            name: "Contact Support",
+            icon: "solar:mailbox-line-duotone",
+            url: "/help/contact",
+            roles: roles(['all'])
           },
           {
-            name: "Roll Base Access",
-            icon: "solar:accessibility-broken",
-            id: uniqueId(),
-            url: "/theme-pages/casl",
-          },
-        ],
-      },
-      {
-        heading: "Widgets",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Cards",
-            icon: "solar:cardholder-line-duotone",
-            url: "/widgets/cards",
-          },
-          {
-            id: uniqueId(),
-            name: "Banners",
-            icon: "solar:align-vertical-spacing-line-duotone",
-            url: "/widgets/banners",
-          },
-          {
-            id: uniqueId(),
-            name: "Charts",
-            icon: "solar:chart-square-line-duotone",
-            url: "/widgets/charts",
-          },
-        ],
-      },
-      {
-        heading: "Icons",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Solar Icons",
-            icon: "solar:sticker-smile-circle-outline",
-            url: "/icons/solar",
-          },
-          {
-            id: uniqueId(),
-            name: "Tabler Icons",
-            icon: "solar:sticker-smile-circle-outline",
-            url: "/icons/tabler",
+            id: uniqueId('link-'),
+            name: "Getting Started",
+            icon: "solar:rocket-line-duotone",
+            url: "/help/getting-started",
+            roles: roles(['all'])
           },
         ],
       },
     ],
   },
-
   {
-    id: 3,
-    name: "Ui components",
+    // === Resources Section (New) ===
+    id: RESOURCES_ID, // Use imported constant
+    name: "Resources",
+    roles: roles(['all']),
     items: [
       {
-        heading: "UI",
+        heading: "Knowledge & Tools",
+        roles: roles(['all']),
         children: [
           {
-            id: uniqueId(),
-            name: "Accordion",
-            icon: "solar:waterdrops-line-duotone",
-            url: "/ui-components/accordion",
-          },
-          {
-            id: uniqueId(),
-            name: "Badge",
-            icon: "solar:tag-horizontal-line-duotone",
-            url: "/ui-components/badge",
-          },
-          {
-            id: uniqueId(),
-            name: "Button",
-            icon: "solar:airbuds-case-minimalistic-line-duotone",
-            url: "/ui-components/buttons",
-          },
-          {
-            id: uniqueId(),
-            name: "Dropdowns",
-            icon: "solar:airbuds-case-line-duotone",
-            url: "/ui-components/dropdown",
-          },
-          {
-            id: uniqueId(),
-            name: "Modals",
-            icon: "solar:bolt-line-duotone",
-            url: "/ui-components/modals",
-          },
-          {
-            id: uniqueId(),
-            name: "Tab",
-            icon: "solar:box-minimalistic-line-duotone",
-            url: "/ui-components/tab",
-          },
-          {
-            id: uniqueId(),
-            name: "Tooltip",
-            icon: "solar:feed-line-duotone",
-            url: "/ui-components/tooltip",
-          },
-          {
-            id: uniqueId(),
-            name: "Alert",
-            icon: "solar:flag-line-duotone",
-            url: "/ui-components/alert",
-          },
-          {
-            id: uniqueId(),
-            name: "Progressbar",
-            icon: "solar:programming-line-duotone",
-            url: "/ui-components/progressbar",
-          },
-          {
-            id: uniqueId(),
-            name: "Pagination",
-            icon: "solar:waterdrops-line-duotone",
-            url: "/ui-components/pagination",
-          },
-          {
-            id: uniqueId(),
-            name: "Breadcrumbs",
-            icon: "solar:slider-minimalistic-horizontal-line-duotone",
-            url: "/ui-components/breadcrumb",
-          },
-          {
-            id: uniqueId(),
-            name: "Drawer",
-            icon: "solar:laptop-minimalistic-line-duotone",
-            url: "/ui-components/drawer",
-          },
-          {
-            id: uniqueId(),
-            name: "Lists",
-            icon: "solar:checklist-bold-duotone",
-            url: "/ui-components/listgroup",
-          },
-          {
-            id: uniqueId(),
-            name: "Carousel",
-            icon: "solar:align-horizonta-spacing-line-duotone",
-            url: "/ui-components/carousel",
-          },
-          {
-            id: uniqueId(),
-            name: "Spinner",
-            icon: "solar:soundwave-bold-duotone",
-            url: "/ui-components/spinner",
-          },
-          {
-            id: uniqueId(),
-            name: "Avatar",
-            icon: "solar:user-line-duotone",
-            url: "/ui-components/avatar",
-          },
-          {
-            id: uniqueId(),
-            name: "Banner",
-            icon: "solar:banknote-linear",
-            url: "/ui-components/banner",
-          },
-          {
-            id: uniqueId(),
-            name: "Button Group",
-            icon: "solar:users-group-two-rounded-outline",
-            url: "/ui-components/button-group",
-          },
-          {
-            id: uniqueId(),
-            name: "Card",
-            icon: "solar:card-line-duotone",
-            url: "/ui-components/card",
-          },
-          {
-            id: uniqueId(),
-            name: "Datepicker",
-            icon: "solar:calendar-search-linear",
-            url: "/ui-components/datepicker",
-          },
-          {
-            id: uniqueId(),
-            name: "Footer",
-            icon: "solar:wad-of-money-outline",
-            url: "/ui-components/footer",
-          },
-          {
-            id: uniqueId(),
-            name: "KBD",
-            icon: "solar:keyboard-line-duotone",
-            url: "/ui-components/kbd",
-          },
-          {
-            id: uniqueId(),
-            name: "Mega Menu",
-            icon: "solar:clipboard-list-linear",
-            url: "/ui-components/megamenu",
-          },
-          {
-            id: uniqueId(),
-            name: "Navbar",
-            icon: "solar:slider-minimalistic-horizontal-linear",
-            url: "/ui-components/navbar",
-          },
-          {
-            id: uniqueId(),
-            name: "Popover",
-            icon: "solar:chat-line-line-duotone",
-            url: "/ui-components/popover",
-          },
-          {
-            id: uniqueId(),
-            name: "Rating",
-            icon: "solar:stars-linear",
-            url: "/ui-components/rating",
-          },
-          {
-            id: uniqueId(),
-            name: "Sidebar",
-            icon: "solar:siderbar-broken",
-            url: "/ui-components/sidebar",
-          },
-          {
-            id: uniqueId(),
-            name: "Tables",
-            icon: "solar:bedside-table-linear",
-            url: "/ui-components/tables",
-          },
-          {
-            id: uniqueId(),
-            name: "Timeline",
-            icon: "solar:align-horizontal-center-outline",
-            url: "/ui-components/timeline",
-          },
-          {
-            id: uniqueId(),
-            name: "Toast",
-            icon: "solar:check-square-linear",
-            url: "/ui-components/toast",
-          },
-          {
-            id: uniqueId(),
-            name: "Typography",
-            icon: "solar:text-bold-duotone",
-            url: "/ui-components/typography",
-          },
-        ],
-      },
-    ],
-  }, //three end
-
-  {
-    id: 4,
-    name: "Tables",
-    items: [
-      {
-        heading: "Tables",
-        children: [
-          {
-            name: "Basic Tables",
-            icon: "solar:tablet-line-duotone",
-            id: uniqueId(),
-            url: "/tables/basic",
-          },
-          {
-            name: "Striped Rows Table",
-            icon: "solar:tablet-line-duotone",
-            id: uniqueId(),
-            url: "/tables/striped-row",
-          },
-          {
-            name: "Hover Table",
-            icon: "solar:tablet-line-duotone",
-            id: uniqueId(),
-            url: "/tables/hover-table",
-          },
-          {
-            name: "Checkbox Table",
-            icon: "solar:tablet-line-duotone",
-            id: uniqueId(),
-            url: "/tables/checkbox-table",
-          },
-        ],
-      },
-      {
-        heading: "React Tables",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Basic",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/basic",
-          },
-          {
-            id: uniqueId(),
-            name: "Dense",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/dense",
-          },
-          {
-            id: uniqueId(),
-            name: "Sorting",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/sorting",
-          },
-          {
-            id: uniqueId(),
-            name: "Filtering",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/filtering",
-          },
-          {
-            id: uniqueId(),
-            name: "Pagination",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/pagination",
-          },
-          {
-            id: uniqueId(),
-            name: "Row Selection",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/row-selection",
-          },
-          {
-            id: uniqueId(),
-            name: "Column Visibility",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/column-visibility",
-          },
-          {
-            id: uniqueId(),
-            name: "Editable",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/editable",
-          },
-          {
-            id: uniqueId(),
-            name: "Sticky",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/sticky",
-          },
-          {
-            id: uniqueId(),
-            name: "Drag & Drop",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/drag-drop",
-          },
-          {
-            id: uniqueId(),
-            name: "Empty",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/empty",
-          },
-          {
-            id: uniqueId(),
-            name: "Expanding",
-            icon:'solar:round-transfer-vertical-broken',
-            url: "/react-tables/expanding",
-          },
-          
-        ],
-      },
-      {
-        heading: "Shadcn Table",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Basic",
-            icon: "solar:command-line-duotone",
-            url: "/shadcn-tables/basic",
-          },
-        ]
-      },
-    ],
-  },
-
-  {
-    id: 5,
-    name: "Charts",
-    items: [
-      {
-        heading: "Charts",
-        children: [
-          {
-            name: "Line Chart",
-            icon: "solar:chart-square-line-duotone",
-            id: uniqueId(),
-            url: "/charts/line",
-          },
-          {
-            name: "Area Chart",
-            icon: "solar:graph-new-broken",
-            id: uniqueId(),
-            url: "/charts/area",
-          },
-          {
-            name: "Gradient Chart",
-            icon: "solar:round-graph-outline",
-            id: uniqueId(),
-            url: "/charts/gradient",
-          },
-          {
-            name: "Candlestick",
-            icon: "solar:chandelier-outline",
-            id: uniqueId(),
-            url: "/charts/candlestick",
-          },
-          {
-            name: "Column",
-            icon: "solar:chart-2-bold-duotone",
-            id: uniqueId(),
-            url: "/charts/column",
-          },
-          {
-            name: "Doughnut & Pie",
-            icon: "solar:pie-chart-2-linear",
-            id: uniqueId(),
-            url: "/charts/doughnut",
-          },
-          {
-            name: "Radialbar & Radar",
-            icon: "solar:graph-line-duotone",
-            id: uniqueId(),
-            url: "/charts/radialbar",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    id: 6,
-    name: "Forms",
-    items: [
-      {
-        heading: "Forms",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Forms Elements",
-            icon: "solar:text-selection-line-duotone",
-            url: "/forms/form-elements",
-          },
-          {
-            id: uniqueId(),
-            name: "Forms Layouts",
-            icon: "solar:document-text-outline",
-            url: "/forms/form-layouts",
-          },
-          {
-            id: uniqueId(),
-            name: "Forms Horizontal",
-            icon: "solar:slider-horizontal-line-duotone",
-            url: "/forms/form-horizontal",
-          },
-          {
-            id: uniqueId(),
-            name: "Forms Vertical",
-            icon: "solar:slider-vertical-line-duotone",
-            url: "/forms/form-vertical",
-          },
-          {
-            id: uniqueId(),
-            name: "Forms Custom",
-            icon: "solar:document-text-outline",
-            url: "/forms/form-custom",
-          },
-          {
-            id: uniqueId(),
-            name: "Form Validation",
-            icon: "solar:bill-check-linear",
-            url: "/forms/form-validation",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    id: 7,
-    name: "Shadcn Ui",
-    items: [
-      {
-        heading: "Shadcn Ui",
-        children: [
-         
-          {
-            id: uniqueId(),
-            name: "Badge",
-            icon: "solar:tag-horizontal-line-duotone",
-            url: "/shadcn-ui/badge",
-          },
-          {
-            id: uniqueId(),
-            name: "Buttons",
-            icon: "solar:airbuds-case-minimalistic-line-duotone",
-            url: "/shadcn-ui/buttons",
-          },
-          {
-            id: uniqueId(),
-            name: "Dropdowns",
-            icon: "solar:airbuds-case-line-duotone",
-            url: "/shadcn-ui/dropdown",
-          },
-          {
-            id: uniqueId(),
-            name: "Dialogs",
-            icon: "solar:bolt-line-duotone",
-            url: "/shadcn-ui/dialogs",
-          },
-          {
-            id: uniqueId(),
-            name: "Alert",
-            icon: "solar:flag-line-duotone",
-            url: "/shadcn-ui/alert",
-          },
-          {
-            id: uniqueId(),
-            name: "Toast",
-            icon: "solar:notification-unread-broken",
-            url: "/shadcn-ui/toast",
-          },
-          {
-            id: uniqueId(),
-            name: "Breadcrumbs",
-            icon: "solar:slider-minimalistic-horizontal-line-duotone",
-            url: "/shadcn-ui/breadcrumb",
-          },
-         
-          {
-            id: uniqueId(),
-            name: "Carousel",
-            icon: "solar:align-horizonta-spacing-line-duotone",
-            url: "/shadcn-ui/carousel",
-          },
-          
-          {
-            id: uniqueId(),
-            name: "Card",
-            icon: "solar:card-line-duotone",
-            url: "/shadcn-ui/card",
-          },
-          {
-            id: uniqueId(),
-            name: "Datepicker",
-            icon: "solar:calendar-search-linear",
-            url: "/shadcn-ui/datepicker",
-          },
-          {
-            id: uniqueId(),
-            name: "Combobox",
-            icon: "solar:wad-of-money-outline",
-            url: "/shadcn-ui/combobox",
-          },
-          {
-            id: uniqueId(),
-            name: "Collapsible",
-            icon: "solar:list-up-minimalistic-bold-duotone",
-            url: "/shadcn-ui/collapsible",
-          },
-          {
-            id: uniqueId(),
-            name: "Command",
-            icon: "solar:command-outline",
-            url: "/shadcn-ui/command",
-          },
-          {
-            id: uniqueId(),
-            name: "Skeleton",
-            icon: "solar:soundwave-bold-duotone",
-            url: "/shadcn-ui/skeleton",
-          },
-          {
-            id: uniqueId(),
-            name: "Avatar",
-            icon: "solar:user-line-duotone",
-            url: "/shadcn-ui/avatar",
-          },
-         
-          {
-            id: uniqueId(),
-            name: "Tooltip",
-            icon: "solar:feed-line-duotone",
-            url: "/shadcn-ui/tooltip",
-          },
-          {
-            name: "Accordion",
-            icon: "solar:round-alt-arrow-down-outline",
-            id: uniqueId(),
-            url: "/shadcn-ui/accordion",
-          },
-          {
-            id: uniqueId(),
-            name: "Tab",
-            icon: "solar:box-minimalistic-line-duotone",
-            url: "/shadcn-ui/tab",
-          },
-          {
-            id: uniqueId(),
-            name: "Progressbar",
-            icon: "solar:programming-line-duotone",
-            url: "/shadcn-ui/progressbar",
-          },
-          {
-            id: uniqueId(),
-            name: "Drawer",
-            icon: "solar:laptop-minimalistic-line-duotone",
-            url: "/shadcn-ui/drawer",
-          },
-        ],
-      },
-      {
-        heading: "Shadcn Form Elements",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Input",
-            icon: "solar:text-circle-linear",
-            url: "/shadcn-form/input",
-          },
-          {
-            id: uniqueId(),
-            name: "Select",
-            icon: "solar:round-alt-arrow-down-outline",
-            url: "/shadcn-form/select",
-          },
-          {
-            id: uniqueId(),
-            name: "Checkbox",
-            icon: "solar:shield-check-linear",
-            url: "/shadcn-form/checkbox",
-          },
-          {
-            id: uniqueId(),
-            name: "Radio",
-            icon: "solar:record-linear",
-            url: "/shadcn-form/radio",
-          },
-        ]
-      },
-    ],
-  },
-
-  {
-    id: 8,
-    name: "Headless",
-    items: [
-      {
-        heading: "Headless Ui Elements",
-        children: [
-          {
-            name: "Dropdown",
-            icon: "solar:round-alt-arrow-down-outline",
-            id: uniqueId(),
-            url: "/headless-ui/dropdown",
-          },
-          {
-            name: "Disclosure",
-            icon: "solar:accumulator-broken",
-            id: uniqueId(),
-            url: "/headless-ui/disclosure",
-          },
-          {
-            name: "Dialog",
-            icon: "solar:smartphone-update-line-duotone",
-            id: uniqueId(),
-            url: "/headless-ui/dialog",
-          },
-          {
-            name: "Popover",
-            icon: "solar:airbuds-case-charge-line-duotone",
-            id: uniqueId(),
-            url: "/headless-ui/popover",
-          },
-          {
-            name: "Tabs",
-            icon: "solar:clapperboard-text-linear",
-            id: uniqueId(),
-            url: "/headless-ui/tabs",
-          },
-          {
-            name: "Transition",
-            icon: "solar:round-transfer-horizontal-line-duotone",
-            id: uniqueId(),
-            url: "/headless-ui/transition",
-          },
-         
-        ],
-      },
-      {
-        heading: "Headless Form Elements",
-        children: [
-          {
-            id: uniqueId(),
-            name: "Buttons",
-            icon: "solar:adhesive-plaster-outline",
-            url: "/headless-form/buttons",
-          },
-          {
-            id: uniqueId(),
-            name: "Checkbox",
-            icon: "solar:check-circle-linear",
-            url: "/headless-form/checkbox",
-          },
-          {
-            id: uniqueId(),
-            name: "Combobox",
-            icon: "solar:archive-down-minimlistic-broken",
-            url: "/headless-form/combobox",
-          },
-          {
-            id: uniqueId(),
-            name: "Fieldset",
-            icon: "solar:password-minimalistic-input-outline",
-            url: "/headless-form/fieldset",
-          },
-          {
-            id: uniqueId(),
-            name: "Input",
-            icon: "solar:text-italic-circle-linear",
-            url: "/headless-form/input",
-          },
-          {
-            id: uniqueId(),
-            name: "Listbox",
-            icon: "solar:list-check-linear",
-            url: "/headless-form/listbox",
-          },
-          {
-            id: uniqueId(),
-            name: "Radio Group",
-            icon: "solar:round-graph-linear",
-            url: "/headless-form/radiogroup",
-          },
-          {
-            id: uniqueId(),
-            name: "Select",
-            icon: "solar:minimize-square-3-outline",
-            url: "/headless-form/select",
-          },
-          {
-            id: uniqueId(),
-            name: "Switch",
-            icon: "solar:branching-paths-down-outline",
-            url: "/headless-form/switch",
-          },
-          {
-            id: uniqueId(),
-            name: "Textarea",
-            icon: "solar:text-square-2-linear",
-            url: "/headless-form/textarea",
-          },
-        
-        ],
-      },
-     
-    ],
-  },
-
-  {
-    id: 9,
-    name: "Auth",
-    items: [
-      {
-        heading: "Auth",
-        children: [
-          {
-            name: "Error",
-            icon: "solar:bug-minimalistic-line-duotone",
-            id: uniqueId(),
-            url: "/auth/error",
-          },
-          {
-            name: "Side Login",
-            icon: "solar:login-3-line-duotone",
-            id: uniqueId(),
-            url: "/auth/auth1/login",
-          },
-          {
-            name: "Boxed Login",
-            icon: "solar:login-3-line-duotone",
-            id: uniqueId(),
-            url: "/auth/auth2/login",
-          },
-          {
-            name: "Side Register",
-            icon: "solar:user-plus-rounded-line-duotone",
-            id: uniqueId(),
-            url: "/auth/auth1/register",
-          },
-          {
-            name: "Boxed Register",
-            icon: "solar:user-plus-rounded-line-duotone",
-            id: uniqueId(),
-            url: "/auth/auth2/register",
-          },
-          {
-            name: "Side Forgot Pwd",
-            icon: "solar:password-outline",
-            id: uniqueId(),
-            url: "/auth/auth1/forgot-password",
-          },
-          {
-            name: "Boxed Forgot Pwd",
-            icon: "solar:password-outline",
-            id: uniqueId(),
-            url: "/auth/auth2/forgot-password",
-          },
-          {
-            name: "Side Two Steps",
-            icon: "solar:password-outline",
-            id: uniqueId(),
-            url: "/auth/auth1/two-steps",
-          },
-          {
-            name: "Boxed Two Steps",
-            icon: "solar:password-outline",
-            id: uniqueId(),
-            url: "/auth/auth2/two-steps",
-          },
-          {
-            name: "Maintenance",
-            icon: "solar:settings-outline",
-            id: uniqueId(),
-            url: "/auth/maintenance",
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    id: 10,
-    name: "Menu",
-    items: [
-      {
-        heading: "Multi level",
-        children: [
-          {
-            name: "Menu Level",
-            icon: "solar:widget-add-line-duotone",
-            id: uniqueId(),
-            children: [
-              {
-                id: uniqueId(),
-                name: "Level 1",
-                url: "",
-              },
-              {
-                id: uniqueId(),
-                name: "Level 1.1",
-                icon: "fad:armrecording",
-                url: "",
-                children: [
-                  {
-                    id: uniqueId(),
-                    name: "Level 2",
-                    url: "",
-                  },
-                  {
-                    id: uniqueId(),
-                    name: "Level 2.1",
-                    icon: "fad:armrecording",
-                    url: "",
-                    children: [
-                      {
-                        id: uniqueId(),
-                        name: "Level 3",
-                        url: "",
-                      },
-                      {
-                        id: uniqueId(),
-                        name: "Level 3.1",
-                        url: "",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        heading: "More Options",
-        children: [
-          {
-            id: uniqueId(),
-            url: "/sample-page",
-            name: "Applications",
-            icon: "solar:check-circle-bold",
-            color: "text-primary",
-          },
-          {
-            id: uniqueId(),
-            url: "",
-            name: "Form Options",
-            icon: "solar:check-circle-bold",
-            color: "text-secondary",
-          },
-          {
-            id: uniqueId(),
-            url: "",
-            name: "Table Variations",
-            icon: "solar:check-circle-bold",
-            color: "text-info",
-          },
-          {
-            id: uniqueId(),
-            url: "",
-            name: "Charts Selection",
-            icon: "solar:check-circle-bold",
-            color: "text-warning",
-          },
-          {
-            id: uniqueId(),
-            url: "",
-            name: "Widgets",
-            icon: "solar:check-circle-bold",
-            color: "text-success",
+            id: uniqueId('link-'),
+            name: "Market Insights",
+            icon: "solar:chart-line-duotone", // Reusing icon, consider a unique one if available
+            url: "/resources/market-insights",
+            roles: roles(['all'])
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Templates",
+            icon: "solar:file-text-line-duotone",
+            url: "/resources/templates",
+            roles: roles(['all'])
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Startup Guides",
+            icon: "solar:notebook-bookmark-line-duotone",
+            url: "/resources/startup-guides",
+            roles: roles(['all'])
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Investor Guides",
+            icon: "solar:notebook-bookmark-line-duotone", // Could be same icon or different
+            url: "/resources/investor-guides",
+            roles: roles(['all'])
           },
         ],
       },

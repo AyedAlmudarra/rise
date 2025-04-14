@@ -8,6 +8,15 @@ import { Link } from "react-router-dom";
 
 const Search = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implement actual search logic here
+    // e.g., call API, navigate to search results page
+    console.log('Performing search for:', searchQuery);
+  };
+
   return (
     <div>
       <button
@@ -19,7 +28,22 @@ const Search = () => {
 
       <Modal dismissible show={openModal} onClose={() => setOpenModal(false)}>
         <div className="p-6 border-b border-ld">
-          <TextInput placeholder="Search here" className="form-control" sizing="md" required />
+          <form onSubmit={handleSearch} className="relative">
+            <TextInput
+              id="search-input"
+              type="text"
+              icon={() => <Icon icon="solar:magnifer-line-duotone" height={18} />}
+              placeholder="Search..."
+              required
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full sm:w-48 [&_input]:!py-2 [&_input]:!ps-11 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+            />
+            {/* Hidden submit button for accessibility and form submission */}
+            <button type="submit" className="absolute -left-[9999px]" aria-hidden="true" tabIndex={-1}>
+              Search
+            </button>
+          </form>
         </div>
         <Modal.Body className="pt-0 "  >
           <SimpleBar className="max-h-72">

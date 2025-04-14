@@ -282,130 +282,84 @@ const AuthRegisterStartup = () => {
 
   const onSubmit = async (data: StartupRegistrationData) => {
     setSubmissionError(null);
-    const loadingToastId = toast.loading('Registering your startup...');
-    console.log("Form Data Submitted:", data);
+    // console.log("Form Data:", data); // Keep for debugging if needed
 
-    try {
-      // 1. Sign up the user
-      console.log("Attempting user sign up...");
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-              data: {
-                  role: 'startup'
-              }
-          }
-      });
+    // 1. Sign up the user first
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    });
 
-      if (authError) {
-        console.error("Auth Error:", authError);
-        throw new Error(`Signup failed: ${authError.message}`);
-      }
-      if (!authData.user) {
-        throw new Error("Signup successful but no user data returned.");
-      }
-
-      const userId = authData.user.id;
-      console.log("User signed up successfully:", userId);
-
-      // 2. Prepare profile data using EXACT database column names
-      const profileDataToInsert = {
-          user_id: userId,
-          name: data.startupName, 
-          industry: data.industry,
-          sector: data.sector || null,
-          location_city: data.locationCity,
-          country_of_operation: data.countryOfOperation, 
-          description: data.companyDescription || null, 
-          operational_stage: data.operationalStage || null, 
-          founding_date: data.foundingDate || null, 
-          founder_name: data.founderName || null,
-          founder_title: data.founderTitle || null,
-          founder_education: data.founderEducation || null,
-          previous_startup_experience: data.previousStartupExperience || null,
-          founder_bio: data.founderBio || null,
-          tech_skills: data.techSkills || null, 
-          website: data.website || null,
-          linkedin_profile: data.linkedinProfile || null,
-          twitter_profile: data.twitterProfile || null,
-          logo_url: data.logo_url || null,
-          pitch_deck_url: data.pitch_deck_url || null, 
-          num_employees: data.numEmployees && !isNaN(Number(String(data.numEmployees))) ? parseInt(String(data.numEmployees), 10) : null,
-          num_customers: data.numCustomers && !isNaN(Number(String(data.numCustomers))) ? parseInt(String(data.numCustomers), 10) : null,
-          team_size: data.teamSize && !isNaN(Number(String(data.teamSize))) ? parseInt(String(data.teamSize), 10) : null, 
-          has_co_founder: data.hasCoFounder ?? null, 
-          annual_revenue: data.annualRevenue && !isNaN(Number(String(data.annualRevenue))) ? parseFloat(String(data.annualRevenue)) : null,
-          annual_expenses: data.annualExpenses && !isNaN(Number(String(data.annualExpenses))) ? parseFloat(String(data.annualExpenses)) : null,
-          kpi_cac: data.kpi_cac && !isNaN(Number(String(data.kpi_cac))) ? parseFloat(String(data.kpi_cac)) : null,
-          kpi_clv: data.kpi_clv && !isNaN(Number(String(data.kpi_clv))) ? parseFloat(String(data.kpi_clv)) : null,
-          kpi_retention_rate: data.kpi_retention_rate && !isNaN(Number(String(data.kpi_retention_rate))) ? parseFloat(String(data.kpi_retention_rate)) : null,
-          kpi_conversion_rate: data.kpi_conversion_rate && !isNaN(Number(String(data.kpi_conversion_rate))) ? parseFloat(String(data.kpi_conversion_rate)) : null,
-          kpi_monthly_growth: data.kpi_monthly_growth && !isNaN(Number(String(data.kpi_monthly_growth))) ? parseFloat(String(data.kpi_monthly_growth)) : null, 
-          kpi_payback_period: data.kpi_payback_period && !isNaN(Number(String(data.kpi_payback_period))) ? parseFloat(String(data.kpi_payback_period)) : null, 
-          kpi_churn_rate: data.kpi_churn_rate && !isNaN(Number(String(data.kpi_churn_rate))) ? parseFloat(String(data.kpi_churn_rate)) : null, 
-          kpi_nps: data.kpi_nps && !isNaN(Number(String(data.kpi_nps))) ? parseFloat(String(data.kpi_nps)) : null, 
-          kpi_tam_size: data.kpi_tam_size || null, 
-          kpi_avg_order_value: data.kpi_avg_order_value && !isNaN(Number(String(data.kpi_avg_order_value))) ? parseFloat(String(data.kpi_avg_order_value)) : null, 
-          kpi_market_share: data.kpi_market_share && !isNaN(Number(String(data.kpi_market_share))) ? parseFloat(String(data.kpi_market_share)) : null, 
-          kpi_yoy_growth: data.kpi_yoy_growth && !isNaN(Number(String(data.kpi_yoy_growth))) ? parseFloat(String(data.kpi_yoy_growth)) : null, 
-          market_growth_rate: data.marketGrowthRate || null, 
-          market_key_trends: data.marketKeyTrends || null, 
-          target_customer_profile: data.targetCustomerProfile || null, 
-          customer_pain_points: data.customerPainPoints || null, 
-          market_barriers: data.marketBarriers || null, 
-          competitive_advantage: data.competitiveAdvantage || null, 
-          competitor1_name: data.competitor1Name || null, 
-          competitor1_size: data.competitor1Size || null, 
-          competitor1_threat: data.competitor1Threat || null, 
-          competitor1_differentiator: data.competitor1Differentiator || null, 
-          competitor2_name: data.competitor2Name || null, 
-          competitor2_size: data.competitor2Size || null, 
-          competitor2_threat: data.competitor2Threat || null, 
-          competitor2_differentiator: data.competitor2Differentiator || null, 
-          competitor3_name: data.competitor3Name || null, 
-          competitor3_size: data.competitor3Size || null, 
-          competitor3_threat: data.competitor3Threat || null, 
-          competitor3_differentiator: data.competitor3Differentiator || null, 
-          current_funding: data.currentFunding || null, 
-          seeking_investment: data.seekingInvestment ?? null, 
-          target_raise_amount: data.targetRaiseAmount && !isNaN(Number(String(data.targetRaiseAmount))) ? parseFloat(String(data.targetRaiseAmount)) : null,
-      };
-
-      console.log("Prepared profile data for insert (using DB keys):", profileDataToInsert);
-
-      // 3. Insert into 'startups' table using the prepared data and selecting columns
-      console.log("Inserting startup profile into database...");
-      const { data: insertedData, error: insertError } = await supabase
-          .from('startups')
-          .insert(profileDataToInsert)
-          .select('id'); // Select at least one column to confirm insert
-
-      if (insertError) {
-          console.error("Insert Error:", insertError);
-          throw new Error(`Failed to save startup profile: ${insertError.message}`);
-      }
-
-      console.log("Startup profile inserted successfully.");
-      toast.dismiss(loadingToastId);
-      toast.success('Registration successful! Please check your email to verify your account.', { duration: 6000 });
-
-      localStorage.setItem('registration_timestamp', Date.now().toString());
-
-      navigate('/auth/check-email', { state: { email: data.email } });
-
-    } catch (error: any) {
-      console.error("Registration process failed:", error);
-      toast.dismiss(loadingToastId);
-      let errorMessage = error.message || "An unexpected error occurred.";
-      if (errorMessage.includes("User already registered")) {
-          errorMessage = "This email address is already registered. Please try logging in.";
-      } else if (errorMessage.includes("Password should be at least 6 characters")) {
-          errorMessage = "Password must be at least 6 characters long.";
-      }
-      setSubmissionError(errorMessage);
-      toast.error(`Registration failed: ${errorMessage}`);
+    // 2. Handle Authentication Error
+    if (authError) {
+      console.error("Auth signup error:", authError);
+      setSubmissionError(`Registration failed: ${authError.message}`);
+      toast.error(`Registration failed: ${authError.message}`);
+      return; // Stop execution if auth fails
     }
+
+    // 3. Check if user object exists (should always exist if no error, but good practice)
+    if (!authData || !authData.user) {
+        console.error("Auth signup success but no user data returned.");
+        setSubmissionError("Registration partially failed: User account created, but profile setup encountered an issue. Please contact support.");
+        toast.error("Registration error: User account created, but profile setup failed.");
+        return;
+    }
+
+    // 4. Extract User ID
+    const userId = authData.user.id;
+
+    // 5. Prepare Startup Profile Data for Insertion
+    // Map form data (data) to the columns in the 'startups' table
+    const startupProfileData: Partial<StartupProfile> = { // Use Partial<StartupProfile> from types/database
+      user_id: userId,
+      name: data.startupName,
+      description: data.companyDescription,
+      industry: data.industry,
+      sector: data.sector || null, // Use null if empty
+      operational_stage: data.operationalStage,
+      location_city: data.locationCity,
+      website: data.website || null,
+      num_employees: data.numEmployees ? parseInt(data.numEmployees, 10) : null, // Parse to int or null
+      num_customers: data.numCustomers ? parseInt(data.numCustomers, 10) : null, // Parse to int or null
+      annual_revenue: data.annualRevenue ? parseFloat(data.annualRevenue) : null, // Parse to float or null
+      annual_expenses: data.annualExpenses ? parseFloat(data.annualExpenses) : null, // Parse to float or null
+      // Map other relevant fields from 'data' to 'startupProfileData' as needed
+      // Example: kpi_cac: data.kpi_cac ? parseFloat(data.kpi_cac) : null,
+      // ... map all relevant fields collected by the form ...
+      // Note: logo_url and pitch_deck_url are handled separately (if implemented)
+    };
+
+    // 6. Insert Startup Profile Data into Supabase
+    console.log("Attempting to insert profile data for user:", userId);
+    const { error: insertError } = await supabase
+      .from('startups') // Ensure 'startups' matches your table name
+      .insert([startupProfileData]); // Insert requires an array
+
+    // 7. Handle Insertion Error
+    if (insertError) {
+      console.error("Startup profile insertion error:", insertError);
+      // Attempt to provide a more specific error if possible
+      let userMessage = `Profile creation failed: ${insertError.message}. Your account was created, but we couldn't save your company details. Please try updating your profile later or contact support.`;
+      if (insertError.message.includes('duplicate key value violates unique constraint')) {
+          userMessage = "Profile creation failed: It seems a profile might already exist for this account.";
+      } else if (insertError.message.includes('violates row-level security policy')) {
+          userMessage = "Profile creation failed due to a permission issue. Please contact support.";
+      }
+      setSubmissionError(userMessage);
+      toast.error(userMessage, { duration: 6000 }); // Longer duration for important errors
+      // Consider if you need to delete the auth user here if profile creation is critical
+      // await supabase.auth.admin.deleteUser(userId); // Requires admin privileges - handle with care!
+      return;
+    }
+
+    // 8. Success
+    console.log("Startup profile inserted successfully for user:", userId);
+    toast.success("Registration successful! Please check your email to confirm your account.", { duration: 5000 });
+    setSubmissionError(null); // Ensure error is cleared on success
+    // Optionally clear form state here if needed: methods.reset();
+    navigate("/login"); // Redirect to login or a confirmation page
+
   };
 
   return (

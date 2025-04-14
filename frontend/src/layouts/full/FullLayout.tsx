@@ -1,11 +1,12 @@
 import { FC, useContext } from 'react';
 import { Outlet } from "react-router";
-import { Customizer } from './shared/customizer/Customizer';
+import { AIAssistant } from './shared/customizer/AIAssistant';
 import { CustomizerContext } from '../../context/CustomizerContext';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Header from './vertical/header/Header';
 import ScrollToTop from 'src/components/shared/ScrollToTop';
 import PartialTransitioning from 'src/components/headless-ui/Transition/PartialTransitioning';
+import { AIAssistantProvider } from 'src/context/AIAssistantContext';
 
 
 
@@ -45,7 +46,9 @@ const FullLayout: FC = () => {
               <Outlet/>
               </ScrollToTop>
             </div>
-            <Customizer />
+            <AIAssistantProvider>
+              <AIAssistant />
+            </AIAssistantProvider>
             <PartialTransitioning/>
           </div>
         </div>

@@ -166,15 +166,32 @@ export interface AIAnalysisData {
   growth_plan_phases?: GrowthPlanPhase[];
   scalability_assessment?: ScalabilityAssessment;
   competitive_advantage_evaluation?: CompetitiveAdvantageEvaluation;
-  market_positioning?: string;             // Added: Assessment of market fit/positioning
+  market_positioning?: string;             // Assessment of market fit/positioning
   current_challenges?: string[];
   strategic_recommendations?: string[];
-  suggested_kpis?: SuggestedKpiItem[];     // Modified: Array of objects with justification
-  key_risks?: string[];
-  what_if_scenarios?: WhatIfScenario[];
-  funding_outlook?: string;                // Added: Commentary on funding readiness/needs
-  // Add any other fields the AI function might return
-  [key: string]: any; // Allow for other potential fields
+  suggested_kpis?: SuggestedKpiItem[];     // Array of objects with justification
+  key_risks?: string[];                    // Risk indicators identified by AI
+  what_if_scenarios?: WhatIfScenario[];    // "Potential Scenarios" section
+  funding_outlook?: string;                // Commentary on funding readiness/needs
+  
+  // New fields for Financial Performance section
+  financial_assessment?: {
+    strengths: string[];
+    weaknesses: string[];
+    recommendations: string[];
+  };
+  cash_burn_rate?: {
+    monthly_rate: number;
+    runway_months: number;
+    assessment: string;
+  };
+  profitability_projection?: {
+    estimated_timeframe: string;
+    key_factors: string[];
+  };
+  
+  // Allow for other potential fields
+  [key: string]: any;
 }
 
 // --- Other Interface Definitions ---
@@ -212,3 +229,16 @@ export interface InterestedInvestor {
 
 // Combined Startup Profile (Database + potentially calculated/joined fields)
 // ... rest of the file ... 
+
+// --- Calendar Event Structure --- 
+
+export interface CalendarEvent {
+  id: string;                   // uuid, Primary Key
+  created_at: string;           // timestamp with time zone
+  user_id: string;              // uuid, Foreign Key to auth.users.id
+  title: string;                // text, Not null
+  start_time: string | null;    // timestamp with time zone, Not null (will be Date or null in component state)
+  end_time: string | null;      // timestamp with time zone, Not null (will be Date or null in component state)
+  all_day: boolean;             // boolean, Default false
+  color: string | null;         // text, e.g., 'primary', 'green'
+} 

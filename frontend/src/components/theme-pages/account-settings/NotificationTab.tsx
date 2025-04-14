@@ -1,11 +1,11 @@
-
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Label,
   TextInput,
   ToggleSwitch,
   Tooltip,
+  Spinner
 } from "flowbite-react";
 import {
   IconArticle,
@@ -15,150 +15,212 @@ import {
   IconMail,
   IconPlayerPause,
   IconTruckDelivery,
+  IconAlertCircle,
+  IconMessage2,
+  IconReceiptDollar,
+  IconSpeakerphone
 } from "@tabler/icons-react";
 import OutlineCard from "src/components/shared/OutlineCard";
+import { useAuth } from "src/context/AuthContext";
+import { supabase } from "src/lib/supabaseClient";
+import { toast } from "react-hot-toast";
+
+// Define the shape of preferences data
+interface NotificationPreferences {
+  id?: string;
+  user_id?: string;
+  new_match_email: boolean;
+  new_match_push: boolean;
+  message_email: boolean;
+  message_push: boolean;
+  funding_milestone_email: boolean;
+  funding_milestone_push: boolean;
+  platform_updates_email: boolean;
+}
+
+const defaultPreferences: NotificationPreferences = {
+  new_match_email: true,
+  new_match_push: false,
+  message_email: true,
+  message_push: true,
+  funding_milestone_email: true,
+  funding_milestone_push: false,
+  platform_updates_email: true,
+};
 
 const NotificationTab = () => {
-  const [switch1, setSwitch1] = useState(false);
-  const [switch2, setSwitch2] = useState(true);
-  const [switch3, setSwitch3] = useState(true);
-  const [switch4, setSwitch4] = useState(false);
-  const [switch5, setSwitch5] = useState(true);
-  const [switch6, setSwitch6] = useState(false);
+  const { user } = useAuth();
+  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const notificationTb = [
+  // Fetch preferences on mount
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      if (!user) {
+        setLoading(false);
+        setError("User not found.");
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('notification_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') { // Ignore 'Not Found' error
+          throw fetchError;
+        }
+        if (data) {
+          setPreferences(data);
+        } else {
+          // Prefs might not exist if trigger failed, use defaults
+          setPreferences({ ...defaultPreferences, user_id: user.id });
+        }
+      } catch (err: any) {
+        console.error("Error fetching preferences:", err);
+        setError("Failed to load notification preferences.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreferences();
+  }, [user]);
+
+  // Handle toggle switch change
+  const handleToggleChange = (field: keyof NotificationPreferences, checked: boolean) => {
+    setPreferences(prev => ({
+      ...prev,
+      [field]: checked,
+    }));
+  };
+
+  // Handle saving preferences
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const { error: saveError } = await supabase
+        .from('notification_preferences')
+        .upsert({ ...preferences, user_id: user.id }, { onConflict: 'user_id' }); // Use upsert
+
+      if (saveError) {
+        throw saveError;
+      }
+      toast.success("Notification preferences saved!");
+    } catch (err: any) {
+      console.error("Error saving preferences:", err);
+      toast.error("Failed to save preferences.");
+      setError("Failed to save preferences.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center p-10"><Spinner /></div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-600"><IconAlertCircle className="inline mr-2"/> {error}</div>;
+  }
+
+  // Define notification options structure
+  const notificationOptions = [
     {
-      title: "Our newsletter",
-      subtitle: "We will always let you know about important changes",
-      icon: <IconArticle />,
-      switch: switch1,
-      switchfun: setSwitch1,
-    },
-    {
-      title: "Order Confirmation",
-      subtitle: "You will be notified when customer order any product",
+      title: "New Matches",
+      subtitle: "Notify me about potential startup/investor matches",
       icon: <IconCheckbox />,
-      switch: switch2,
-      switchfun: setSwitch2,
+      emailField: 'new_match_email',
+      pushField: 'new_match_push', // Assuming you might add push later
     },
     {
-      title: "Order Status Changed",
-      subtitle: "You will be notified when customer make changes to the order",
-      icon: <IconClock />,
-      switch: switch3,
-      switchfun: setSwitch3,
+      title: "New Messages",
+      subtitle: "Notify me when I receive a new message",
+      icon: <IconMessage2 />,
+      emailField: 'message_email',
+      pushField: 'message_push',
     },
     {
-      title: "Order Delivered",
-      subtitle: "You will be notified once the order is delivered",
-      icon: <IconTruckDelivery />,
-      switch: switch4,
-      switchfun: setSwitch4,
+      title: "Funding Milestones",
+      subtitle: "Notify me about funding round updates or milestones",
+      icon: <IconReceiptDollar />,
+      emailField: 'funding_milestone_email',
+      pushField: 'funding_milestone_push',
     },
     {
-      title: "Email Notification",
-      subtitle: "Turn on email notificaiton to get updates through email",
-      icon: <IconMail />,
-      switch: switch5,
-      switchfun: setSwitch5,
+      title: "Platform Updates",
+      subtitle: "Receive news and updates about the RISE platform",
+      icon: <IconSpeakerphone />,
+      emailField: 'platform_updates_email',
+      // No push field for this example
     },
   ];
+
   return (
     <>
-      <div className="flex justify-center">
-        <div className="lg:w-3/4 w-full">
-          <OutlineCard className="shadow-none pb-0">
-            <h5 className="card-title">Notification Preferences</h5>
-            <p className="card-subtitle -mt-1">
-              Select the notificaitons ou would like to receive via email.
-              Please note that you cannot opt out of receving service messages,
-              such as payment, security or legal notifications.
-            </p>
-            <div className="my-4">
-              <div className="mb-2 block">
-                <Label htmlFor="eml" value="Email" />
+      <OutlineCard className="shadow-none">
+        <h5 className="card-title">Notification Preferences</h5>
+        <p className="card-subtitle -mt-1">
+          Select the notifications you would like to receive. 
+          Service messages (security, legal) cannot be opted out of.
+        </p>
+        
+        <div className="mt-6 space-y-6">
+          {notificationOptions.map((item, i) => (
+            <div className="flex items-center justify-between" key={item.title}>
+              <div className="flex gap-3.5 items-center">
+                <div className="flex-shrink-0 flex justify-center items-center h-10 w-10 rounded-md bg-muted dark:bg-darkmuted text-dark dark:text-white">
+                  {item.icon}
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium">{item.title}</h6>
+                  <p className="text-xs text-bodytext">{item.subtitle}</p>
+                </div>
               </div>
-              <TextInput
-                id="eml"
-                type="email"
-                sizing="md"
-                className="form-control"
-              />
-              <small className="text-sm text-bodytext">
-                Required for notificaitons.
-              </small>
-            </div>
-
-            <div>
-              {notificationTb.map((item, i) => (
-                <div className="flex mb-6 items-center" key={i}>
-                  <div className="flex gap-3.5">
-                    <div className="flex justify-center h-12 w-12 rounded-md bg-muted dark:bg-darkmuted items-center text-dark dark:text-white">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h6 className="text-base">{item.title}</h6>
-                      <p className="text-sm text-bodytext">{item.subtitle}</p>
-                    </div>
-                  </div>
-                  <div className="ms-auto">
-                    <ToggleSwitch
-                      checked={item.switch}
-                      onChange={item.switchfun}
+              <div className="flex items-center gap-4 ml-auto pl-4">
+                {/* Email Toggle */}
+                {item.emailField && (
+                  <div className="flex flex-col items-center">
+                     <ToggleSwitch
+                      checked={!!preferences[item.emailField as keyof NotificationPreferences]}
+                      onChange={(checked) => handleToggleChange(item.emailField as keyof NotificationPreferences, checked)}
+                      label="Email"
+                      className="text-xs"
                     />
                   </div>
-                </div>
-              ))}
-            </div>
-          </OutlineCard>
-          <OutlineCard className="mt-[30px] shadow-none ">
-            <h5 className="card-title">Date & Time</h5>
-            <p className="card-subtitle -mt-1">
-              Time zones and calendar display settings.
-            </p>
-            <div className="flex items-center mt-6">
-              <div className="flex gap-3.5">
-                <div className="flex justify-center h-12 w-12 rounded-md bg-muted dark:bg-darkmuted items-center text-dark dark:text-white">
-                  <IconClock />
-                </div>
-                <div>
-                  <p className="text-sm text-bodytext">Time zone</p>
-                  <h6 className="text-base">(UTC + 02:00) Athens, Bucharet</h6>
-                </div>
-              </div>
-              <div className="ms-auto">
-                <Tooltip content="Download">
-                  <IconDownload
-                    size={18}
-                    className="text-dark dark:text-bodytext cursor-pointer"
-                  />
-                </Tooltip>
+                )}
+                 {/* Push Toggle (Placeholder/Future) */}
+                 {item.pushField && (
+                  <div className="flex flex-col items-center">
+                     <ToggleSwitch
+                      checked={!!preferences[item.pushField as keyof NotificationPreferences]}
+                      onChange={(checked) => handleToggleChange(item.pushField as keyof NotificationPreferences, checked)}
+                      label="Push" // Consider changing label if only using email for now
+                      disabled // Disable if push not implemented
+                      className="text-xs opacity-50"
+                    />
+                  </div>
+                )} 
               </div>
             </div>
-          </OutlineCard>
-
-          <OutlineCard className="mt-[30px] shadow-none">
-            <h5 className="card-title">Ignore Tracking</h5>
-            <div className="flex items-center mt-5">
-              <div className="flex gap-3.5">
-                <div className="flex justify-center h-12 w-12 rounded-md bg-muted dark:bg-darkmuted items-center text-dark dark:text-white">
-                  <IconPlayerPause />
-                </div>
-                <div>
-                  <h6 className="text-base">Ignore Browser Tracking</h6>
-                  <p className="text-sm text-bodytext">Browser Cookie</p>
-                </div>
-              </div>
-              <div className="ms-auto">
-                <ToggleSwitch checked={switch6} onChange={setSwitch6} />
-              </div>
-            </div>
-          </OutlineCard>
+          ))}
         </div>
-      </div>
+      </OutlineCard>
+      
+      {/* Removed Date/Time and Ignore Tracking sections as they might not be relevant */}
+
       <div className="flex justify-end gap-3 pt-7">
-        <Button color={"primary"}>Save</Button>
-        <Button color={"lighterror"}>Cancel</Button>
+        <Button color={"primary"} onClick={handleSave} isProcessing={saving} disabled={saving}>
+          Save Preferences
+        </Button>
+        {/* <Button color={"lighterror"}>Cancel</Button> // Optional cancel */}
       </div>
     </>
   );
