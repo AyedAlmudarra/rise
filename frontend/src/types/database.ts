@@ -98,21 +98,25 @@ export interface StartupProfile {
 
 // Updated InvestorProfile interface to match the new SQL schema
 export interface InvestorProfile {
-  // Core Fields
-  id: number;
-  user_id: string;
-  created_at: string;
-  updated_at: string; // Added required field
+  // Core Fields (Matching SQL)
+  id: number;                       // bigint -> number
+  user_id: string;                  // uuid -> string (FK to auth.users)
+  created_at: string;               // timestamp with time zone -> string (ISO 8601)
+  updated_at: string;               // timestamp with time zone -> string (ISO 8601)
 
-  // Profile Fields
-  job_title: string | null;
-  company_name: string | null;
-  company_description: string | null;
-  website: string | null;
-  linkedin_profile: string | null;
-  preferred_industries: string[] | null; // Match SQL (text[] null)
-  preferred_geography: string[] | null;  // Match SQL (text[] null)
-  preferred_stage: string[] | null;      // Match SQL (text[] null)
+  // Profile Fields (Matching SQL)
+  full_name: string;                // text -> string (Not Null in SQL)
+  job_title: string | null;         // text -> string | null
+  company_name: string | null;      // text -> string | null
+  investor_type: 'Personal' | 'Angel' | 'VC' | null; // text CHECK constraint -> specific string literal union | null
+  website: string | null;           // text -> string | null (URL validation in SQL)
+  linkedin_profile: string | null;  // text -> string | null (URL validation in SQL)
+  company_description: string | null; // text -> string | null
+
+  // Preferences (Matching SQL)
+  preferred_industries: string[] | null; // text[] -> string[] | null
+  preferred_geography: string[] | null;  // text[] -> string[] | null
+  preferred_stage: string[] | null;      // text[] -> string[] | null
 }
 
 // --- AI Analysis Structure Definitions ---
@@ -241,4 +245,64 @@ export interface CalendarEvent {
   end_time: string | null;      // timestamp with time zone, Not null (will be Date or null in component state)
   all_day: boolean;             // boolean, Default false
   color: string | null;         // text, e.g., 'primary', 'green'
+} 
+
+// --- Connection & Notification System Structures (Frontend Types) ---
+
+// Structure for `connection_requests` table (Assumed based on usage)
+export interface ConnectionRequest {
+  id: number;                  // Database primary key (e.g., bigint)
+  created_at: string;          // timestamp with time zone
+  requester_user_id: string;   // uuid, FK to auth.users.id
+  recipient_user_id: string;   // uuid, FK to auth.users.id
+  requester_role: 'startup' | 'investor'; // Role of the user sending the request
+  recipient_role: 'startup' | 'investor'; // Role of the user receiving the request
+  status: 'pending' | 'accepted' | 'declined'; // Status of the request
+  request_message?: string | null; // Optional message added in profile pages
+}
+
+// Interface matching the refined `notifications` table schema (v1.4)
+export interface AppNotification {
+  id: string;                   // Database primary key (e.g., uuid)
+  created_at: string;           // timestamp with time zone
+  user_id: string;              // uuid, FK to auth.users.id (The user who receives the notification)
+  type: 'connection_request' | 'message' | 'system' | 'ai_insight' | string; // Type of notification
+  title: string;                // Short title/summary
+  body: string;                 // Detailed message content (maps to subtitle in frontend)
+  link: string | null;          // Optional deep link into the app
+  is_read: boolean;             // Whether the user has marked it as read
+  reference_id?: string | null; // Optional reference to related entity (e.g., request ID, message ID)
+  // Optional frontend styling fields (populated by backend logic)
+  icon?: string | null;         // Iconify icon name (e.g., 'solar:user-plus-line-duotone')
+  icon_bg_color?: string | null;// Tailwind CSS class (e.g., 'bg-blue-100')
+  icon_color?: string | null;   // Tailwind CSS class (e.g., 'text-blue-500')
+}
+
+// TODO: Define structure for `investor_outreach` table if manual logging is kept
+export interface InvestorOutreachLog {
+  id: number;
+  created_at: string;
+  startup_user_id: string;       // uuid, FK to auth.users.id
+  investor_id: number;           // bigint, FK to investors.id
+  // Optional: Store investor name/company redundantly or join?
+  // investor_name?: string;
+  // investor_company?: string;
+  contact_method: 'Email' | 'Call' | 'LinkedIn' | 'Meeting' | 'Other';
+  contact_date: string;          // date or timestampz
+  status: string;                // Free text or predefined ('Contacted', 'Responded', etc.)
+  notes: string | null;
+}
+
+// TODO: Define structure for `startup_engagement` table (investor equivalent)
+export interface StartupEngagementLog {
+   id: number;
+   created_at: string;
+   investor_user_id: string;      // uuid, FK to auth.users.id
+   startup_id: number;            // bigint, FK to startups.id
+   // Optional: Store startup name redundantly or join?
+   // startup_name?: string;
+   contact_method: 'Email' | 'Call' | 'LinkedIn' | 'Meeting' | 'Platform Message' | 'Other';
+   contact_date: string;          // date or timestampz
+   status: string;                // Free text or predefined ('Reviewed', 'Contacted', 'Meeting', 'Watching', 'Passed', etc.)
+   notes: string | null;
 } 

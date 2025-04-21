@@ -1,11 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import Logo from "src/layouts/full/shared/logo/Logo";
 import AuthLogin from "../authforms/AuthLogin";
 import SocialButtons from "../authforms/SocialButtons";
 import LeftSidebarPart from "../LeftSidebarPart";
-import { Card, Button } from "flowbite-react";
+import { Card, Button, Alert } from "flowbite-react";
+import { CheckCircle } from "lucide-react";
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
+  const [registrationMessage, setRegistrationMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message) {
+      setRegistrationMessage(decodeURIComponent(message));
+    }
+  }, [searchParams]);
+
   return (
     <>
       <div className="relative overflow-hidden min-h-screen">
@@ -22,6 +34,19 @@ const Login = () => {
                   Enter your credentials to continue
                 </p>
               </div>
+
+              {registrationMessage && (
+                 <Alert 
+                    color="success" 
+                    icon={CheckCircle} 
+                    className="mb-4"
+                    withBorderAccent
+                 >
+                   <span>
+                     <span className="font-medium">Success!</span> {registrationMessage}
+                   </span>
+                 </Alert>
+              )}
 
               <AuthLogin />
 

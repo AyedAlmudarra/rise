@@ -1,65 +1,37 @@
-import { Icon } from "@iconify/react";
-import { ChatContext } from "src/context/ChatContext";
-import { TextInput } from "flowbite-react";
-import  { ChangeEvent, FormEvent, useContext, useState } from "react";
+import React from 'react';
+import { HiCheckCircle } from 'react-icons/hi';
 
+interface ChatMsgSentProps {
+  msg: string;
+  time: string;
+  readAt: string | null;
+}
 
-
-const ChatMsgSent = () => {
-  const { sendMessage, selectedChat } = useContext(ChatContext);
-  const [msg, setMsg] = useState<string>("");
-
-  const handleChatMsgChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setMsg(e.target.value);
-  };
-
-  const onChatMsgSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!msg.trim() || !selectedChat) return;
-    sendMessage(selectedChat.id, msg.trim() as any);
-    setMsg("");
-  };
-
+const ChatMsgSent: React.FC<ChatMsgSentProps> = ({ msg, time, readAt }) => {
   return (
-    <>
-      <form onSubmit={onChatMsgSubmit}>
-        <div className="flex lg:gap-3 gap-0.5 items-center py-5 px-5 lg:flex-nowrap flex-wrap">
-          <div>
-            <div className="btn-circle-hover cursor-pointer">
-              <Icon icon="solar:sticker-smile-circle-2-linear" height="20" />
-            </div>
-          </div>
-          <TextInput
-            className="form-control-chat border-0 w-full min-w-10"
-            sizing="md"
-            required
-            value={msg}
-            onChange={handleChatMsgChange}
-          />
-          <div className="flex gap-3 items-center">
-            <div className="btn-circle-hover cursor-pointer ">
-              <Icon icon="solar:plain-linear"
-                height="20"
-                onClick={() => {
-                  sendMessage(selectedChat?.id || "", msg as any);
-                  setMsg("");
-                }}
-              />
-            </div>
-            <div className="btn-circle-hover cursor-pointer">
-              <Icon icon="solar:gallery-add-linear" height="20" />
-            </div>
-            <div className="btn-circle-hover cursor-pointer">
-              <Icon icon="solar:paperclip-outline" height="20" />
-            </div>
-            <div className="btn-circle-hover cursor-pointer">
-              <Icon icon="solar:microphone-2-outline" height="20" />
-            </div>
-          </div>
+    <div className="flex items-start gap-3 mb-4 justify-end">
+      {/* Message Bubble (Right Aligned) */}
+      <div className="max-w-xs md:max-w-md">
+        <div className="bg-blue-500 text-white p-3 rounded-lg rounded-tr-none shadow">
+          <p className="text-sm">{msg}</p>
         </div>
-      </form>
-    </>
+        {/* Timestamp and Read Receipt */}
+        <div className="flex items-center justify-end mt-1 gap-1">
+          {/* Show read check only if readAt is not null */}
+          {readAt && (
+            <HiCheckCircle className="h-3.5 w-3.5 text-blue-400 dark:text-blue-300" title={`Read at ${new Date(readAt).toLocaleTimeString()}`} />
+          )}
+          <p className="text-xs text-gray-400 dark:text-gray-500">{time}</p>
+        </div>
+      </div>
+      {/* Optional: Add avatar for current user if desired, but often omitted for sent messages */}
+      {/* 
+      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400">
+          Me
+      </div> 
+      */}
+    </div>
   );
 };
 
-export default ChatMsgSent;
+export default ChatMsgSent; 

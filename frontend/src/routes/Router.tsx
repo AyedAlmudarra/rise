@@ -185,6 +185,45 @@ const StartupActivityPage = Loadable(lazy(() => import('src/views/dashboards/sta
 // Import the new Calendar Page
 const CalendarPage = Loadable(lazy(() => import('src/views/calendar/CalendarPage')));
 
+// Add imports for newly created/relevant pages
+const FindInvestorsPage = Loadable(lazy(() => import('src/views/startup/FindInvestorsPage')));
+const TrackOutreachPage = Loadable(lazy(() => import('src/views/startup/TrackOutreachPage')));
+
+// Add imports for Investor pages
+const AISuggestionsPage = Loadable(lazy(() => import('src/views/investor/AISuggestionsPage')));
+const BrowseStartupsPage = Loadable(lazy(() => import('src/views/investor/BrowseStartupsPage')));
+const AIRecommendationsPage = Loadable(lazy(() => import('src/views/investor/AIRecommendationsPage')));
+const SavedSearchesPage = Loadable(lazy(() => import('src/views/investor/SavedSearchesPage')));
+const WatchlistPage = Loadable(lazy(() => import('src/views/investor/WatchlistPage')));
+const ActiveDealsPage = Loadable(lazy(() => import('src/views/investor/ActiveDealsPage')));
+const DataRoomsPage = Loadable(lazy(() => import('src/views/investor/DataRoomsPage')));
+const PortfolioSummaryPage = Loadable(lazy(() => import('src/views/investor/portfolio/PortfolioSummaryPage')));
+const PortfolioPerformancePage = Loadable(lazy(() => import('src/views/investor/portfolio/PortfolioPerformancePage')));
+const ManageCompaniesPage = Loadable(lazy(() => import('src/views/investor/portfolio/ManageCompaniesPage')));
+const PortfolioReportingPage = Loadable(lazy(() => import('src/views/investor/portfolio/PortfolioReportingPage')));
+
+// Add imports for Help pages
+const FaqPage = Loadable(lazy(() => import('src/views/help/FaqPage')));
+const DocsPage = Loadable(lazy(() => import('src/views/help/DocsPage')));
+const ContactHelpPage = Loadable(lazy(() => import('src/views/help/ContactPage'))); // Renamed import slightly
+const GettingStartedPage = Loadable(lazy(() => import('src/views/help/GettingStartedPage')));
+
+// Add imports for Resources pages
+const MarketInsightsPage = Loadable(lazy(() => import('src/views/resources/MarketInsightsPage')));
+const TemplatesPage = Loadable(lazy(() => import('src/views/resources/TemplatesPage')));
+const StartupGuidesPage = Loadable(lazy(() => import('src/views/resources/StartupGuidesPage')));
+const InvestorGuidesPage = Loadable(lazy(() => import('src/views/resources/InvestorGuidesPage')));
+
+// +++ Add imports for the new Public Profile View pages +++
+const ViewInvestorProfilePage = Loadable(lazy(() => import('src/views/profile/ViewInvestorProfilePage')));
+const ViewStartupProfilePage = Loadable(lazy(() => import('src/views/profile/ViewStartupProfilePage')));
+
+// Add new ConnectionsPage import
+const ConnectionsPage = Loadable(lazy(() => import('src/views/connections/ConnectionsPage')));
+
+// +++ Add Chat Page import +++
+const ChatPage = Loadable(lazy(() => import('src/views/apps/chat/Chats')));
+
 const Router = [
   {
     path: '/',
@@ -207,18 +246,50 @@ const Router = [
           // --- Add Calendar Route (Protected, accessible to all roles) ---
           { path: '/calendar', element: <CalendarPage /> }, // Protected by the parent <ProtectedRoute />
 
+          // --- Add route for AI Insights (All Roles) ---
+          { path: '/ai-insights', element: <AIInsightsPage /> },
+
           // --- RISE Specific Routes (General Access, Role handled internally or unprotected) ---
           { path: '/settings/:tab?', element: <SettingsPage /> },
-          { path: '/profile/view', element: <ViewProfilePage /> },
           { path: '/profile/edit', element: <EditProfilePage /> },
 
-          // --- Role-Protected Routes ---
-          { path: '/profile/documents', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <ManageDocumentsPage /> }] },
-          { path: '/startup/metrics', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <StartupMetricsPage /> }] },
-          { path: '/startup/activity', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <StartupActivityPage /> }] },
-          // Add investor sub-pages routes here later using the same pattern
-          // { path: '/investor/ai-suggestions', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <InvestorSuggestionsPage /> }] },
-          // { path: '/investor/activity', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <InvestorActivityPage /> }] },
+          // --- Public Profile Views (accessible when logged in) --- 
+          { path: '/view/startup/:startupId', element: <ViewStartupProfilePage /> },
+          { path: '/view/investor/:investorId', element: <ViewInvestorProfilePage /> },
+
+          // --- Startup Specific Routes --- 
+          { path: '/startup/find-investors', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <FindInvestorsPage /> }] },
+          { path: '/startup/track-outreach', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <TrackOutreachPage /> }] },
+
+          // --- Investor Specific Routes --- 
+          { path: '/investor/browse-startups', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <BrowseStartupsPage /> }] },
+          { path: '/investor/ai-recommendations', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <AIRecommendationsPage /> }] },
+          { path: '/investor/saved-searches', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <SavedSearchesPage /> }] },
+          { path: '/investor/watchlist', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <WatchlistPage /> }] },
+          { path: '/investor/active-deals', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <ActiveDealsPage /> }] },
+          { path: '/investor/data-rooms', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <DataRoomsPage /> }] },
+          { path: '/investor/portfolio/summary', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <PortfolioSummaryPage /> }] },
+          { path: '/investor/portfolio/performance', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <PortfolioPerformancePage /> }] },
+          { path: '/investor/portfolio/manage', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <ManageCompaniesPage /> }] },
+          { path: '/investor/portfolio/reporting', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <PortfolioReportingPage /> }] },
+          
+          // --- Help Routes (All Roles) ---
+          { path: '/help/faq', element: <FaqPage /> },
+          { path: '/help/docs', element: <DocsPage /> },
+          { path: '/help/contact', element: <ContactHelpPage /> },
+          { path: '/help/getting-started', element: <GettingStartedPage /> },
+
+          // --- Resources Routes (All Roles) ---
+          { path: '/resources/market-insights', element: <MarketInsightsPage /> },
+          { path: '/resources/templates', element: <TemplatesPage /> },
+          { path: '/resources/startup-guides', element: <StartupGuidesPage /> },
+          { path: '/resources/investor-guides', element: <InvestorGuidesPage /> },
+
+          // --- Add Connections Management Route (Accessible to all logged-in roles) --- 
+          { path: '/connections/:tab?', element: <ConnectionsPage /> }, // Allow optional tab parameter
+
+          // +++ Add Messages Route +++
+          { path: '/messages', element: <ChatPage /> },
 
           // ... other existing routes inside FullLayout ...
           { path: '/sample-page', element: <SamplePage /> },
@@ -233,7 +304,7 @@ const Router = [
       { path: 'auth1/login', element: <Login /> },
       { path: 'auth2/login', element: <Login2 /> },
       { path: 'register/startup', element: <RegisterStartup /> },
-      { path: 'register/investor', element: <RegisterInvestor /> }, // Using direct import
+      { path: 'register/investor', element: <RegisterInvestor /> },
       { path: 'auth1/forgot-password', element: <ForgotPassword /> },
       { path: 'auth2/forgot-password', element: <ForgotPassword2 /> },
       { path: 'auth1/two-steps', element: <TwoSteps /> },
@@ -259,6 +330,10 @@ const Router = [
       { path: 'blog', element: <BlogPage /> },
       { path: 'blogpost', element: <BlogPost /> }, // Consider if this needs a parameter :postId
     ]
+  },
+  {
+    path: '*',
+    element: <Navigate to="/auth/404" />,
   }
 ];
 

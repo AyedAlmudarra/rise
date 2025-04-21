@@ -193,7 +193,7 @@ This document outlines the development tasks for the RISE platform.
 
     2.  **Implement Startup Select Handler (`startup.ts`):**
         *   **File:** `frontend/src/api/mocks/handlers/startup.ts`
-        *   **Action:** Add `http.get(\`\${supabaseUrl}/rest/v1/startups\`, ...)` handler.
+        *   **Action:** Add `http.get(\`${supabaseUrl}/rest/v1/startups\`, ...)` handler.
         *   Parse `request.url` to extract `user_id` from `?user_id=eq.USER_ID`.
         *   Check if `select=*` is present and `user_id` filter exists.
         *   Look up `user_id` in `mockStartupProfiles`.
@@ -202,7 +202,7 @@ This document outlines the development tasks for the RISE platform.
 
     3.  **Define Mock Investor Profile Data & Handler (`investor.ts`):**
         *   **File:** `frontend/src/api/mocks/handlers/investor.ts` (New File)
-        *   **Action:** Create file, define `const mockInvestorProfiles`, and implement `http.get(\`\${supabaseUrl}/rest/v1/investors\`, ...)` handler similar to step 2, using `mockInvestorProfiles`.
+        *   **Action:** Create file, define `const mockInvestorProfiles`, and implement `http.get(\`${supabaseUrl}/rest/v1/investors\`, ...)` handler similar to step 2, using `mockInvestorProfiles`.
         *   Export handlers as `investorHandlers`.
         *   **(Done)**
 
@@ -216,5 +216,77 @@ This document outlines the development tasks for the RISE platform.
 
     6.  **Commit:**
         *   Commit all related changes. (Done)
+
+---
+
+## Task 9: Connect Frontend to Real Supabase Backend
+
+*   **Status:** Done (Pending RLS Verification)
+*   **Goal:** Modify frontend components (Registration, Dashboards) to interact directly with Supabase tables (`startups`, `investors`) instead of relying on MSW mock handlers for core data operations (creation, fetching).
+*   **Summary:** Updated `AuthRegisterStartup` to insert profile data into the `startups` table after successful sign-up. Confirmed `AuthRegisterInvestor` already had this logic. Verified `StartupDashboard` and `InvestorDashboard` fetch data directly from Supabase. Disabled relevant `GET` and `POST` mock handlers in MSW (`startup.ts`, `investor.ts`). Identified necessary Row Level Security (RLS) policies to be applied manually in Supabase.
+*   **Detailed Steps:**
+    1.  **Startup Registration Insertion:** Update `AuthRegisterStartup.tsx`'s submit handler... (Done)
+    2.  **Investor Registration Insertion:** Update `AuthRegisterInvestor.tsx`'s submit handler... (Done - Already implemented)
+    3.  **Startup Dashboard Fetching:** Verify/update `StartupDashboard.tsx`... (Done - Already implemented)
+    4.  **Investor Dashboard Fetching:** Verify/update `InvestorDashboard.tsx`... (Done - Already implemented)
+    5.  **(Optional but Recommended) Disable/Remove MSW Handlers:** Comment out or remove the MSW handlers... (Done)
+    6.  **Implement RLS:** Ensure basic Row Level Security policies are active... (**Action Required:** Apply SQL policies manually in Supabase & Verify).
+    7.  **Update Task Definition:** Add this task definition. (Done)
+    8.  **Commit:** Commit changes incrementally... (Done for code changes)
+
+---
+
+## Task 10: Implement AI Analysis Generation (`request-analysis` Edge Function)
+
+*   **Status:** Done (Blocked by Env Var Issue)
+*   **Goal:** Develop the core logic for the `request-analysis` Supabase Edge Function to generate a comprehensive AI analysis for a given startup based on its profile data.
+*   **Summary:** Implemented logic within `request-analysis/index.ts` to fetch startup data, build a detailed prompt, call the Google AI Gemini model (requesting JSON output), parse the response, and store the structured `ai_analysis` JSON in the `startups` table. Updated `analysis_status` and `analysis_timestamp` fields accordingly. Added error handling. **NOTE:** Function deployment is currently blocked by a persistent linter/runtime error related to accessing environment variables (`Deno.env.get`) within the Edge Function context.
+*   **Detailed Steps:**
+    1.  **Function Signature & Input:** Define function to accept `startup_id`... (Done)
+    2.  **Fetch Startup Data:** Retrieve the full `StartupProfile`... (Done)
+    3.  **Update Status (Initial):** Set `analysis_status` to `'processing'`... (Done)
+    4.  **Define Analysis Sections & Prompts:** Create specific prompts... (Done - Integrated into `buildAnalysisPrompt`)
+    5.  **Iterative AI Calls:** Loop through the defined sections... (Done - Single comprehensive call implemented)
+    6.  **Consolidate Results:** Combine the parsed results... (Done - Single JSON object generated)
+    7.  **Store Results & Update Status (Final):** Update the `startups` table... (Done)
+    8.  **Error Handling:** Implement robust error handling... (Done)
+    9.  **Return Response:** Return a success or error message... (Done)
+    10. **Update Task Definition:** Add this task definition. (Done)
+    11. **Commit:** Commit changes. (Done - Code written)
+
+---
+
+## Task 11: Display AI Analysis Results & Realtime Updates (Frontend)
+
+*   **Status:** Done
+*   **Goal:** Update the Startup Dashboard UI to display the generated AI analysis results stored in the database and reflect the analysis status (`pending`, `processing`, `completed`, `error`) in real-time.
+*   **Summary:** Updated `StartupDashboard` to parse `ai_analysis` JSON and pass props correctly to child components. Enhanced `AIInsightsSection` to render detailed analysis sections (Summary, SWOT, Market Pos., Scalability, Comp. Advantage, Challenges, KPIs, Recommendations, Funding Outlook) based on `analysisData` and `analysis_status`. Verified `FinancialPerformanceCard`, `GrowthPlanCard`, and `ProjectionsRisksCard` already handle relevant analysis data display. Confirmed `AIInsightsSection` manages Realtime updates for analysis status/results. Ensured Refresh button triggers the `request-analysis` function.
+*   **Detailed Steps:**
+    1.  **Identify Display Component(s):** Determine which component(s)... (Done - `AIInsightsSection` primary, others supplement).
+    2.  **Fetch Analysis Data:** Ensure the `fetchStartupData` function... (Done - Verified).
+    3.  **Parse and Pass Data:** In `StartupDashboard.tsx`, parse the fetched `ai_analysis` JSON... (Done).
+    4.  **Display Logic:** Implement rendering logic within the display component(s)... (Done - Added to `AIInsightsSection`, verified others).
+    5.  **Realtime Subscription:** Set up a Supabase Realtime subscription... (Done - Handled within `AIInsightsSection`).
+    6.  **Realtime Handler:** When a change notification is received... (Done - Handled within `AIInsightsSection`).
+    7.  **Refresh Button Logic:** Ensure any "Refresh Analysis" button correctly calls... (Done).
+    8.  **Update Task Definition:** Add this task definition. (Done).
+    9.  **Commit:** Commit changes. (Done).
+
+---
+
+## Task 12: Refine Startup Dashboard Display Components (AI Driven)
+
+*   **Status:** Done
+*   **Goal:** Ensure the main dashboard provides a complete and accurate snapshot by fully implementing the data display in existing sections, leveraging AI-generated insights for KPIs and Funding Readiness.
+*   **Summary:** Updated `request-analysis` function (backend) to include `funding_readiness_score` and justification in the AI analysis. Modified `KeyMetricsSection` (frontend) to display AI-suggested KPIs instead of raw data. Created `FundingReadinessCard` component to display AI score/justification. Integrated `FundingReadinessCard` and relocated `KeyMetricsSection` to the 'Analysis & AI' tab in `StartupDashboard`. Simplified `InvestorInterestSection` to a placeholder message.
+*   **Detailed Steps:**
+    1.  **Modify `KeyMetricsSection.tsx`:** Change component to display the `suggested_kpis`... (Done)
+    2.  **Implement AI Funding Readiness Score (Backend):** Modify the `request-analysis` function prompt... (Done)
+    3.  **Create `FundingReadinessCard.tsx` (Frontend):** Develop a new component to display the AI-generated... (Done)
+    4.  **Integrate `FundingReadinessCard`:** Add the new `FundingReadinessCard` component... (Done)
+    5.  **Relocate `KeyMetricsSection`:** Move the `KeyMetricsSection` component from the 'Overview' tab... (Done)
+    6.  **Implement `InvestorInterestSection` (Placeholder/Initial):** Determine initial data source... (Done - Placeholder implemented)
+    7.  **Update Task Definition:** Add this revised task definition. (Done)
+    8.  **Commit:** Commit changes incrementally. (Done)
 
 --- 

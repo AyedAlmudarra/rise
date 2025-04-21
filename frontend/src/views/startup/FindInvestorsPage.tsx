@@ -1,340 +1,392 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'src/context/AuthContext';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-    Card, Spinner, Alert, Button, TextInput, Label, Checkbox, Select,
-    Table, Pagination, Badge, Avatar
+  Card,
+  Spinner,
+  Alert,
+  TextInput,
+  Label,
+  Checkbox,
+  Button,
+  Dropdown,
+  Badge,
 } from 'flowbite-react';
-import {
-    IconSearch, IconFilter, IconX, IconBriefcase, IconBuildingFactory2, IconScale, IconMapPin,
-    IconAlertCircle, IconUserSearch
-} from '@tabler/icons-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
-import { supabase } from 'src/lib/supabaseClient';
-import { InvestorProfile } from 'src/types/database'; // Assuming type exists
-import { debounce } from 'lodash'; // For debouncing search input
+import { HiOutlineSearch, HiOutlineFilter, HiOutlineUserGroup, HiLink, HiLocationMarker, HiBriefcase, HiOutlineBriefcase } from 'react-icons/hi';
+import { supabase } from '../../lib/supabaseClient';
+import { InvestorProfile } from '../../types/database';
+import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
-// Constants for filters (assuming they exist)
-const INDUSTRIES = ["Technology", "Healthcare", "Finance", "Education", "E-commerce", "Entertainment", "Real Estate", "Logistics"];
-const STAGES = ["Idea", "Pre-Seed", "Seed", "Series A", "Series B+", "Growth"];
-const GEOGRAPHIES = ["MENA", "Europe", "North America", "Asia", "Global"];
+// Helper Function to get unique filter options
+const getUniqueOptions = (items: (string[] | null)[] | undefined): string[] => {
+  if (!items) return [];
+  const allValues = items.flat().filter((item): item is string => item !== null);
+  return Array.from(new Set(allValues)).sort();
+};
 
-const BCrumb = [
-  { to: '/', title: 'Home' },
-  { title: 'Find Investors' },
-];
-
-const ITEMS_PER_PAGE = 10;
+// Define Investor Types explicitly for filtering and display
+const investorTypes = ['Personal', 'Angel', 'VC'] as const;
+type InvestorType = typeof investorTypes[number];
 
 const FindInvestorsPage: React.FC = () => {
-  const { user, loading: authLoading, userRole } = useAuth();
+  const { user } = useAuth();
   const [investors, setInvestors] = useState<InvestorProfile[]>([]);
-  const [filteredInvestors, setFilteredInvestors] = useState<InvestorProfile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
-  // Filter State
-  const [searchTerm, setSearchTerm] = useState('');
+  // Filter States
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-  const [selectedStages, setSelectedStages] = useState<string[]>([]);
   const [selectedGeographies, setSelectedGeographies] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [selectedStages, setSelectedStages] = useState<string[]>([]);
+  const [selectedInvestorTypes, setSelectedInvestorTypes] = useState<InvestorType[]>([]);
 
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(filteredInvestors.length / ITEMS_PER_PAGE);
-  const paginatedInvestors = filteredInvestors.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // Unique options for filters, derived from fetched data
+  const uniqueIndustries = useMemo(() => getUniqueOptions(investors?.map(inv => inv.preferred_industries)), [investors]);
+  const uniqueGeographies = useMemo(() => getUniqueOptions(investors?.map(inv => inv.preferred_geography)), [investors]);
+  const uniqueStages = useMemo(() => getUniqueOptions(investors?.map(inv => inv.preferred_stage)), [investors]);
 
-  // Fetch all investors initially
-  const fetchAllInvestors = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { data, error: fetchError } = await supabase
-        .from('investors')
-        .select(`
-          id,
-          user_id,
-          company_name,
-          job_title,
-          preferred_industries,
-          preferred_stage,
-          preferred_geography,
-          users ( id, user_metadata->>full_name, user_metadata->>avatar_url )
-        `); // Join with users table
+  useEffect(() => {
+    const fetchInvestors = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Explicitly select needed columns, including investor_type
+        const { data, error: fetchError } = await supabase
+          .from('investors')
+          .select(`
+            id,
+            user_id,
+            full_name,
+            job_title,
+            company_name,
+            investor_type, 
+            company_description,
+            website,
+            linkedin_profile,
+            preferred_industries,
+            preferred_geography,
+            preferred_stage
+          `); 
 
-      if (fetchError) throw fetchError;
-      setInvestors(data || []);
+        if (fetchError) {
+          throw fetchError;
+        }
+        // Ensure data matches InvestorProfile structure before setting state
+        setInvestors(data as InvestorProfile[] || []); 
+      } catch (err: any) {
+        console.error('Error fetching investors:', err);
+        setError(err.message || 'Failed to fetch investor profiles.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    } catch (err: any) {
-      console.error("Error fetching investors:", err);
-      setError("Failed to load investor directory.");
-      setInvestors([]);
-    } finally {
-      setIsLoading(false);
-    }
+    fetchInvestors();
   }, []);
 
-  useEffect(() => {
-     // Only fetch if user is loaded and is a startup
-    if (!authLoading && user && userRole === 'startup') {
-        fetchAllInvestors();
-    } else if (!authLoading && (!user || userRole !== 'startup')) {
-         setIsLoading(false);
-         setError(userRole !== 'startup' ? "Access denied. This page is for startups only." : "User not authenticated.");
+  // Handle filter changes - extended for Investor Type
+  const handleFilterChange = (
+    filterType: 'industry' | 'geography' | 'stage' | 'investorType',
+    value: string
+  ) => {
+    switch (filterType) {
+      case 'industry':
+        setSelectedIndustries(prev =>
+          prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+        );
+        break;
+      case 'geography':
+        setSelectedGeographies(prev =>
+          prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+        );
+        break;
+      case 'stage':
+        setSelectedStages(prev =>
+          prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+        );
+        break;
+      case 'investorType':
+        setSelectedInvestorTypes(prev =>
+            prev.includes(value as InvestorType) 
+            ? prev.filter(item => item !== value)
+            : [...prev, value as InvestorType]
+        );
+        break;
     }
-  }, [user, authLoading, userRole, fetchAllInvestors]);
-
-  // --- Filtering Logic --- 
-  const applyFilters = useCallback(() => {
-      let tempFiltered = [...investors];
-      
-      // Search Term (Name, Company)
-       if (searchTerm) {
-          const lowerSearchTerm = searchTerm.toLowerCase();
-          tempFiltered = tempFiltered.filter(inv => 
-               inv.users?.user_metadata?.full_name?.toLowerCase().includes(lowerSearchTerm) ||
-               inv.company_name?.toLowerCase().includes(lowerSearchTerm)
-           );
-       }
-       
-      // Industry Filter
-      if (selectedIndustries.length > 0) {
-          tempFiltered = tempFiltered.filter(inv => 
-              inv.preferred_industries?.some(ind => selectedIndustries.includes(ind))
-          );
-      }
-      
-      // Stage Filter
-       if (selectedStages.length > 0) {
-          tempFiltered = tempFiltered.filter(inv => 
-              inv.preferred_stage && selectedStages.includes(inv.preferred_stage)
-          );
-      }
-      
-       // Geography Filter
-      if (selectedGeographies.length > 0) {
-           tempFiltered = tempFiltered.filter(inv => 
-              inv.preferred_geography?.some(geo => selectedGeographies.includes(geo))
-          );
-      }
-
-      setFilteredInvestors(tempFiltered);
-      setCurrentPage(1); // Reset to first page after filtering
-  }, [investors, searchTerm, selectedIndustries, selectedStages, selectedGeographies]);
-
-  // Debounced search handler
-  const debouncedApplyFilters = useCallback(debounce(applyFilters, 300), [applyFilters]);
-
-  // Apply filters whenever investors data or filter criteria change
-  useEffect(() => {
-    debouncedApplyFilters();
-    // Cleanup debounce timer on unmount
-    return debouncedApplyFilters.cancel;
-  }, [investors, searchTerm, selectedIndustries, selectedStages, selectedGeographies, debouncedApplyFilters]);
-
-  // --- Handlers for Filters --- 
-   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(event.target.value);
-  };
-  
-   const handleCheckboxChange = (setter: React.Dispatch<React.SetStateAction<string[]>>, value: string, checked: boolean) => {
-      setter(prev => 
-          checked ? [...prev, value] : prev.filter(item => item !== value)
-      );
   };
 
-  const resetFilters = () => {
-      setSearchTerm('');
-      setSelectedIndustries([]);
-      setSelectedStages([]);
-      setSelectedGeographies([]);
-      setShowFilters(false);
+  // Filter investors based on search term and selected filters - including investor type
+  const filteredInvestors = useMemo(() => {
+    return investors.filter(investor => {
+      // Search term check (company name, full name, job title)
+      const term = searchTerm.toLowerCase();
+      const matchesSearch =
+        term === '' ||
+        investor.company_name?.toLowerCase().includes(term) ||
+        investor.full_name?.toLowerCase().includes(term) || 
+        investor.job_title?.toLowerCase().includes(term);
+
+      // Filter checks
+      const matchesIndustry =
+        selectedIndustries.length === 0 ||
+        investor.preferred_industries?.some(ind => selectedIndustries.includes(ind));
+      const matchesGeography =
+        selectedGeographies.length === 0 ||
+        investor.preferred_geography?.some(geo => selectedGeographies.includes(geo));
+      const matchesStage =
+        selectedStages.length === 0 ||
+        investor.preferred_stage?.some(st => selectedStages.includes(st));
+      const matchesInvestorType =
+        selectedInvestorTypes.length === 0 ||
+        (investor.investor_type && selectedInvestorTypes.includes(investor.investor_type));
+
+      // Return true only if all conditions match
+      return matchesSearch && matchesIndustry && matchesGeography && matchesStage && matchesInvestorType;
+    });
+  }, [investors, searchTerm, selectedIndustries, selectedGeographies, selectedStages, selectedInvestorTypes]);
+
+  // Helper to get Badge color based on type
+  const getTypeBadgeColor = (type: InvestorType | null): string => {
+    switch (type) {
+        case 'VC': return 'purple';
+        case 'Angel': return 'success';
+        case 'Personal': return 'warning';
+        default: return 'gray';
+    }
   };
-
-  // Handler for Pagination
-  const onPageChange = (page: number) => {
-      setCurrentPage(page);
-  };
-
-  // --- Render Logic --- 
-  if (authLoading) {
-     return <div className="flex justify-center items-center h-screen"><Spinner size="xl" /></div>; 
-  }
-
-  if (error) {
-      return (
-        <>
-          <BreadcrumbComp title="Find Investors" items={BCrumb} />
-          <Alert color="failure" icon={IconAlertCircle}>{error}</Alert>
-        </>
-      );
-  }
 
   return (
-    <>
-      <BreadcrumbComp title="Find Investors" items={BCrumb} />
-
-       <Card className="mb-6">
-         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <TextInput 
-                icon={IconSearch} 
-                placeholder="Search by name or company..." 
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="flex-grow md:max-w-sm"
-            />
-             <Button outline color="gray" onClick={() => setShowFilters(!showFilters)}>
-                <IconFilter size={18} className="mr-2"/>
-                {showFilters ? 'Hide Filters' : 'Show Filters'}
-             </Button>
-         </div>
-          {/* Filter Section */} 
-          {showFilters && (
-             <div className="mt-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                     {/* Industry Filter */}
-                     <div>
-                         <Label className="font-semibold mb-2 block">Industry</Label>
-                         <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
-                              {INDUSTRIES.map(ind => (
-                                 <div key={ind} className="flex items-center">
-                                     <Checkbox 
-                                         id={`filter-ind-${ind}`} 
-                                         value={ind} 
-                                         checked={selectedIndustries.includes(ind)}
-                                         onChange={(e) => handleCheckboxChange(setSelectedIndustries, ind, e.target.checked)}
-                                     />
-                                     <Label htmlFor={`filter-ind-${ind}`} className="ml-2 text-sm">{ind}</Label>
-                                 </div>
-                             ))}
-                         </div>
-                     </div>
-                      {/* Stage Filter */}
-                     <div>
-                         <Label className="font-semibold mb-2 block">Investment Stage</Label>
-                          <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
-                             {STAGES.map(stage => (
-                                 <div key={stage} className="flex items-center">
-                                     <Checkbox 
-                                         id={`filter-stage-${stage}`} 
-                                         value={stage} 
-                                         checked={selectedStages.includes(stage)}
-                                         onChange={(e) => handleCheckboxChange(setSelectedStages, stage, e.target.checked)}
-                                     />
-                                     <Label htmlFor={`filter-stage-${stage}`} className="ml-2 text-sm">{stage}</Label>
-                                 </div>
-                             ))}
-                         </div>
-                     </div>
-                      {/* Geography Filter */}
-                      <div>
-                         <Label className="font-semibold mb-2 block">Geography</Label>
-                         <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
-                             {GEOGRAPHIES.map(geo => (
-                                 <div key={geo} className="flex items-center">
-                                     <Checkbox 
-                                         id={`filter-geo-${geo}`} 
-                                         value={geo} 
-                                         checked={selectedGeographies.includes(geo)}
-                                         onChange={(e) => handleCheckboxChange(setSelectedGeographies, geo, e.target.checked)}
-                                     />
-                                     <Label htmlFor={`filter-geo-${geo}`} className="ml-2 text-sm">{geo}</Label>
-                                 </div>
-                             ))}
-                         </div>
-                     </div>
-                 </div>
-                 <div className="mt-4 flex justify-end">
-                     <Button color="light" size="xs" onClick={resetFilters}>
-                        <IconX size={14} className="mr-1"/> Reset Filters
-                     </Button>
-                 </div>
-             </div>
-          )}
-       </Card>
-
-      {/* Investor Table */} 
-      <div className="overflow-x-auto">
-         {isLoading ? (
-             <div className="flex justify-center p-10"><Spinner size="lg" /></div>
-         ) : ( 
-            <> 
-            <Table hoverable>
-                 <Table.Head>
-                     <Table.HeadCell>Investor</Table.HeadCell>
-                     <Table.HeadCell>Company</Table.HeadCell>
-                     <Table.HeadCell>Preferred Industries</Table.HeadCell>
-                     <Table.HeadCell>Preferred Stage</Table.HeadCell>
-                     <Table.HeadCell>Preferred Geography</Table.HeadCell>
-                     <Table.HeadCell>
-                         <span className="sr-only">Actions</span>
-                     </Table.HeadCell>
-                 </Table.Head>
-                 <Table.Body className="divide-y">
-                     {paginatedInvestors.length > 0 ? (
-                         paginatedInvestors.map((investor) => (
-                            <Table.Row key={investor.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                     <div className="flex items-center gap-3">
-                                         <Avatar 
-                                             img={investor.users?.user_metadata?.avatar_url || undefined} // Use undefined for default Flowbite avatar
-                                             rounded
-                                             size="sm"
-                                         />
-                                        <div>
-                                             {investor.users?.user_metadata?.full_name || 'N/A'}
-                                             <div className="text-xs text-gray-500">{investor.job_title || 'N/A'}</div>
-                                         </div>
-                                     </div>
-                                 </Table.Cell>
-                                 <Table.Cell>{investor.company_name || 'N/A'}</Table.Cell>
-                                 <Table.Cell>
-                                      <div className="flex flex-wrap gap-1 max-w-xs">
-                                         {(investor.preferred_industries || []).slice(0, 3).map(ind => <Badge key={ind} size="xs" color="info">{ind}</Badge>)} 
-                                         {(investor.preferred_industries?.length ?? 0) > 3 && <Badge size="xs" color="gray">+{(investor.preferred_industries?.length ?? 0) - 3} more</Badge>}
-                                      </div>
-                                 </Table.Cell>
-                                 <Table.Cell>{investor.preferred_stage || 'N/A'}</Table.Cell>
-                                  <Table.Cell>
-                                     <div className="flex flex-wrap gap-1 max-w-xs">
-                                         {(investor.preferred_geography || []).slice(0, 3).map(geo => <Badge key={geo} size="xs" color="pink">{geo}</Badge>)}
-                                         {(investor.preferred_geography?.length ?? 0) > 3 && <Badge size="xs" color="gray">+{(investor.preferred_geography?.length ?? 0) - 3} more</Badge>}
-                                     </div>
-                                  </Table.Cell>
-                                 <Table.Cell>
-                                     {/* Add View Profile / Connect buttons here later */}
-                                     <Button size="xs" color="light">
-                                         View
-                                     </Button>
-                                 </Table.Cell>
-                             </Table.Row>
-                         ))
-                     ) : (
-                         <Table.Row>
-                            <Table.Cell colSpan={6} className="text-center py-10 text-gray-500">
-                                 No investors found matching your criteria.
-                            </Table.Cell>
-                         </Table.Row>
-                     )}
-                 </Table.Body>
-             </Table>
-             {totalPages > 1 && (
-                 <div className="flex justify-center py-4">
-                     <Pagination 
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={onPageChange} 
-                        showIcons
-                    />
-                 </div>
-             )}
-             </>
-         )}
+    <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center">
+          <div className="mr-4 p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg shadow-lg">
+            <HiOutlineUserGroup size={28} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+              Find Investors
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Discover and filter potential investors matching your criteria.
+            </p>
+          </div>
+        </div>
       </div>
-    </>
+
+      <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex-grow w-full md:w-auto">
+                <Label htmlFor="searchInvestors" value="Search Investors" className="sr-only" />
+                <TextInput
+                    id="searchInvestors"
+                    type="text"
+                    icon={HiOutlineSearch}
+                    placeholder="Search by name, company, or title..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            <div className="flex gap-2 flex-wrap justify-start md:justify-end">
+                 {/* Investor Type Filter Dropdown */}
+                <Dropdown 
+                    label="Type" 
+                    dismissOnClick={false} 
+                    renderTrigger={() => (
+                        <Button size="sm" outline color="gray" className="min-w-[100px]">
+                            <HiBriefcase className="mr-2 h-4 w-4" />
+                            Type{selectedInvestorTypes.length > 0 ? ` (${selectedInvestorTypes.length})` : ''}
+                        </Button>
+                    )}
+                >
+                    {investorTypes.map(type => (
+                    <Dropdown.Item key={type} className="flex items-center gap-2">
+                        <Checkbox
+                            id={`type-${type}`}
+                            checked={selectedInvestorTypes.includes(type)}
+                            onChange={() => handleFilterChange('investorType', type)}
+                        />
+                        <Label htmlFor={`type-${type}`}>{type}</Label>
+                    </Dropdown.Item>
+                    ))}
+                </Dropdown>
+
+                 {/* Industry Filter Dropdown */}
+                <Dropdown 
+                    label="Industry" 
+                    dismissOnClick={false} 
+                    renderTrigger={() => (
+                        <Button size="sm" outline color="gray" className="min-w-[100px]">
+                            <HiOutlineFilter className="mr-2 h-4 w-4" />
+                            Industry{selectedIndustries.length > 0 ? ` (${selectedIndustries.length})` : ''}
+                        </Button>
+                    )}
+                >
+                    {uniqueIndustries.map(industry => (
+                    <Dropdown.Item key={industry} className="flex items-center gap-2">
+                        <Checkbox
+                            id={`industry-${industry}`}
+                            checked={selectedIndustries.includes(industry)}
+                            onChange={() => handleFilterChange('industry', industry)}
+                        />
+                        <Label htmlFor={`industry-${industry}`}>{industry}</Label>
+                    </Dropdown.Item>
+                    ))}
+                    {uniqueIndustries.length === 0 && <Dropdown.Item disabled>No options</Dropdown.Item>}
+                </Dropdown>
+
+                 {/* Geography Filter Dropdown */}
+                <Dropdown 
+                    label="Geography" 
+                    dismissOnClick={false} 
+                    renderTrigger={() => (
+                        <Button size="sm" outline color="gray" className="min-w-[100px]">
+                            <HiLocationMarker className="mr-2 h-4 w-4" />
+                            Geography{selectedGeographies.length > 0 ? ` (${selectedGeographies.length})` : ''}
+                        </Button>
+                    )}
+                >
+                    {uniqueGeographies.map(geo => (
+                    <Dropdown.Item key={geo} className="flex items-center gap-2">
+                        <Checkbox
+                            id={`geo-${geo}`}
+                            checked={selectedGeographies.includes(geo)}
+                            onChange={() => handleFilterChange('geography', geo)}
+                        />
+                        <Label htmlFor={`geo-${geo}`}>{geo}</Label>
+                    </Dropdown.Item>
+                    ))}
+                    {uniqueGeographies.length === 0 && <Dropdown.Item disabled>No options</Dropdown.Item>}
+                </Dropdown>
+
+                 {/* Stage Filter Dropdown */}
+                <Dropdown 
+                    label="Stage" 
+                    dismissOnClick={false} 
+                    renderTrigger={() => (
+                        <Button size="sm" outline color="gray" className="min-w-[100px]">
+                            <HiOutlineFilter className="mr-2 h-4 w-4" />
+                            Stage{selectedStages.length > 0 ? ` (${selectedStages.length})` : ''}
+                        </Button>
+                    )}
+                >
+                    {uniqueStages.map(stage => (
+                    <Dropdown.Item key={stage} className="flex items-center gap-2">
+                        <Checkbox
+                            id={`stage-${stage}`}
+                            checked={selectedStages.includes(stage)}
+                            onChange={() => handleFilterChange('stage', stage)}
+                        />
+                        <Label htmlFor={`stage-${stage}`}>{stage}</Label>
+                    </Dropdown.Item>
+                    ))}
+                    {uniqueStages.length === 0 && <Dropdown.Item disabled>No options</Dropdown.Item>}
+                </Dropdown>
+            </div>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="text-center py-10">
+          <Spinner size="xl" />
+        </div>
+      )}
+
+      {error && (
+        <Alert color="failure" className="mb-6">
+          {error}
+        </Alert>
+      )}
+
+      {!loading && !error && (
+        <>
+          <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            Showing {filteredInvestors.length} of {investors.length} investors.
+          </div>
+          {filteredInvestors.length > 0 ? (
+            <div className="space-y-3">
+              {filteredInvestors.map((investor) => (
+                <div key={investor.id} className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-4 transition-shadow duration-200 hover:shadow-md hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-4">
+                    
+                    <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto sm:basis-1/3 lg:basis-1/4">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-sm">
+                            <span className="text-xl font-bold text-white">
+                                {investor.company_name?.[0] || investor.full_name?.[0] || '?'}
+                            </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                              {investor.full_name || 'Investor Name'}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              {investor.job_title || 'Job Title'}
+                          </p>
+                        </div>
+                    </div>
+
+                    <div className="flex-grow min-w-0 basis-full sm:basis-1/4 lg:basis-1/4 order-3 sm:order-2">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                           {investor.company_name || '-'}
+                        </p>
+                        {investor.investor_type && (
+                          <Badge color={getTypeBadgeColor(investor.investor_type)} size="xs" className="mt-1 inline-block">
+                             {investor.investor_type}
+                          </Badge>
+                        )}
+                    </div>
+
+                    <div className="flex-grow min-w-0 hidden lg:block lg:basis-1/4 order-4 sm:order-3">
+                        <div className="space-y-1.5">
+                            {investor.preferred_industries && investor.preferred_industries.length > 0 && (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    <HiOutlineBriefcase className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                                    {investor.preferred_industries.slice(0, 3).map(ind => (
+                                        <Badge key={ind} color="gray" size="xs">{ind}</Badge>
+                                    ))}
+                                    {investor.preferred_industries.length > 3 && <span className="text-xs text-gray-400">...</span>}
+                                </div>
+                            )}
+                            {investor.preferred_geography && investor.preferred_geography.length > 0 && (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    <HiLocationMarker className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
+                                    {investor.preferred_geography.slice(0, 2).map(geo => (
+                                        <Badge key={geo} color="gray" size="xs">{geo}</Badge>
+                                    ))}
+                                     {investor.preferred_geography.length > 2 && <span className="text-xs text-gray-400">...</span>}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex-shrink-0 flex sm:flex-col lg:flex-row gap-2 w-full sm:w-auto order-2 sm:order-4 justify-end">
+                        <Button 
+                          as={Link} 
+                          to={`/view/investor/${investor.user_id}`} 
+                          size="xs"
+                          className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+                        >
+                          <span className="hidden lg:inline">View</span> Profile
+                        </Button>
+                        <Button size="xs" color="gray" disabled className="w-full lg:w-auto">
+                          Connect
+                        </Button> 
+                    </div>
+
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="col-span-full text-center py-10 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-100 dark:border-gray-700">
+               <HiOutlineUserGroup className="mx-auto h-12 w-12 text-gray-400"/>
+               <p className="mt-2 font-semibold">No investors found</p>
+               <p className="text-sm">Try adjusting your search terms or filters.</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

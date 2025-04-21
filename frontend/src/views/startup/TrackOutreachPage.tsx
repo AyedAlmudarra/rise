@@ -1,220 +1,197 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'src/context/AuthContext';
+import React, { useState, useEffect } from 'react';
 import {
-    Card, Spinner, Alert, Button, Table, Pagination, Badge, Modal, Textarea, Select, Label, TextInput // Added Modal, Textarea, Select, Label, TextInput
+  Card,
+  Table,
+  Button,
+  Spinner,
+  Alert,
+  Modal,
+  Label,
+  TextInput,
+  Select,
+  Textarea
 } from 'flowbite-react';
-import {
-    IconAlertCircle, IconPlus, IconPencil, IconTrash, IconNotebook // Added relevant icons
-} from '@tabler/icons-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
-import { supabase } from 'src/lib/supabaseClient';
-import { toast } from 'react-hot-toast';
+import { HiPlus } from 'react-icons/hi';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabaseClient';
 
-// Define the shape of an outreach record (adjust based on your table schema)
+// Define the structure for an outreach record (including investor details)
 interface OutreachRecord {
-  id: string;
-  startup_user_id: string;
-  investor_profile_id: string; // FK to investors table
-  interaction_date: string; // Or Date object
-  interaction_type: 'Email' | 'Meeting' | 'Call' | 'Introduction' | 'Other';
-  status: 'Contacted' | 'Responded' | 'Meeting Scheduled' | 'Due Diligence' | 'Declined' | 'Invested' | 'On Hold';
-  notes?: string | null;
-  created_at: string;
-  // Add fields to join investor data if needed
-  investors?: { 
-    company_name?: string | null;
-    users?: { 
-      user_metadata?: { 
-        full_name?: string | null; 
-      } | null;
-    } | null;
-  } | null;
+  id: number;
+  investor_id: number;
+  investor_name: string; // Assuming we join/fetch this
+  investor_company: string; // Assuming we join/fetch this
+  status: 'Not Contacted' | 'Contacted' | 'Responded' | 'Meeting Scheduled' | 'Declined';
+  last_contacted_at: string | null;
+  notes: string | null;
 }
 
-const BCrumb = [
-  { to: '/', title: 'Home' },
-  { title: 'Track Investor Outreach' },
-];
-
-const ITEMS_PER_PAGE = 10;
-// Define options for dropdowns
-const INTERACTION_TYPES: OutreachRecord['interaction_type'][] = ['Email', 'Meeting', 'Call', 'Introduction', 'Other'];
-const STATUSES: OutreachRecord['status'][] = ['Contacted', 'Responded', 'Meeting Scheduled', 'Due Diligence', 'Declined', 'Invested', 'On Hold'];
+// Mock Data Generation (Replace with actual fetch later)
+const generateMockOutreach = (count: number): OutreachRecord[] => {
+  const statuses: OutreachRecord['status'][] = ['Not Contacted', 'Contacted', 'Responded', 'Meeting Scheduled', 'Declined'];
+  return Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
+    investor_id: 100 + i,
+    investor_name: `Investor ${String.fromCharCode(65 + i)}`,
+    investor_company: `VC Firm ${String.fromCharCode(65 + i)}`,
+    status: statuses[i % statuses.length],
+    last_contacted_at: i % 3 !== 0 ? new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : null,
+    notes: i % 2 === 0 ? `Initial contact made via email on ${new Date(Date.now() - (i + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}. Follow up scheduled.` : null,
+  }));
+};
 
 const TrackOutreachPage: React.FC = () => {
-  const { user, loading: authLoading, userRole } = useAuth();
+  const { user } = useAuth();
   const [outreachData, setOutreachData] = useState<OutreachRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(outreachData.length / ITEMS_PER_PAGE);
-  const paginatedData = outreachData.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  // Fetch outreach data
-  const fetchOutreach = useCallback(async () => {
-    if (!user) {
-        setIsLoading(false);
-        setError("User not found.");
-        return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Ensure the table name 'investor_outreach' is correct
-      // Join with investors and users to get names
-      const { data, error: fetchError } = await supabase
-        .from('investor_outreach') 
-        .select(`
-            *,
-            investors ( 
-                company_name,
-                users ( user_metadata->>full_name )
-            )
-        `)
-        .eq('startup_user_id', user.id) // Filter for the logged-in startup
-        .order('interaction_date', { ascending: false });
-
-      if (fetchError) throw fetchError;
-      setOutreachData(data || []);
-
-    } catch (err: any) {
-      console.error("Error fetching outreach data:", err);
-      setError("Failed to load outreach records. Please ensure the 'investor_outreach' table exists and has correct policies.");
-      setOutreachData([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!authLoading && user && userRole === 'startup') {
-        fetchOutreach();
-    } else if (!authLoading && (!user || userRole !== 'startup')) {
-        setIsLoading(false);
-        setError(userRole !== 'startup' ? "Access denied. This page is for startups only." : "User not authenticated.");
-    }
-  }, [user, authLoading, userRole, fetchOutreach]);
+    const fetchOutreach = async () => {
+      if (!user) {
+         setError("User not authenticated.");
+         setLoading(false);
+         return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        // --- MOCK DATA USAGE ---
+        // Replace this section with actual Supabase fetch when table exists
+        // Example: const { data, error } = await supabase.from('investor_outreach').select('*, investors(company_name, name)').eq('startup_user_id', user.id);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+        const mockData = generateMockOutreach(8); // Generate 8 mock records
+        setOutreachData(mockData);
+        // --- END MOCK DATA USAGE ---
 
-  // --- TODO: Add Handlers for Add/Edit/Delete Modal --- 
-  // const [showModal, setShowModal] = useState(false);
-  // const [isEditing, setIsEditing] = useState(false);
-  // const [currentRecord, setCurrentRecord] = useState<Partial<OutreachRecord> | null>(null);
-  // const handleOpenAddModal = () => { ... }
-  // const handleOpenEditModal = (record: OutreachRecord) => { ... }
-  // const handleSave = async () => { ... }
-  // const handleDelete = async (id: string) => { ... }
+      } catch (err: any) {
+        console.error('Error fetching outreach data:', err);
+        setError(err.message || 'Failed to fetch outreach records.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const onPageChange = (page: number) => {
-      setCurrentPage(page);
+    fetchOutreach();
+  }, [user]);
+
+  const handleAddOutreach = () => {
+      console.log("Saving new outreach record...");
+      setShowAddModal(false);
   };
 
-  // --- Render Logic --- 
-  if (authLoading) {
-     return <div className="flex justify-center items-center h-screen"><Spinner size="xl" /></div>; 
-  }
-
-  if (error) {
-      return (
-        <>
-          <BreadcrumbComp title="Track Investor Outreach" items={BCrumb} />
-          <Alert color="failure" icon={IconAlertCircle}>{error}</Alert>
-        </>
-      );
-  }
-
   return (
-    <>
-      <BreadcrumbComp title="Track Investor Outreach" items={BCrumb} />
+    <div className="p-4 md:p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">Track Investor Outreach</h2>
+        <Button onClick={() => setShowAddModal(true)} size="sm">
+          <HiPlus className="mr-2 h-5 w-5" />
+          Add Outreach
+        </Button>
+      </div>
 
-      <Card>
-         <div className="flex justify-between items-center mb-4">
-             <h5 className="card-title">Investor Outreach Log</h5>
-             <Button color="primary" size="sm" > {/* onClick={handleOpenAddModal} */}
-                 <IconPlus size={16} className="mr-2"/>
-                 Log New Interaction
-             </Button>
-         </div>
+      {loading && (
+        <div className="text-center py-10">
+          <Spinner size="xl" aria-label="Loading outreach data..." />
+        </div>
+      )}
 
-         <div className="overflow-x-auto">
-             {isLoading ? (
-                 <div className="flex justify-center p-10"><Spinner size="lg" /></div>
-             ) : (
-                 <>
-                 <Table hoverable>
-                     <Table.Head>
-                         <Table.HeadCell>Investor</Table.HeadCell>
-                         <Table.HeadCell>Company</Table.HeadCell>
-                         <Table.HeadCell>Date</Table.HeadCell>
-                         <Table.HeadCell>Type</Table.HeadCell>
-                         <Table.HeadCell>Status</Table.HeadCell>
-                         <Table.HeadCell>Notes</Table.HeadCell>
-                         <Table.HeadCell>
-                             <span className="sr-only">Actions</span>
-                         </Table.HeadCell>
-                     </Table.Head>
-                     <Table.Body className="divide-y">
-                         {paginatedData.length > 0 ? (
-                             paginatedData.map((record) => (
-                                <Table.Row key={record.id} className="bg-white dark:border-gray-700 dark:bg-gray-800 text-sm">
-                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                         {record.investors?.users?.user_metadata?.full_name || 'N/A'}
-                                     </Table.Cell>
-                                     <Table.Cell>{record.investors?.company_name || 'N/A'}</Table.Cell>
-                                     <Table.Cell>{new Date(record.interaction_date).toLocaleDateString()}</Table.Cell>
-                                     <Table.Cell>{record.interaction_type}</Table.Cell>
-                                     <Table.Cell>
-                                         <Badge 
-                                             color={record.status === 'Invested' ? 'success' : record.status === 'Declined' ? 'failure' : 'info'}
-                                             size="sm"
-                                            >
-                                             {record.status}
-                                         </Badge>
-                                     </Table.Cell>
-                                      <Table.Cell className="max-w-xs truncate" title={record.notes || ''}>{record.notes || '-'}</Table.Cell>
-                                     <Table.Cell>
-                                         <div className="flex gap-2">
-                                            <Button size="xs" color="light" > {/* onClick={() => handleOpenEditModal(record)} */} 
-                                                 <IconPencil size={14}/>
-                                             </Button>
-                                             <Button size="xs" color="failure" > {/* onClick={() => handleDelete(record.id)} */}
-                                                <IconTrash size={14} />
-                                             </Button>
-                                         </div>
-                                     </Table.Cell>
-                                 </Table.Row>
-                             ))
-                         ) : (
-                             <Table.Row>
-                                <Table.Cell colSpan={7} className="text-center py-10 text-gray-500">
-                                     No outreach activities logged yet.
-                                </Table.Cell>
-                             </Table.Row>
-                         )}
-                     </Table.Body>
-                 </Table>
-                  {totalPages > 1 && (
-                     <div className="flex justify-center py-4">
-                         <Pagination 
-                            currentPage={currentPage} 
-                            totalPages={totalPages} 
-                            onPageChange={onPageChange} 
-                            showIcons
-                        />
-                     </div>
-                 )}
-                </>
-             )}
-          </div>
-      </Card>
+      {error && (
+        <Alert color="failure" onDismiss={() => setError(null)}>
+          <span className="font-medium">Error!</span> {error}
+        </Alert>
+      )}
 
-        {/* --- TODO: Add/Edit Outreach Modal --- */} 
-       {/* <Modal show={showModal} onClose={() => setShowModal(false)}> ... </Modal> */}
-    </>
+      {!loading && !error && (
+        <Card className="overflow-x-auto">
+          {outreachData.length === 0 ? (
+             <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+                No outreach records found. Click "Add Outreach" to get started.
+             </div>
+          ) : (
+            <Table hoverable>
+              <Table.Head>
+                <Table.HeadCell>Investor</Table.HeadCell>
+                <Table.HeadCell>Company</Table.HeadCell>
+                <Table.HeadCell>Status</Table.HeadCell>
+                <Table.HeadCell>Last Contacted</Table.HeadCell>
+                <Table.HeadCell>Notes</Table.HeadCell>
+                <Table.HeadCell>
+                  <span className="sr-only">Edit</span>
+                </Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {outreachData.map((record) => (
+                  <Table.Row key={record.id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                      {record.investor_name}
+                    </Table.Cell>
+                    <Table.Cell>{record.investor_company}</Table.Cell>
+                    <Table.Cell>{record.status}</Table.Cell>
+                    <Table.Cell>{record.last_contacted_at || 'N/A'}</Table.Cell>
+                    <Table.Cell className="max-w-xs truncate">{record.notes || 'N/A'}</Table.Cell>
+                    <Table.Cell>
+                      <a href="#" className="font-medium text-cyan-600 hover:underline dark:text-cyan-500">
+                        Edit
+                      </a>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+          )}
+        </Card>
+      )}
+
+      <Modal show={showAddModal} onClose={() => setShowAddModal(false)} popup size="md">
+            <Modal.Header />
+            <Modal.Body>
+            <div className="space-y-6">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">Add New Outreach Record</h3>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="investorSelect" value="Select Investor" />
+                    </div>
+                    <Select id="investorSelect" required>
+                        <option>Investor A (VC Firm A)</option>
+                         <option>Investor B (VC Firm B)</option>
+                         <option>Investor C (VC Firm C)</option>
+                     </Select>
+                </div>
+                 <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="statusSelect" value="Status" />
+                    </div>
+                    <Select id="statusSelect" required>
+                         <option>Not Contacted</option>
+                         <option>Contacted</option>
+                         <option>Responded</option>
+                         <option>Meeting Scheduled</option>
+                         <option>Declined</option>
+                    </Select>
+                 </div>
+                 <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="lastContacted" value="Last Contacted Date (Optional)" />
+                    </div>
+                    <TextInput id="lastContacted" type="date" />
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="notes" value="Notes (Optional)" />
+                    </div>
+                    <Textarea id="notes" placeholder="Add notes about the interaction..." rows={3} />
+                </div>
+
+                <div className="w-full">
+                <Button onClick={handleAddOutreach}>Add Record</Button>
+                </div>
+            </div>
+            </Modal.Body>
+        </Modal>
+
+    </div>
   );
 };
 

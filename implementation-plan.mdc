@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+*   Commit all related changes. (Done)
+
+--- 
+
+## Task 9: Refactor AI Components to Dedicated Page
+
+*   **Status:** In Progress
+*   **Goal:** Consolidate AI-related placeholder components from Startup and Investor dashboards into a single "AI Insights" page accessible via the sidebar for better code organization and user experience.
+*   **Steps:**
+    *   Verify/Add "AI Insights" link in sidebar (`Sidebaritems.ts`). (Done)
+    *   Define a new route `/ai-insights` in `Router.tsx`. (Done)
+    *   Create the `AIInsightsPage.tsx` component. (Done)
+    *   Remove `AIInsightsSection` from `StartupDashboard.tsx` and adjust layout. (Done)
+    *   Remove `AISuggestionsSection` from `InvestorDashboard.tsx` and adjust layout. (Done)
+    *   Import and render `AIInsightsSection` (for startups) and `AISuggestionsSection` (for investors, using mock data) in `AIInsightsPage.tsx`, handling data fetching for startup profile and conditional rendering based on role. (Done)
+    *   Update this task definition in `implementation-plan.mdc`. (Done)
+    *   Commit changes. (Pending) 

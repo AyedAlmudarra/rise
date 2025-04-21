@@ -12,6 +12,7 @@ import MiniSidebarIcons, {
 } from './MiniSidebar'; 
 // Remove Tabler icon import as we will use solar strings
 // import { IconChartPie, IconBriefcase, IconCalendarEvent, IconSettings } from "@tabler/icons-react";
+import { IconMessages, IconUserSearch, IconUserCheck, IconBuildingCommunity, IconBriefcase, IconDashboard, IconHelp, IconSettings, IconDatabaseExport } from '@tabler/icons-react';
 
 // Define allowed roles explicitly
 type UserRole = 'startup' | 'investor' | 'all';
@@ -216,6 +217,20 @@ const SidebarContent: MenuItem[] = [
             icon: "solar:eye-line-duotone", // Updated icon
             url: "/investor/watchlist",
             roles: roles(['investor']),
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Manage Connections",
+            icon: "solar:users-group-rounded-line-duotone", // Icon representing connections/users
+            url: "/connections",
+            roles: roles(['startup', 'investor']), // Accessible by both roles
+          },
+          {
+            id: uniqueId('link-'),
+            name: "Messages",
+            icon: IconMessages,
+            url: "/messages",
+            roles: roles(['startup', 'investor']),
           },
         ],
       },
