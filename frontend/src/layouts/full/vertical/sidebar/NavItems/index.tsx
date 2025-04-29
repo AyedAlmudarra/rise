@@ -1,18 +1,18 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import { ChildItem } from "../Sidebaritems";
 import { Sidebar } from "flowbite-react";
 import { Icon } from "@iconify/react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { DashboardContext } from "src/context/DashboardContext/DashboardContext";
+import { DashboardContext } from "@/context/DashboardContext/DashboardContext";
 
 
 
 interface NavItemsProps {
   item: ChildItem;
 }
-const NavItems: React.FC<NavItemsProps> = ({ item }) => {
+const NavItems = ({ item }: NavItemsProps) => {
   const location = useLocation();
   const pathname = location.pathname;
   const { t } = useTranslation();

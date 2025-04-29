@@ -1,8 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from 'react';
-import Logo from "src/layouts/full/shared/logo/Logo";
+import Logo from "@/layouts/full/shared/logo/Logo";
 import AuthLogin from "../authforms/AuthLogin";
-import SocialButtons from "../authforms/SocialButtons";
+// import SocialButtons from "../authforms/SocialButtons"; // Removed unused import
 import LeftSidebarPart from "../LeftSidebarPart";
 import { Card, Button, Alert } from "flowbite-react";
 import { CheckCircle } from "lucide-react";

@@ -1,33 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Tooltip, Badge, Button, Avatar, Progress, Table, Tabs, Spinner, Alert } from 'flowbite-react';
-import { StartupProfile, InterestedInvestor } from '../../../types/database'; // Adjust path if necessary
-import { supabase } from '../../../lib/supabaseClient'; // Added supabase import
-import { toast } from 'react-hot-toast'; // Added toast for feedback
+import React from 'react';
+import { Spinner } from 'flowbite-react';
+
 import { 
   IconEye, 
-  IconScale, 
-  IconUsers, 
-  IconClock, 
-  IconArrowUpRight, 
-  IconHeart, 
-  IconMessage,
-  IconBuildingSkyscraper,
-  IconMapPin,
-  IconUserCheck,
-  IconChevronRight,
-  IconSearch,
-  IconFilter,
-  IconDownload,
-  IconStar,
-  IconBell,
-  IconSend,
-  IconSettings,
-  IconInfoCircle, // Added for loading/info state
-  IconExternalLink, // Added for links
-  IconRefresh // Added for refresh button
 } from "@tabler/icons-react";
-import Chart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
 
 // --- Mock Data (Keep for MSW) ---
 // Removed - now defined in MSW handler
@@ -85,35 +61,15 @@ const mockInvestorDataForMSW: MockInvestor[] = [
 
 // --- Component Props Interface ---
 interface InvestorInterestSectionProps {
-    startupData: StartupProfile | null;
+    // startupData: StartupProfile | null; // Removed unused prop
     isLoading: boolean; 
 }
 
 // --- Helper Functions ---
-const formatDate = (dateString: string | null): string => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-};
-  
-const getInterestColor = (level: string | null): "success" | "warning" | "gray" => {
-    switch(level) {
-      case 'High': return 'success';
-      case 'Medium': return 'warning';
-      case 'Low': return 'gray';
-      default: return 'gray';
-    }
-};
+
 
 // --- Main Component ---
-const InvestorInterestSection: React.FC<InvestorInterestSectionProps> = ({ startupData, isLoading }) => {
+const InvestorInterestSection: React.FC<InvestorInterestSectionProps> = ({ isLoading }) => { // Removed startupData from props
   
   if (isLoading) {
     // Keep a simple loading state if needed

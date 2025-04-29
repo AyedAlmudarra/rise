@@ -1,61 +1,59 @@
-
 import { Accordion } from "flowbite-react";
-import { Link } from "react-router";
 
 
-export const FAQ = () => {
+export const FaqComponent = () => {
   const Questions = [
     {
-      key: "question1",
-      question: "What is included with my purchase?",
+      key: "rise-q1",
+      question: "What is RISE?",
       answer:
-        "Tailor the dashboard to your exact needs. Customize layouts, color schemes, and widgets effortlessly for a personalized user experience.",
+        "RISE is a platform designed to connect innovative startups with relevant investors in the Saudi market. We leverage AI-driven analysis to facilitate matchmaking and provide valuable insights for both parties.",
     },
     {
-      key: "question2",
-      question: "Are there any recurring fees?",
+      key: "rise-q2",
+      question: "How does RISE help startups?",
       answer:
-        "Unlock the true potential of your data with our advanced analytics tools. Gain valuable insights and make data-driven decisions with ease.",
+        "Startups can create detailed profiles, receive AI-powered analysis on their business and funding readiness, gain visibility among a curated network of investors, and manage their fundraising outreach process efficiently.",
     },
     {
-      key: "question3",
-      question: "Can I use the template on multiple projects?",
+      key: "rise-q3",
+      question: "How does RISE benefit investors?",
       answer:
-        "Visualize complex data sets beautifully with our interactive graphs and charts. Quickly grasp trends and patterns for smarter analysis.",
+        "Investors gain access to a vetted pool of startups, utilize AI-driven recommendations based on their investment thesis, streamline deal flow management, access data rooms, and track portfolio performance.",
     },
     {
-      key: "question4",
+      key: "rise-q4",
       question:
-        "Can I customize the admin dashboard template to match my brand?",
+        "Is my company data secure on the platform?",
       answer:
-        "Visualize complex data sets beautifully with our interactive graphs and charts. Quickly grasp trends and patterns for smarter analysis.",
+        "Data security is a top priority. We utilize robust infrastructure and implement strict access controls (including Row Level Security in our database) to protect your confidential information. Refer to our Privacy Policy for full details.",
     },
     {
-      key: "question5",
-      question: "Are there any restrictions on using the template?",
+      key: "rise-q5",
+      question: "How does the AI analysis work?",
       answer:
-        "Visualize complex data sets beautifully with our interactive graphs and charts. Quickly grasp trends and patterns for smarter analysis.",
+        "Our AI analyzes the comprehensive data provided in a startup's profile, including financials, market positioning, team, and metrics, to generate insights on strengths, weaknesses, opportunities, threats (SWOT), funding readiness, and key performance indicators (KPIs).",
     },
     {
-      key: "question6",
-      question: "How can I get support after purchase?",
+      key: "rise-q6",
+      question: "How do I get started on RISE?",
       answer:
-        "Visualize complex data sets beautifully with our interactive graphs and charts. Quickly grasp trends and patterns for smarter analysis.",
+        "Simply click the 'Register' button, choose whether you are a Startup or Investor, and complete the guided registration process. Once your profile is set up, you can begin exploring the platform's features.",
     },
   ];
   return (
     <>
-      <div className="dark:bg-dark">
-        <div className="max-w-[800px] mx-auto px-5 lg:py-24 py-12">
+      <div id="faq" className="dark:bg-dark lg:py-24 py-12">
+        <div className="max-w-[800px] mx-auto px-5">
           <h2 className="sm:text-44 text-3xl font-bold !leading-[48px] text-dark dark:text-white text-center mb-14">
-            Frequently asked questions
+            Frequently Asked Questions
           </h2>
           <Accordion className="shadow-none dark:shadow-none divide-y-1 divide-b-0 divided:border-ld !rounded-none flex flex-col gap-4">
-            {Questions.map((item,index) => {
+            {Questions.map((item) => {
               return (
                
-                  <Accordion.Panel key={index}>
-                    <Accordion.Title className="focus:ring-0 px-6  text-lg text-ld py-5 border border-ld rounded-md !border-b-none">
+                  <Accordion.Panel key={item.key}>
+                    <Accordion.Title className="focus:ring-0 px-6 text-lg text-ld py-5 border border-ld rounded-md !border-b-none">
                       {item.question}
                     </Accordion.Title>
                     <Accordion.Content className="!p-0 px-0 pt-0 rounded-none">
@@ -70,21 +68,21 @@ export const FAQ = () => {
           </Accordion>
           <p className="mt-14 text-sm font-medium justify-center text-darklink flex flex-wrap items-center gap-1 border border-dashed w-fit mx-auto px-3 py-1.5 rounded-md">
             Still have a question?{" "}
-            <Link
-               to="https://discord.com/invite/eMzE8F6Wqs"
+            <a
+              href="/app/help/contact"
+              className="underline hover:text-primary"
+            >
+              Contact Support
+            </a>{" "}
+            <span>or</span>
+            <a
+              href="https://discord.com/invite/eMzE8F6Wqs"
               className="underline hover:text-primary"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Ask On Discord
-            </Link>{" "}
-            <span>or</span>
-            <Link
-               to="https://support.wrappixel.com/"
-              className="underline hover:text-primary"
-              target="_blank"
-            >
-              Submit A Ticket
-            </Link>
+            </a>
           </p>
         </div>
       </div>

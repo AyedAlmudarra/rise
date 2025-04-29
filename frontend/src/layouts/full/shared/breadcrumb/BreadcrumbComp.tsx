@@ -1,39 +1,39 @@
+import { Breadcrumb } from "flowbite-react";
+import { Link } from "react-router-dom";
+import CardBox from "@/components/shared/CardBox";
 
-
-import { Badge, Breadcrumb } from "flowbite-react";
-import { Icon } from "@iconify/react";
-import CardBox from "src/components/shared/CardBox";
-interface BreadCrumbType {
-  subtitle?: string;
-  items?: any[];
+interface BreadcrumbItemType {
   title: string;
-  children?: JSX.Element;
+  to?: string;
 }
 
-const BreadcrumbComp = ({ items, title }: BreadCrumbType) => {
+interface BreadCrumbType {
+  items?: BreadcrumbItemType[];
+  title: string;
+}
+
+const BreadcrumbComp = ({ items = [], title }: BreadCrumbType) => {
   return (
     <>
       <CardBox className={`mb-[30px]`}>
-        <Breadcrumb className="flex justify-between">
-          <h6 className="text-base">{title}</h6>
-          <div className="flex items-center gap-3 ms-auto">
-            {items
-              ? items.map((item) => (
-                  <div key={item.title}>
-                    {item.to ? (
-                      <Breadcrumb.Item href={item.to}>
-                        <Icon
-                          icon="solar:home-2-line-duotone"
-                          height={20}
-                        ></Icon>{" "}
-                        <span className="ms-3">/</span>
-                      </Breadcrumb.Item>
-                    ) : (
-                      <Badge color={"lightprimary"}>{item.title}</Badge>
-                    )}
-                  </div>
-                ))
-              : ""}
+        <Breadcrumb aria-label="breadcrumb">
+          <div className="flex justify-between items-center">
+            <h6 className="text-base font-semibold">{title}</h6>
+            <div className="flex items-center gap-1.5 text-sm">
+              {items.map((item, index) => (
+                <Breadcrumb.Item key={item.title}>
+                  {item.to && index < items.length - 1 ? (
+                    <Link to={item.to} className="text-primary hover:underline">
+                      {item.title}
+                    </Link>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {item.title}
+                    </span>
+                  )}
+                </Breadcrumb.Item>
+              ))}
+            </div>
           </div>
         </Breadcrumb>
       </CardBox>

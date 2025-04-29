@@ -1,53 +1,57 @@
-import { Badge } from "flowbite-react";
-import { Link, useLocation } from "react-router";
-const FrontNav = [
+// Use anchor links for scrolling on the same page
+// import { Link, useLocation } from "react-router-dom";
+
+// Updated navigation items for homepage sections
+const RiseHomepageNav = [
   {
-    menu: "About Us",
-    link: "/frontend-pages/aboutus",
-    badge: false,
+    menu: "Features",
+    link: "#features", // Assumes a section with id="features"
   },
   {
-    menu: "Blog",
-    link: "/frontend-pages/blog",
-    badge: false,
+    menu: "Highlights",
+    link: "#highlights", // Assumes a section with id="highlights"
   },
   {
-    menu: "Portfolio",
-    link: "/frontend-pages/portfolio",
-    badge: true,
+    menu: "FAQ",
+    link: "#faq", // Assumes a section with id="faq"
   },
   {
-    menu: "Dashboard",
-    link: "/",
-    badge: false,
-  },
-  {
-    menu: "Pricing",
-    link: "/frontend-pages/pricing",
-    badge: false,
-  },
-  {
-    menu: "Contact",
-    link: "/frontend-pages/contact",
-    badge: false,
+    menu: "Get Started",
+    link: "#get-started", // Assumes the 'PurchaseTemp' section has id="get-started"
   },
 ];
 
 const Navigation = () => {
-  const location = useLocation();
-  const pathname = location.pathname;
+  // Location check is less relevant for same-page scroll links
+  // const location = useLocation();
+  // const pathname = location.pathname;
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, targetId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId.substring(1)); // Remove #
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <>
       <ul className="flex xl:flex-row flex-col xl:gap-9 gap-6 xl:items-center">
-        {FrontNav.map((item, index) => (
+        {RiseHomepageNav.map((item, index) => (
           <li
             key={index}
-            className={`rounded-full font-semibold text-15 py-1.5 px-2.5 ${pathname == item.link ? 'bg-lightprimary text-primary' : 'text-dark dark:text-white ' }`}
+            // Removed active class logic based on pathname
+            className={`rounded-full font-semibold text-15 py-1.5 px-2.5 text-dark dark:text-white hover:text-primary dark:hover:text-primary`}
           >
-            <Link to={item.link} className="flex gap-3 items-center text-primary-ld">
+            {/* Use standard anchor tags for scrolling */}
+            <a 
+              href={item.link} 
+              onClick={(e) => handleScroll(e, item.link)}
+              className="flex gap-3 items-center text-primary-ld"
+            >
               {item.menu}
-              {item.badge == true ? <Badge color={'lightprimary'}>New</Badge> : null}
-            </Link>
+              {/* Removed badge logic */}
+            </a>
           </li>
         ))}
       </ul>

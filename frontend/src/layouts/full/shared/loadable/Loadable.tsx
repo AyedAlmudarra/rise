@@ -1,15 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import  { Suspense } from 'react';
-import Spinner from '../../../../views/spinner/Spinner';
+import { Suspense, ComponentType } from 'react';
+import Spinner from '@/views/spinner/Spinner';
 
 // project imports
 
 
 // ===========================|| LOADABLE - LAZY LOADING ||=========================== //
 
-const Loadable = (Component: any) => (props: any) =>
-  (
+// Use generics for better type safety
+const Loadable = <P extends object>(Component: ComponentType<P>) => 
+  (props: P) => (
     <Suspense fallback={<Spinner />}>
       <Component {...props} />
     </Suspense>

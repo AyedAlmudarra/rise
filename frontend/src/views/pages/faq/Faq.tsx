@@ -1,6 +1,6 @@
-import Questions from "src/components/theme-pages/faq/Questions";
-import StillHaveQst from "src/components/theme-pages/faq/StillHaveQst";
-import BreadcrumbComp from "src/layouts/full/shared/breadcrumb/BreadcrumbComp";
+import Questions from "@/components/theme-pages/faq/Questions";
+import StillHaveQst from "@/components/theme-pages/faq/StillHaveQst";
+import BreadcrumbComp from "@/layouts/full/shared/breadcrumb/BreadcrumbComp";
 
 
 const BCrumb = [

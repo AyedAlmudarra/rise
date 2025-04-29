@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormContext, Controller } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/shadcn-ui/Default-Ui/form";
 import { Checkbox } from "../../../components/shadcn-ui/Default-Ui/checkbox";
 import { InvestorRegistrationData, Industries, Geographies, Stages } from '../../../types/investorRegistration';

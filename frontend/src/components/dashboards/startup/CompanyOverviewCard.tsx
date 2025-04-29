@@ -1,63 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Badge, Button, Progress, Avatar, Modal, Tabs, Tooltip, Card as CardBox, Spinner, Alert } from 'flowbite-react';
+import React, { useState } from 'react';
+import { Badge, Button, Progress, Avatar, Modal, Tabs, Tooltip, Card as CardBox } from 'flowbite-react';
 import { 
-  IconStar, IconStarFilled, IconUsers, IconBriefcase, IconArrowsRightLeft,
-  IconFileAnalytics, IconClipboard, IconInfoCircle, IconBrandLinkedin, IconBrandTwitter,
-  IconWorld, IconCategory, IconChartBar, IconMapPin, IconBuildingStore, IconCoin,
-  IconMail, IconBell, IconChartPie, IconArrowNarrowUp, IconDeviceFloppy, IconDownload,
-  IconCalendarEvent, IconCurrencyDollar, IconBooks, IconTrendingUp, IconUserCheck,
-  IconTargetArrow, IconAward, IconBuildingSkyscraper, IconBrandGithub, IconDeviceAnalytics,
-  IconCloudUpload, IconArrowUpRight, IconPresentation
+  IconUsers, IconArrowsRightLeft,
+  IconClipboard, IconInfoCircle, IconBrandLinkedin, 
+  IconWorld, IconCategory, IconChartBar, IconMapPin, IconBuildingStore, 
+  IconChartPie, IconCalendarEvent,
+  IconBuildingSkyscraper, IconDeviceAnalytics,
+  IconDeviceFloppy,
+  
 } from '@tabler/icons-react';
-import { StartupProfile } from 'src/types/database';
+import { StartupProfile } from '@/types/database';
 
 interface CompanyOverviewCardProps {
   startupData: StartupProfile | null;
-  mockData?: any;
   isLoading: boolean;
   error: string | null;
 }
 
-const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, mockData, isLoading, error }) => {
-  const [isStarred, setIsStarred] = useState<boolean>(false);
+const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, isLoading, error }) => {
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('profile');
-  const [profileViews, setProfileViews] = useState<number>(124);
   const [saved, setSaved] = useState<boolean>(false);
   const [showMore, setShowMore] = useState<boolean>(false);
-  const [showTeam, setShowTeam] = useState<boolean>(false);
-  const [teamMembers, setTeamMembers] = useState([
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      role: 'CEO & Co-Founder',
-      avatar: 'https://flowbite.com/docs/images/people/profile-picture-5.jpg',
-      linkedin: '#',
-      github: '#',
-      twitter: '#',
-      bio: 'Former Google product lead with 12+ years of experience in tech.'
-    },
-    {
-      id: 2,
-      name: 'David Chen',
-      role: 'CTO & Co-Founder',
-      avatar: 'https://flowbite.com/docs/images/people/profile-picture-2.jpg',
-      linkedin: '#',
-      github: '#',
-      twitter: '#',
-      bio: 'MIT graduate with background in AI and machine learning.'
-    },
-    {
-      id: 3,
-      name: 'Priya Patel',
-      role: 'Head of Product',
-      avatar: 'https://flowbite.com/docs/images/people/profile-picture-3.jpg',
-      linkedin: '#',
-      github: '#',
-      twitter: '#',
-      bio: 'Product strategist with experience at multiple successful startups.'
-    }
-  ]);
 
   if (isLoading) {
     return (
@@ -95,9 +59,9 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
     );
   }
 
-  const { name, industry, sector, operational_stage, location_city, description, logo_url, website, linkedin_profile, pitch_deck_url } = startupData;
+  const { name, industry, sector, operational_stage, location_city, description, logo_url, website, linkedin_profile } = startupData;
 
-  const logoUrlActual = logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`;
+  const logoUrlActual = logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Company')}&background=random&color=fff`;
   
   const safeDescription = description ?? '';
   const descriptionTooLong = safeDescription.length > 120;
@@ -114,21 +78,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
     startupData[field]
   );
   
+  // TODO: Review and refine profile completion logic based on actual requirements
   const completionPercentage = Math.round((filledFields.length / requiredFields.length) * 100);
-
-  const handleToggleStar = () => {
-    setIsStarred(!isStarred);
-  };
-
-  const handleCopyLink = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
-  const handleTrackView = () => {
-    setProfileViews(prev => prev + 1);
-    setShowProfileModal(false);
-  };
 
   return (
     <>
@@ -136,16 +87,15 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
         <div className="relative">
           <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 relative">
             <div className="absolute top-2 right-2 z-10">
-              <button 
-                onClick={handleToggleStar}
-                className="p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-              >
-                {isStarred ? (
-                  <IconStarFilled size={18} className="text-amber-400" />
-                ) : (
-                  <IconStar size={18} className="text-white" />
-                )}
-              </button>
+               {/* TODO: Implement Star Button backend logic and onClick handler */}
+               {/* 
+               <button 
+                 onClick={handleToggleStar} // Add handler here
+                 className="p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
+               >
+                 <IconStar size={18} className="text-white" />
+               </button> 
+               */}
             </div>
           </div>
           
@@ -169,6 +119,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    {/* TODO: Implement Full Profile modal display/logic if needed beyond the basic modal toggle */}
                     <Button size="xs" color="blue" onClick={() => setShowProfileModal(true)}>
                       <IconDeviceAnalytics size={14} className="mr-1" />
                       Full Profile
@@ -194,9 +145,12 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                   {location_city}
                 </Badge>
               )}
+              {/* TODO: Replace hardcoded funding target with dynamic data if available */}
+              {/* 
               <Badge color="info" size="sm" icon={IconTargetArrow}>
-                Funding Target: $2.5M
-              </Badge>
+                 Funding Target: $2.5M 
+              </Badge> 
+              */}
             </div>
             
             <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
@@ -227,6 +181,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
               />
               <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center">
                 <IconInfoCircle size={12} className="mr-1" />
+                {/* TODO: Verify this text or make it dynamic */} 
                 Complete your profile to attract more investors
               </div>
             </div>
@@ -266,60 +221,100 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
             </div>
             
             <div className="grid grid-cols-2 gap-3 mt-4">
-              <Button size="sm" color="light" className="w-full relative group overflow-hidden">
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-                <IconMail size={16} className="mr-1.5" />
-                Contact
-              </Button>
-              <Button size="sm" color="light" className="w-full relative group overflow-hidden">
-                <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-                <IconWorld size={16} className="mr-1.5" />
-                Website
-              </Button>
+               {/* TODO: Implement Contact button functionality (handler/modal/etc) */}
+               {/* 
+               <Button size="sm" color="light" className="w-full relative group overflow-hidden" onClick={() => {}}> 
+                 <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                 <IconMail size={16} className="mr-1.5" />
+                 Contact
+               </Button> 
+               */}
+               {/* Website button - Opens link if available */}
+               <Button 
+                 size="sm" 
+                 color="light" 
+                 className="w-full relative group overflow-hidden" 
+                 onClick={() => website ? window.open(website.startsWith('http') ? website : `https://${website}`, '_blank') : alert('Website not provided')}
+                 disabled={!website}
+               >
+                 <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                 <IconWorld size={16} className="mr-1.5" />
+                 Website
+               </Button>
             </div>
             
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              <Button size="xs" color="light" className="w-full">
-                <IconBriefcase size={14} className="mr-1" />
-                Jobs
-              </Button>
-              <Button size="xs" color="light" className="w-full">
-                <IconFileAnalytics size={14} className="mr-1" />
-                Report
-              </Button>
-              <Button size="xs" color="light" className="w-full" onClick={handleCopyLink}>
-                <IconClipboard size={14} className="mr-1" />
-                {saved ? 'Copied!' : 'Copy Link'}
-              </Button>
+            {/* Adjust grid, Jobs button removed */} 
+            <div className="grid grid-cols-2 gap-2 mt-2"> 
+               {/* TODO: Implement Report button functionality */}
+               {/* 
+               <Button size="xs" color="light" className="w-full" onClick={() => {}}> 
+                 <IconFileAnalytics size={14} className="mr-1" />
+                 Report
+               </Button> 
+               */}
+               {/* Copy Link button */} 
+               <Button size="xs" color="light" className="w-full" onClick={() => {
+                 const link = `https://rise.io/company/${startupData.id}`; // Example link
+                 navigator.clipboard.writeText(link).then(() => {
+                   console.log("Link copied to clipboard (or would be)", link);
+                   setSaved(true);
+                   setTimeout(() => setSaved(false), 2000);
+                 }).catch(err => {
+                   console.error('Failed to copy link: ', err);
+                   alert('Failed to copy link.');
+                 });
+               }}>
+                 <IconClipboard size={14} className="mr-1" />
+                 {saved ? 'Copied!' : 'Copy Link'}
+               </Button>
             </div>
             
             <div className="flex justify-center gap-3 pt-3 mt-2 border-t border-gray-200 dark:border-gray-700">
               <Tooltip content="LinkedIn Profile">
-                <button className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                  <IconBrandLinkedin size={20} />
-                </button>
+                 {/* LinkedIn button - Opens link if available */}
+                 <button 
+                   onClick={() => linkedin_profile ? window.open(linkedin_profile.startsWith('http') ? linkedin_profile : `https://${linkedin_profile}`, '_blank') : alert('LinkedIn profile not provided')}
+                   disabled={!linkedin_profile}
+                   className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:hover:text-gray-500 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                 >
+                   <IconBrandLinkedin size={20} />
+                 </button>
               </Tooltip>
               <Tooltip content="Twitter Profile">
-                <button className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                  <IconBrandTwitter size={20} />
-                </button>
+                 {/* TODO: Implement Twitter button functionality (link or action) */}
+                 {/* 
+                 <button 
+                   onClick={() => {}} 
+                   className="text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                 >
+                   <IconBrandTwitter size={20} />
+                 </button> 
+                 */}
               </Tooltip>
               <Tooltip content="Company Website">
-                <button className="text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                  <IconWorld size={20} />
-                </button>
+                  {/* Website icon button - Opens link if available */}
+                  <button 
+                    onClick={() => website ? window.open(website.startsWith('http') ? website : `https://${website}`, '_blank') : alert('Website not provided')}
+                    disabled={!website}
+                    className="text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 disabled:opacity-50 disabled:hover:text-gray-500 transition-colors p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  >
+                    <IconWorld size={20} />
+                  </button>
               </Tooltip>
             </div>
             
+            {/* TODO: Implement Premium Upgrade functionality */}
+            {/* 
             <div className="mt-2 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 p-2 rounded-lg border border-amber-200 dark:border-amber-800/30">
               <div className="flex items-center text-xs text-amber-800 dark:text-amber-300">
                 <IconBell size={14} className="mr-1.5 flex-shrink-0" />
                 <span>Get <span className="font-semibold">5x more investor views</span> with Premium</span>
-                <Button size="xs" color="warning" className="ml-auto" pill>
+                <Button size="xs" color="warning" className="ml-auto" pill onClick={() => {}}>
                   Upgrade
                 </Button>
               </div>
-            </div>
+            </div> 
+            */}
           </div>
         </div>
         
@@ -392,7 +387,7 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                       <ul className="space-y-2 text-sm">
                         <li className="flex">
                           <span className="font-medium w-24">Founded:</span>
-                          <span className="text-gray-600 dark:text-gray-400">2020</span>
+                          <span className="text-gray-600 dark:text-gray-400">{startupData.founding_date || 'N/A'}</span>
                         </li>
                         <li className="flex">
                           <span className="font-medium w-24">Team size:</span>
@@ -406,7 +401,9 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                         </li>
                         <li className="flex">
                           <span className="font-medium w-24">Growth rate:</span>
-                          <span className="text-green-600 dark:text-green-400">+32% YoY</span>
+                          <span className="text-green-600 dark:text-green-400">
+                             {startupData.kpi_yoy_growth ? `${startupData.kpi_yoy_growth}% YoY` : 'N/A'}
+                           </span>
                         </li>
                       </ul>
                     </div>
@@ -420,7 +417,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 active={activeTab === 'insights'}
               >
                 <div className="p-4 text-center text-gray-500">
-                  Insights data will be displayed here.
+                  {/* TODO: Implement Insights/Analytics view */}
+                   Insights data will be displayed here.
                 </div>
               </Tabs.Item>
               
@@ -430,7 +428,8 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                 active={activeTab === 'milestones'}
               >
                 <div className="p-4 text-center text-gray-500">
-                  Company milestones will be displayed here.
+                  {/* TODO: Implement Milestones view */}
+                   Company milestones will be displayed here.
                 </div>
               </Tabs.Item>
               
@@ -449,7 +448,17 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                         readOnly
                         className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       />
-                      <Button color="blue" onClick={handleCopyLink}>
+                      <Button color="blue" onClick={() => {
+                        const link = `https://rise.io/company/${startupData.id}`;
+                        navigator.clipboard.writeText(link).then(() => {
+                          console.log("Link copied to clipboard (or would be)", link);
+                          setSaved(true);
+                          setTimeout(() => setSaved(false), 2000);
+                        }).catch(err => {
+                          console.error('Failed to copy link: ', err);
+                          alert('Failed to copy link.');
+                        });
+                      }}>
                         {saved ? (
                           <IconDeviceFloppy size={16} className="mr-2" />
                         ) : (
@@ -461,14 +470,20 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
                     
                     <h6 className="text-sm font-semibold mb-3">Export Options</h6>
                     <div className="grid grid-cols-2 gap-3">
-                      <Button outline gradientDuoTone="purpleToBlue">
-                        <IconFileAnalytics size={16} className="mr-2" />
-                        Export as PDF
-                      </Button>
-                      <Button outline gradientDuoTone="cyanToBlue">
-                        <IconDownload size={16} className="mr-2" />
-                        Download Data
-                      </Button>
+                       {/* TODO: Implement Export as PDF functionality */}
+                       {/* 
+                       <Button outline gradientDuoTone="purpleToBlue" onClick={() => {}}> 
+                         <IconFileAnalytics size={16} className="mr-2" />
+                         Export as PDF
+                       </Button> 
+                       */}
+                       {/* TODO: Implement Download Data functionality */}
+                       {/* 
+                       <Button outline gradientDuoTone="cyanToBlue" onClick={() => {}}> 
+                         <IconDownload size={16} className="mr-2" />
+                         Download Data
+                       </Button> 
+                       */}
                     </div>
                   </div>
                 </div>
@@ -477,9 +492,12 @@ const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({ startupData, 
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={() => setShowProfileModal(false)}>Close</Button>
-            <Button color="blue" onClick={handleTrackView}>
-              View Full Profile
-            </Button>
+             {/* TODO: Implement modal profile view tracking/action */}
+             {/* 
+             <Button color="blue" onClick={handleTrackView}> 
+               View Full Profile
+             </Button> 
+             */}
           </Modal.Footer>
         </Modal>
       </CardBox>

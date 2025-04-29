@@ -1,17 +1,32 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
+// Define the structure for a navigation item
+export interface NavItem {
+  id: string | number; // Assuming an id exists for keys
+  title: string;
+  icon?: string | React.ReactNode; // Allow string or component type
+  href: string;
+  children?: NavItem[]; // Optional children for submenus
+}
+
+// Define the props for the ChildComponent
+interface ChildComponentProps {
+  item: NavItem;
+  isActive?: boolean; // Prop received but not directly used for rendering logic here, only passed down
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  title?: string; // Used for special positioning class
+}
+
 const ChildComponent = ({
   item,
   isActive,
-  handleMouseEnter,
-  handleMouseLeave,
   onClick,
   title
-}: any) => {
+}: ChildComponentProps) => {
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
   const location = useLocation();
@@ -42,7 +57,11 @@ const ChildComponent = ({
           } py-1 px-3 rounded-md flex gap-3 items-center text-ld  hover:text-primary`}
         >
           <span className="flex gap-3 items-center w-full">
-            <Icon icon={`${item.icon}`} height={18} />
+            {item.icon && (
+              typeof item.icon === 'string' ? 
+              <Icon icon={item.icon} height={18} /> :
+              item.icon
+            )}
             <span className="line-clamp-1 max-w-24 overflow-hidden text-nowrap">
               {t(`${item.title}`)}
             </span>
@@ -53,14 +72,12 @@ const ChildComponent = ({
       {isSubMenuOpen && item.children && (
         <div className={`absolute   top-0 mt-0 w-56 bg-white dark:bg-dark rounded-md shadow-lg ${title=="Tables"?"tables-position":"left-full rtl:right-full"}`}>
           <ul className="p-3 flex flex-col gap-2">
-            {item.children.map((child: any) => (
+            {item.children.map((child: NavItem) => (
               <li key={child.id}>
                 {child.children ? (
                   <ChildComponent
                     item={child}
                     isActive={isActive}
-                    handleMouseEnter={handleMouseEnter}
-                    handleMouseLeave={handleMouseLeave}
                   />
                 ) : (
                   <Link to={child.href}>

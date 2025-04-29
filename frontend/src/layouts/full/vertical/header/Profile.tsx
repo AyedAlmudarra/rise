@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { Button, Dropdown, Avatar, Spinner } from 'flowbite-react';
 import SimpleBar from 'simplebar-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from 'src/context/AuthContext';
-import { supabase } from 'src/lib/supabaseClient';
-import { StartupProfile, InvestorProfile } from 'src/types/database';
-import userImg from '/src/assets/images/profile/user-1.jpg';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import userImg from '@/assets/images/profile/user-1.jpg';
 
 const Profile = () => {
   const { user, userRole, signOut, loading: authLoading } = useAuth();

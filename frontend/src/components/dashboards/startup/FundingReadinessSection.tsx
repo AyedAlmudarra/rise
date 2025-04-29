@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Tooltip, Badge, Progress, Button, Accordion, Spinner, Alert } from 'flowbite-react';
+import React, { useState } from 'react';
+import { Card, Tooltip, Badge, Button, Accordion, Spinner } from 'flowbite-react';
 import { StartupProfile } from '../../../types/database'; // Adjust path if necessary
 import { supabase } from '../../../lib/supabaseClient'; // Import supabase client
 import { toast } from 'react-hot-toast'; // Import toast
 import {
   IconInfoCircle,
-  IconFileReport,
-  IconArrowUpRight,
-  IconArrowDownRight,
-  IconBulb,
   IconCheck,
   IconX,
   IconExclamationCircle,
-  IconChevronRight,
-  IconChevronDown,
   IconRefresh,
-  IconFileUpload,
-  IconDownload,
-  IconEdit,
   IconListCheck,
   IconScale
 } from "@tabler/icons-react";
@@ -43,7 +34,6 @@ const getReadinessSummary = (score: number): string => {
 
 const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ startupData, isLoading, onRefreshRequest }) => {
     // Use state for the score to handle updates and default value
-    const [readinessScore, setReadinessScore] = useState<number>(0);
     const [isRefreshing, setIsRefreshing] = useState(false); // Renamed from isRecomputing
 
     // --- Moved helper functions/objects INSIDE the component --- 
@@ -56,56 +46,6 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
         return gaugeColors[2];
     };
 
-    // Updated gauge chart configuration (defined inside component)
-    const gaugeOptions: ApexOptions = {
-        chart: {
-            type: 'radialBar',
-            height: 200,
-            offsetY: -10,
-            sparkline: { enabled: true },
-            animations: { enabled: true, speed: 800 },
-        },
-        plotOptions: {
-            radialBar: {
-                startAngle: -135,
-                endAngle: 135,
-                hollow: { size: '65%' },
-                track: { background: "#e7e7e7", strokeWidth: '97%', margin: 5 },
-                dataLabels: {
-                    name: { show: false },
-                    value: {
-                        offsetY: 5,
-                        fontSize: '22px',
-                        fontWeight: 600,
-                        // Handle null/pending score case in formatter - use ai_analysis
-                        formatter: (val) => {
-                            const score = startupData?.ai_analysis?.funding_readiness_score;
-                            if (startupData?.analysis_status === 'completed' && typeof score === 'number') {
-                                return `${Math.round(val)}%`; // val should be the score here
-                            } 
-                            return '--%'; // Show placeholder if not completed or no score
-                        }
-                    }
-                }
-            }
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'dark',
-                type: 'horizontal',
-                gradientToColors: [getGaugeColor(readinessScore)], // Accesses readinessScore from state
-                stops: [0, 100]
-            }
-        },
-        stroke: { lineCap: 'round' },
-        labels: ['Readiness'],
-        colors: [getGaugeColor(readinessScore)], // Accesses readinessScore from state
-    };
-
-    // Gauge series now uses state
-    const gaugeSeries = [readinessScore]; 
-
     // Function to get explanatory text for readiness score level
     const getReadinessLevel = (score: number): { level: string; color: "failure" | "warning" | "success"; icon: React.FC<React.SVGProps<SVGSVGElement>> } => {
         if (score < 40) return { level: 'Low', color: 'failure', icon: () => <IconX className="mr-1" size={14}/> };
@@ -113,33 +53,18 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
         return { level: 'High', color: 'success', icon: () => <IconCheck className="mr-1" size={14}/> };
     };
 
-    // Get title and description for pitch deck status based on URL presence
-    const getPitchDeckStatus = (pitchDeckUrl: string | null | undefined): { title: string; description: string; color: "failure" | "success"; icon: JSX.Element } => {
-        if (!pitchDeckUrl) {
-            return { 
-                title: 'Not Uploaded', 
-                description: 'Upload a pitch deck to significantly improve your funding readiness.',
-                color: 'failure',
-                icon: <IconX className="w-4 h-4 text-red-500" />
-            };
-        } else {
-            return { 
-                title: 'Uploaded', 
-                description: 'Your pitch deck is uploaded. Ensure it is up-to-date and compelling.',
-                color: 'success',
-                icon: <IconCheck className="w-4 h-4 text-green-500" />
-            };
-        }
-    };
+    // Removed unused getPitchDeckStatus function
+    // const getPitchDeckStatus = (pitchDeckUrl: string | null | undefined): { title: string; description: string; color: "failure" | "success"; icon: JSX.Element } => { ... };
 
-    const pitchDeckStatusDetails = getPitchDeckStatus(startupData?.pitch_deck_url);
+    // Removed unused pitchDeckStatusDetails
+    // const pitchDeckStatusDetails = getPitchDeckStatus(startupData?.pitch_deck_url);
 
     // Keep progress color logic
-    const getProgressColor = (value: number): "failure" | "warning" | "success" => {
-        if (value < 40) return 'failure';
-        if (value < 70) return 'warning';
-        return 'success';
-    };
+    // const getProgressColor = (value: number): "failure" | "warning" | "success" => {
+    //     if (value < 40) return 'failure';
+    //     if (value < 70) return 'warning';
+    //     return 'success';
+    // };
     
     // --- End of moved functions/objects ---
 
@@ -235,9 +160,42 @@ const FundingReadinessSection: React.FC<FundingReadinessSectionProps> = ({ start
                     const currentReadinessScore = Math.max(0, Math.min(100, score)); // Clamp score 0-100
                     const { level, color, icon: ReadinessIcon } = getReadinessLevel(currentReadinessScore);
                     const currentGaugeOptions: ApexOptions = {
-                        ...gaugeOptions, // Spread base options
-                        fill: { ...gaugeOptions.fill, gradient: { ...gaugeOptions.fill?.gradient, gradientToColors: [getGaugeColor(currentReadinessScore)] } },
-                        colors: [getGaugeColor(currentReadinessScore)]
+                        chart: {
+                            type: 'radialBar',
+                            height: 200,
+                            offsetY: -10,
+                            sparkline: { enabled: true },
+                            animations: { enabled: true, speed: 800 },
+                        },
+                        plotOptions: {
+                            radialBar: {
+                                startAngle: -135,
+                                endAngle: 135,
+                                hollow: { size: '65%' },
+                                track: { background: "#e7e7e7", strokeWidth: '97%', margin: 5 },
+                                dataLabels: {
+                                    name: { show: false },
+                                    value: {
+                                        offsetY: 5,
+                                        fontSize: '22px',
+                                        fontWeight: 600,
+                                        formatter: (val) => `${Math.round(val)}%` // Score is known here
+                                    }
+                                }
+                            }
+                        },
+                        fill: { 
+                            type: 'gradient',
+                            gradient: {
+                                shade: 'dark',
+                                type: 'horizontal',
+                                gradientToColors: [getGaugeColor(currentReadinessScore)], // Use outer scope function
+                                stops: [0, 100]
+                            }
+                        },
+                        stroke: { lineCap: 'round' },
+                        labels: ['Readiness'],
+                        colors: [getGaugeColor(currentReadinessScore)] // Use outer scope function
                     };
                     const currentGaugeSeries = [currentReadinessScore];
 

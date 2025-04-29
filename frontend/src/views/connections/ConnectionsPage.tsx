@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Tabs, Spinner, Alert, Button, Avatar, Badge } from 'flowbite-react';
 import { HiUserGroup, HiOutlineInboxIn, HiOutlinePaperAirplane, HiOutlineLink, HiCheck, HiX, HiOutlineClock, HiOutlineUserCircle, HiOutlineChatAlt2, HiOutlineTrash } from 'react-icons/hi';
-import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../context/AuthContext';
-import { ConnectionRequest, InvestorProfile, StartupProfile } from '../../types/database';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
+import { ConnectionRequest, InvestorProfile, StartupProfile } from '@/types/database';
 import { toast } from 'react-hot-toast';
-import ProfilePreviewModal from '../../components/profile/ProfilePreviewModal';
+import ProfilePreviewModal from '@/components/profile/ProfilePreviewModal';
 
 // Combined type for display
 type ConnectionDisplayData = ConnectionRequest & {
@@ -19,9 +19,9 @@ type TabIdentifier = 'incoming' | 'outgoing' | 'active';
 const tabIdentifiers: TabIdentifier[] = ['incoming', 'outgoing', 'active'];
 
 const ConnectionsPage: React.FC = () => {
-  const { user, userRole } = useAuth();
+  const { user } = useAuth();
   const { tab: initialTabParam } = useParams<{ tab?: TabIdentifier }>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   // --- State ---
@@ -283,18 +283,6 @@ const ConnectionsPage: React.FC = () => {
     const avatarInitials = displayName?.[0]?.toUpperCase() || '?';
     const avatarImg = profile.role === 'startup' ? profile.logo_url : undefined;
     const isActionLoading = actionLoading[item.id] || false;
-
-    const currentUserRole = userRole;
-
-    // --- Profile Link Logic (Still generates URL but button behavior changes) ---
-    let profileUrl = '#';
-    if (profileUserId && profileRole && profileRole !== 'unknown' && currentUserRole) {
-        if (currentUserRole === 'investor' && profileRole === 'startup') {
-            profileUrl = `/investor/startup-profile/${profileUserId}`;
-        } else if (currentUserRole === 'startup' && profileRole === 'investor') {
-            profileUrl = `/startup/investor-profile/${profileUserId}`;
-        }
-    }
 
     // --- Message Handler Placeholder (No Change) ---
     const handleMessageClick = (otherUserId: string | undefined) => {

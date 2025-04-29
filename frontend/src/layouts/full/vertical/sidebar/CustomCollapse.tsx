@@ -1,17 +1,18 @@
-
+import { ReactNode } from 'react';
 import { twMerge } from "tailwind-merge";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
 
-const CustomCollapse: React.FC<{
-    label: string;
-    open: boolean;
-    children:any;
-    onClick: () => void;
-    icon: string;
-    className?: string;
-  }> = ({ label, open, onClick, icon, children, className }) => {
+interface CustomCollapseProps {
+  label: string;
+  open: boolean;
+  children: ReactNode;
+  onClick: () => void;
+  icon: string;
+  className?: string;
+}
+
+const CustomCollapse = ({ label, open, onClick, icon, children, className }: CustomCollapseProps) => {
     return (
       <div className={twMerge("transition-all duration-300")}>
         <div

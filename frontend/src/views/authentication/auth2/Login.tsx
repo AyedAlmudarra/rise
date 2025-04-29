@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import CardBox from "src/components/shared/CardBox";
-import Logo from "src/layouts/full/shared/logo/Logo";
+import CardBox from "@/components/shared/CardBox";
+import Logo from "@/layouts/full/shared/logo/Logo";
 import AuthLogin from "../authforms/AuthLogin";
-import SocialButtons from "../authforms/SocialButtons";
+
 
 const Login = () => {
   return (
@@ -13,7 +13,6 @@ const Login = () => {
             <div className="mx-auto">
               <Logo />
             </div>
-            <SocialButtons title="or sign in with" />
             <AuthLogin />
             <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-center">
               <p>New to MaterialM?</p>

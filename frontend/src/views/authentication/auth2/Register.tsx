@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import CardBox from "src/components/shared/CardBox";
-import Logo from "src/layouts/full/shared/logo/Logo";
-import AuthRegister from "../authforms/AuthRegister";
-import SocialButtons from "../authforms/SocialButtons";
+import CardBox from "@/components/shared/CardBox";
+import Logo from "@/layouts/full/shared/logo/Logo";
+
 
 
 const Register = () => {
@@ -14,8 +13,6 @@ const Register = () => {
             <div className="mx-auto">
               <Logo />
             </div>
-            <SocialButtons title="or sign up with" />
-            <AuthRegister />
             <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-start">
                   <p>Already have an Account?</p>
                   <Link

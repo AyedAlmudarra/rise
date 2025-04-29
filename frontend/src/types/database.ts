@@ -247,6 +247,25 @@ export interface CalendarEvent {
   color: string | null;         // text, e.g., 'primary', 'green'
 } 
 
+// +++ ADDED: Minimal types for Messages feature +++
+export interface Conversation {
+  id: number; 
+  participant1_user_id: string; 
+  participant2_user_id: string; 
+  created_at: string; 
+  last_message_at: string | null; 
+}
+
+export interface Message {
+  id: number; 
+  conversation_id: number; 
+  sender_user_id: string; 
+  content: string; 
+  created_at: string; 
+  read_at: string | null; 
+}
+// +++ END ADDED +++
+
 // --- Connection & Notification System Structures (Frontend Types) ---
 
 // Structure for `connection_requests` table (Assumed based on usage)

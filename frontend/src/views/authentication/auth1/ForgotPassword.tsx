@@ -1,6 +1,5 @@
-import React from "react";
-import { Button, Label, TextInput } from "flowbite-react";
-import Logo from "src/layouts/full/shared/logo/Logo";
+import { Button } from "flowbite-react";
+import Logo from "@/layouts/full/shared/logo/Logo";
 import { Link } from "react-router-dom";
 import LeftSidebarPart from "../LeftSidebarPart";
 import AuthForgotPassword from "../authforms/AuthForgotPassword";

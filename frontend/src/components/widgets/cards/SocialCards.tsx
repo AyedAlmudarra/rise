@@ -1,17 +1,14 @@
-import user1 from "src/assets/images/profile/user-1.jpg";
-import user2 from "/src/assets/images/profile/user-2.jpg";
-import user3 from "/src/assets/images/profile/user-3.jpg";
-import user6 from "src/assets/images/profile/user-6.jpg";
+import user1 from "@/assets/images/profile/user-1.jpg";
+import user2 from "@/assets/images/profile/user-2.jpg";
+import user3 from "@/assets/images/profile/user-3.jpg";
 import {
   IconBrandFacebook,
   IconBrandGithub,
   IconBrandInstagram,
   IconBrandTwitter,
 } from "@tabler/icons-react";
-import CardBox from "src/components/shared/CardBox";
+import CardBox from "@/components/shared/CardBox";
 import { Link } from "react-router-dom";
-import { Avatar, Button, Badge } from "flowbite-react";
-import { IconMail, IconUserPlus } from "@tabler/icons-react";
 
 const profileCards = [
   {

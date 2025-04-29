@@ -4,9 +4,9 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/shadcn-ui/Default-Ui/form";
 import { StartupRegistrationData } from '../../../types/startupRegistration';
 import { Switch } from "../../../components/shadcn-ui/Default-Ui/switch";
-import { Users, UserPlus, LightbulbIcon, AlertTriangle, User, Puzzle, Cpu, BarChart2, BadgePercent, Briefcase, Info, LucideIcon } from 'lucide-react';
+import { Users, UserPlus, AlertTriangle, User, Cpu, BarChart2, BadgePercent, Briefcase, Info, Puzzle } from 'lucide-react';
 import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
-import { Card, CardContent } from "../../../components/shadcn-ui/Default-Ui/card";
+import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
 
 interface TeamRoleCardProps {
   title: string;

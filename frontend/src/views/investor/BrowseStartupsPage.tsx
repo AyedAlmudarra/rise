@@ -10,11 +10,11 @@ import {
   Badge,
   Avatar
 } from 'flowbite-react';
-import { HiOutlineSearch, HiOutlineFilter, HiLocationMarker, HiBriefcase, HiLink, HiUserGroup } from 'react-icons/hi';
+import { HiOutlineSearch, HiLocationMarker, HiBriefcase } from 'react-icons/hi';
 import { HiOutlineBuildingOffice2, HiCalendarDays } from 'react-icons/hi2';
-import { supabase } from '../../lib/supabaseClient';
-import { StartupProfile } from '../../types/database'; // Assuming StartupProfile type exists
-import { useAuth } from '../../context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { StartupProfile } from '@/types/database'; // Assuming StartupProfile type exists
+import { useAuth } from '@/context/AuthContext';
 import { Link } from 'react-router-dom';
 
 // Define Startup Stages explicitly if needed for filtering/display

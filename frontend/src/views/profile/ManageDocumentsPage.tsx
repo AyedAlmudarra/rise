@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'src/context/AuthContext';
-import { Card, Button, FileInput, Spinner, Alert, List, Tooltip } from 'flowbite-react';
+import { useAuth } from '@/context/AuthContext';
+import { Button, FileInput, Spinner, Alert, List, Tooltip } from 'flowbite-react';
 import {
   IconAlertCircle,
   IconFileUpload,
   IconTrash,
   IconDownload,
-  IconEye,
+  
   IconFileDescription,
   IconFileText,
   IconFileSpreadsheet,
   IconFileUnknown
 } from '@tabler/icons-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
-import OutlineCard from 'src/components/shared/OutlineCard';
+import BreadcrumbComp from '@/layouts/full/shared/breadcrumb/BreadcrumbComp';
+import OutlineCard from '@/components/shared/OutlineCard';
 import { toast } from 'react-hot-toast';
-import { supabase } from 'src/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { FileObject } from '@supabase/storage-js'; // Import FileObject type
 
 const BCrumb = [

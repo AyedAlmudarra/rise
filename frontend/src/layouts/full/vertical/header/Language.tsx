@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dropdown } from 'flowbite-react';
-import { Icon } from '@iconify/react';
-import englishFlag from "/src/assets/images/flag/icon-flag-en.svg"
-import southAfricaFlag from "/src/assets/images/flag/icon-flag-sa.svg" // Assuming SA flag for Arabic
+import englishFlag from "@/assets/images/flag/icon-flag-en.svg"
+import southAfricaFlag from "@/assets/images/flag/icon-flag-sa.svg" // Assuming SA flag for Arabic
 
 // Define language options directly
 const languages = [

@@ -5,14 +5,13 @@ interface appsLinkType {
   subtext: string;
   avatar: string;
 }
-import chatImg from "/src/assets//images/svgs/icon-dd-chat.svg";
-import cartImg from "/src/assets//images/svgs/icon-dd-cart.svg";
-import invoiceImg from "/src/assets//images/svgs/icon-dd-invoice.svg";
-import dateImg from "/src/assets//images/svgs/icon-dd-date.svg";
-import mobileImg from "/src/assets//images/svgs/icon-dd-mobile.svg";
-import lifebuoyImg from "/src/assets//images/svgs/icon-dd-lifebuoy.svg";
-import messageBoxImg from "/src/assets//images/svgs/icon-dd-message-box.svg";
-import applicationImg from "/src/assets//images/svgs/icon-dd-application.svg";
+import chatImg from "@/assets/images/svgs/icon-dd-chat.svg";
+import invoiceImg from "@/assets/images/svgs/icon-dd-invoice.svg";
+import dateImg from "@/assets/images/svgs/icon-dd-date.svg";
+import mobileImg from "@/assets/images/svgs/icon-dd-mobile.svg";
+import lifebuoyImg from "@/assets/images/svgs/icon-dd-lifebuoy.svg";
+import messageBoxImg from "@/assets/images/svgs/icon-dd-message-box.svg";
+import applicationImg from "@/assets/images/svgs/icon-dd-application.svg";
 
 const appsLink: appsLinkType[] = [
   {
@@ -20,12 +19,6 @@ const appsLink: appsLinkType[] = [
     title: "Chat Application",
     subtext: "New messages arrived",
     avatar: chatImg,
-  },
-  {
-    href: "/apps/ecommerce/shop",
-    title: "eCommerce App",
-    subtext: "New stock available",
-    avatar: cartImg,
   },
   {
     href: "/apps/notes",
@@ -98,10 +91,6 @@ const pageLinks: LinkType[] = [
   {
     href: "/apps/blog/post",
     title: "Blog Design",
-  },
-  {
-    href: "/apps/ecommerce/checkout",
-    title: "Shopping Cart",
   },
 ];
 

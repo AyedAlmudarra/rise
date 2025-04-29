@@ -1,12 +1,12 @@
-import AnnouncementBar from "src/components/front-pages/layout/AnnouncementBar";
-import { Footer } from "src/components/front-pages/layout/Footer";
-import FrontHeader from "src/components/front-pages/layout/Header";
-import customTheme from "src/utils/theme/custom-theme";
+import AnnouncementBar from "@/components/front-pages/layout/AnnouncementBar";
+import { Footer } from "@/components/front-pages/layout/Footer";
+import FrontHeader from "@/components/front-pages/layout/Header";
+import customTheme from "@/utils/theme/custom-theme";
 import { Flowbite } from "flowbite-react";
 import { Outlet } from "react-router";
-import ScrollToTop from "src/components/shared/ScrollToTop";
+import ScrollToTop from "@/components/shared/ScrollToTop";
 import { useContext, useEffect } from "react";
-import { CustomizerContext } from "src/context/CustomizerContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
 
 
 const FrontendLayout = () => {

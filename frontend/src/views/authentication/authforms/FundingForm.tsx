@@ -9,9 +9,7 @@ import { CircleDollarSign, PiggyBank, Info } from 'lucide-react';
 import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
 
-type FundingFormProps = {
-  isRegistrationFlow?: boolean;
-};
+type FundingFormProps = {};
 
 const fundingOptions = [
   { value: "Bootstrapped", label: "Bootstrapped" },
@@ -39,8 +37,8 @@ const InfoTooltip: React.FC<{ description: string }> = ({ description }) => (
   </TooltipProvider>
 );
 
-const FundingForm: React.FC<FundingFormProps> = ({ isRegistrationFlow = true }) => {
-  const { control, watch, formState: { errors } } = useFormContext<StartupRegistrationData>();
+const FundingForm: React.FC<FundingFormProps> = () => {
+  const { control, watch } = useFormContext<StartupRegistrationData>();
   const seekingInvestment = watch('seekingInvestment');
 
   return (

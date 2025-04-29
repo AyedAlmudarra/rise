@@ -1,15 +1,13 @@
 /*--Products Cards Images--*/
-import proimg1 from "/src/assets/images/products/s2.jpg";
-import proimg2 from "/src/assets/images/products/s5.jpg";
-import proimg3 from "/src/assets/images/products/s8.jpg";
-import proimg4 from "/src/assets/images/products/s11.jpg";
-import img1 from "src/assets/images/products/s1.jpg";
-import img6 from "src/assets/images/products/s6.jpg";
+import proimg1 from "@/assets/images/products/s2.jpg";
+import proimg2 from "@/assets/images/products/s5.jpg";
+import proimg3 from "@/assets/images/products/s8.jpg";
+import proimg4 from "@/assets/images/products/s11.jpg";
+
 import { Button, Rating } from "flowbite-react";
 import { IconBasket } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
-import CardBox from "src/components/shared/CardBox";
-import { Badge } from "flowbite-react";
+import CardBox from "@/components/shared/CardBox";
 /*--Products Cards--*/
 const productsCardData = [
   {

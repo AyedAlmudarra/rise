@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Label, TextInput, Textarea, Spinner, Alert } from 'flowbite-react';
-import { IconChartBar, IconCurrencyDollar, IconUsers, IconTargetArrow, IconInfoCircle, IconAlertTriangle, IconDeviceFloppy } from '@tabler/icons-react';
-import { StartupProfile } from '../../types/database';
-import { supabase } from '../../lib/supabaseClient';
+import { Modal, Button, Label, TextInput, Alert } from 'flowbite-react';
+import { IconChartBar, IconCurrencyDollar, IconUsers, IconTargetArrow, IconAlertTriangle, IconDeviceFloppy } from '@tabler/icons-react';
+import { StartupProfile } from '@/types/database';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
 
 interface UpdateMetricsModalProps {
@@ -110,14 +110,25 @@ const UpdateMetricsModal: React.FC<UpdateMetricsModalProps> = ({
 
     setIsLoading(true);
 
-    // Filter out unchanged values (optional, but good practice)
+    // Filters out unchanged fields before sending update
     const updatedFields: Partial<StartupProfile> = {};
     Object.keys(formData).forEach(key => {
-        const formValue = formData[key as keyof StartupProfile];
-        const originalValue = startupData[key as keyof StartupProfile];
+        const formKey = key as keyof StartupProfile;
+        const formValue = formData[formKey];
+        const originalValue = startupData[formKey];
+
         // Check for actual change, handling null/undefined comparisons
         if (formValue !== originalValue && !(formValue == null && originalValue == null)) {
-             updatedFields[key as keyof StartupProfile] = formValue;
+             // @ts-ignore - Linter seems unable to correctly infer type here
+             updatedFields[formKey] = formValue; 
+        }
+    });
+    
+    // Clean up any potential explicit undefined values if Supabase prefers omitting the key
+    // This step is now more important due to the workaround above
+    Object.keys(updatedFields).forEach(key => {
+        if (updatedFields[key as keyof StartupProfile] === undefined) {
+            delete updatedFields[key as keyof StartupProfile];
         }
     });
 
@@ -161,7 +172,7 @@ const UpdateMetricsModal: React.FC<UpdateMetricsModalProps> = ({
         type={type}
         icon={() => React.cloneElement(icon as React.ReactElement, { size: 18, className: "text-gray-500"})}
         placeholder={placeholder || `Enter ${label.toLowerCase()}`}
-        value={formData[name] ?? ''} // Handle null/undefined for input value
+        value={formData[name] != null ? String(formData[name]) : ''}
         onChange={handleChange}
         color={validationErrors[name] ? 'failure' : 'gray'}
         helperText={validationErrors[name] ? (
@@ -234,11 +245,10 @@ const UpdateMetricsModal: React.FC<UpdateMetricsModalProps> = ({
           Cancel
         </Button>
         <Button 
-          type="submit" // Connects to form onSubmit
-          onClick={handleSubmit} // Also call directly to ensure it fires
+          onClick={handleSubmit}
           isProcessing={isLoading} 
           disabled={isLoading}
-          color="primary" // Or your theme's primary color
+          color="primary"
           className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
         >
           <IconDeviceFloppy size={18} className="mr-2" />

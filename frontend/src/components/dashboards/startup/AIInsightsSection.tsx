@@ -1,31 +1,18 @@
-/** @jsx React.createElement */
-import React, { useState } from 'react';
-import { Card, Tabs, Badge, Button, Dropdown, Spinner, Alert, Textarea, Tooltip } from 'flowbite-react';
-import { StartupProfile, AIAnalysisData, SWOTAnalysis, ScalabilityAssessment, CompetitiveAdvantageEvaluation, WhatIfScenario, GrowthPlanPhase, SuggestedKpiItem } from '../../../types/database'; // Import all needed types
-import { toast } from 'react-hot-toast';
+import React from 'react';
+import { Badge, Spinner, Alert } from 'flowbite-react';
+import { StartupProfile, AIAnalysisData } from '../../../types/database'; // Import all needed types
 import {
-  IconBulb,
-  IconRobot,
+  
   IconInfoCircle,
-  IconX,
-  IconThumbUp,
-  IconThumbDown,
   IconReportAnalytics,
   IconScale,
   IconTargetArrow,
   IconListCheck,
-  IconTrendingUp,
   IconShieldCheck,
   IconExclamationCircle,
-  IconHelpCircle,
   IconMapPin,          // Added
   IconCurrencyDollar,  // Added
-  IconCalendarEvent,     // Added
-  IconArrowUpRight,
-  IconArrowDownRight,
-  IconCircleCheck,
   IconChartBar,
-  IconCalendarStats,
   IconPlayerPlay, // Added for initial state
 } from "@tabler/icons-react";
 

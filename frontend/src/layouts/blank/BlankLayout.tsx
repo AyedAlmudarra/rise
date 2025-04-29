@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import ScrollToTop from "src/components/shared/ScrollToTop";
+import ScrollToTop from "@/components/shared/ScrollToTop";
 
 const BlankLayout = () => (
   <>

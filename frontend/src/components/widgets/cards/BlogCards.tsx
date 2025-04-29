@@ -1,11 +1,11 @@
-import CardBox from "../../shared/CardBox";
-import avatar1 from "src/assets/images/profile/user-1.jpg";
-import avatar2 from "src/assets/images/profile/user-2.jpg";
-import avatar3 from "src/assets/images/profile/user-3.jpg";
-import img1 from "/src/assets/images/blog/blog-img1.jpg";
-import img2 from "/src/assets/images/blog/blog-img2.jpg";
-import img3 from "/src/assets/images/blog/blog-img3.jpg";
-import { Badge, Avatar, Tooltip } from "flowbite-react";
+import CardBox from "@/components/shared/CardBox";
+import avatar1 from "@/assets/images/profile/user-1.jpg";
+import avatar2 from "@/assets/images/profile/user-2.jpg";
+import avatar3 from "@/assets/images/profile/user-3.jpg";
+import img1 from "@/assets/images/blog/blog-img1.jpg";
+import img2 from "@/assets/images/blog/blog-img2.jpg";
+import img3 from "@/assets/images/blog/blog-img3.jpg";
+import { Badge } from "flowbite-react";
 import { IconEye, IconMessage2, IconPoint } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 

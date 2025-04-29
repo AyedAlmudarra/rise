@@ -1,12 +1,10 @@
 import { Icon } from "@iconify/react";
 import { Button, Dropdown, Avatar } from "flowbite-react";
-import * as profileData from "../../header/Data";
 import SimpleBar from "simplebar-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "src/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
-import { supabase } from "src/lib/supabaseClient";
-import { StartupProfile, InvestorProfile } from "src/types/database";
+import { supabase } from "@/lib/supabaseClient";
 
 const SideProfile = () => {
   const { user, userRole, signOut } = useAuth();
@@ -21,14 +19,14 @@ const SideProfile = () => {
         let roleDisplay = userRole ? (userRole.charAt(0).toUpperCase() + userRole.slice(1)) : "User";
         
         if (userRole === 'startup') {
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from('startups')
             .select('name')
             .eq('user_id', user.id)
             .single();
           if (data) name = data.name;
         } else if (userRole === 'investor') {
-          const { data, error } = await supabase
+          const { data } = await supabase
             .from('investors')
             .select('company_name')
             .eq('user_id', user.id)

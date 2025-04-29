@@ -1,4 +1,3 @@
-
 import React, { useContext } from "react";
 import { Button, Drawer, RangeSlider, Tooltip } from "flowbite-react";
 import { Icon } from "@iconify/react";
@@ -6,38 +5,15 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { IconCheck, IconSettings } from "@tabler/icons-react";
 import SimpleBar from "simplebar-react";
-import { CustomizerContext } from "src/context/CustomizerContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
 
 export const Customizer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
-  interface SliderProps {
-    value: number;
-    min: number;
-    max: number;
-    valueLabelDisplay: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  }
-  const addAttributeToBody = (cvalue: any) => {
+
+  const addAttributeToBody = (cvalue: string) => {
     document.body.setAttribute("data-color-theme", cvalue);
   };
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-  const Slider: React.FC<SliderProps> = ({
-    value,
-    max,
-    onChange,
-  }) => (
-    <input
-      type="range"
-      value={value}
-      min={10}
-      max={max}
-      onChange={onChange}
-      className="slider w-full"
-    />
-  );
 
   const {
     activeDir,
@@ -394,7 +370,7 @@ export const Customizer = () => {
               value={isBorderRadius}
               min={4}
               max={24}
-              onChange={(event: any) => setIsBorderRadius(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsBorderRadius(Number(event.target.value))}
             />
             <div>Current Value: {isBorderRadius}</div>
           </div>

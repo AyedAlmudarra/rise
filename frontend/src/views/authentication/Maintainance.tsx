@@ -2,7 +2,7 @@ import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import ErrorImg from "/src/assets/images/backgrounds/maintenance.svg";
 
-const Maintainance = () => {
+const Maintenance = () => {
   return (
     <>
     <div className="h-screen flex items-center  justify-center bg-white dark:bg-darkgray ">
@@ -19,4 +19,4 @@ const Maintainance = () => {
   )
 }
 
-export default Maintainance
+export default Maintenance

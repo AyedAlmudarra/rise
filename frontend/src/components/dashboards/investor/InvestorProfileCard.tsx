@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  Card, Avatar, Badge, Button, Modal, Tabs, Tooltip
+  Card, Avatar, Badge, Button, Modal, Tabs,
 } from 'flowbite-react';
 import { 
-  IconBriefcase, IconMail, IconBuildingSkyscraper, IconMapPin, 
-  IconCategory, IconChartBar, IconInfoCircle, IconWorld, 
+  IconMail, IconWorld, 
   IconBrandLinkedin, IconEdit, IconSettings, IconUserCircle
 } from '@tabler/icons-react';
-import { InvestorProfile } from 'src/types/database';
+import { InvestorProfile } from '@/types/database';
 
 interface InvestorProfileCardProps {
   investorData: InvestorProfile | null;
@@ -43,7 +42,13 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
         <div className="p-4 text-center text-red-500">
           <p className="mb-2 font-medium">Error loading investor profile</p>
           <p className="text-sm">{error}</p>
-          <Button color="light" size="xs" className="mt-2">
+          {/* TODO: Implement re-fetch logic for investor data */}
+          <Button 
+            color="light" 
+            size="xs" 
+            className="mt-2" 
+            onClick={() => console.log('TODO: Implement Try Again functionality')}
+          >
             Try Again
           </Button>
         </div>
@@ -98,7 +103,12 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
               <Avatar size="lg" rounded className="mb-3 mx-auto border-4 border-gray-100" />
               <p className="mb-2 font-medium">No profile data found</p>
               <p className="text-sm text-gray-500 mb-3">Please complete your investor profile.</p>
-              <Button size="xs" color="blue">
+              {/* TODO: Implement navigation to profile creation/edit page */}
+              <Button 
+                size="xs" 
+                color="blue" 
+                onClick={() => console.log('TODO: Implement Create/Edit Profile navigation')}
+              >
                 Create Profile
               </Button>
             </div>
@@ -107,7 +117,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
               {/* Avatar and name section */}
               <div className="flex items-center mb-4">
                 <Avatar 
-                  img={investorData.avatar_url || undefined}
+                  placeholderInitials={(userName || userEmail || '?')[0].toUpperCase()}
                   alt={investorData.company_name || 'Investor'} 
                   size="lg" 
                   rounded 
@@ -196,7 +206,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center mb-4">
                   <Avatar 
-                    img={investorData?.avatar_url || undefined}
+                    placeholderInitials={(userName || userEmail || '?')[0].toUpperCase()}
                     alt={investorData?.company_name || 'Investor'} 
                     size="lg" 
                     rounded
@@ -312,8 +322,15 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
               active={activeTab === 'settings'}
             >
               <div className="p-4 text-center text-gray-500">
+                {/* TODO: Implement Account Settings UI/Form */}
                 <p>Account settings will be available here.</p>
-                <Button color="blue" size="sm" className="mt-3">
+                {/* TODO: Implement action for Edit Profile button (e.g., navigate, open form) */}
+                <Button 
+                  color="blue" 
+                  size="sm" 
+                  className="mt-3" 
+                  onClick={() => console.log('TODO: Implement Edit Profile action from modal')}
+                >
                   Edit Profile
                 </Button>
               </div>

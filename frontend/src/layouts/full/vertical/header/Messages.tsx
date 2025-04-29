@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { Badge, Button, Dropdown, Spinner } from 'flowbite-react';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../context/AuthContext'; // Adjust path as necessary
-import { supabase } from '../../../../lib/supabaseClient'; // Adjust path as necessary
-import { Conversation, Message } from '../../../../types/chat'; // Adjust path as necessary
-import { InvestorProfile, StartupProfile } from '../../../../types/database'; // Adjust path as necessary
+import { useAuth } from '@/context/AuthContext'; // Adjust path as necessary
+import { supabase } from '@/lib/supabaseClient'; // Adjust path as necessary
+import { Message, InvestorProfile, StartupProfile } from '@/types/database'; // Adjust path as necessary
 import { formatDistanceToNowStrict } from 'date-fns';
 
 // Define a basic structure for a message preview

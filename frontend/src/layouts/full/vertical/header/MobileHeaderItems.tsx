@@ -6,14 +6,14 @@ import { Language } from "./Language";
 import { Navbar } from "flowbite-react";
 import AppLinks from "./AppLinks";
 import { useContext } from "react";
-import { CustomizerContext } from "src/context/CustomizerContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
 
 
 const MobileHeaderItems = () => {
 
   const {setActiveMode,activeMode } = useContext(CustomizerContext);
   const toggleMode = () => {
-    setActiveMode((prevMode: string) => (prevMode === "light" ? "dark" : "light"));
+    setActiveMode(activeMode === "light" ? "dark" : "light");
   };
   return (
     <Navbar

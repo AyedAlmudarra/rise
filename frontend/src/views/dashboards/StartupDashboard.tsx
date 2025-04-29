@@ -1,47 +1,41 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
-import { StartupProfile, AIAnalysisData } from '../../types/database';
-import { Spinner, Alert, Badge, Card, Avatar, Button, Dropdown, Timeline, Modal, Progress, Tooltip, Tabs, Label } from 'flowbite-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { StartupProfile, AIAnalysisData } from '@/types/database';
+import { Spinner, Alert, Badge, Card, Avatar, Button, Dropdown, Timeline, Tooltip, Tabs, Label } from 'flowbite-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  IconBulb,
+  
   IconRefresh,
-  IconChartBar,
+  
   IconBuilding,
   IconChartPie,
   IconRobot,
-  IconFocus,
   IconUsers,
   IconBell,
-  IconDots,
-  IconArrowUp,
+
   IconSettings,
-  IconSearch,
+  
   IconCalendar,
-  IconClipboard,
-  IconStar,
   IconMail,
   IconDownload,
   IconArrowRight,
-  IconChevronUp,
-  IconChevronDown,
   IconCheck,
   IconX,
   IconInfoCircle,
-  IconBriefcase,
+  
   IconTrendingUp,
   IconDotsVertical,
-  IconScale,
+  
   IconListCheck,
-  IconMapPin,
+  
   IconCurrencyDollar,
   IconTargetArrow,
   IconAlertTriangle,
   IconCalendarEvent,
-  IconReportAnalytics,
+  
   IconActivity,
   IconEdit,
   IconBuildingSkyscraper,
@@ -49,25 +43,22 @@ import {
   IconTrendingDown,
   IconArrowUpRight,
   IconArrowsExchange,
-  IconEye
+  IconEye,
 } from "@tabler/icons-react";
 
 // Import the refactored section components
 import {
   CompanyOverviewCard,
-  InvestorInterestSection,
   KeyMetricsSection,
   AIInsightsSection,
   FundingReadinessCard,
   FinancialPerformanceCard,
   GrowthPlanCard,
   ProjectionsRisksCard
-} from "../../components/dashboards/startup";
-import ComingSoonPlaceholder from '../../components/placeholders/ComingSoonPlaceholder';
-import UpdateMetricsModal from '../../components/modals/UpdateMetricsModal';
+} from "@/components/dashboards/startup";
+import ComingSoonPlaceholder from "@/components/placeholders/ComingSoonPlaceholder";
+import UpdateMetricsModal from "@/components/modals/UpdateMetricsModal";
 
-// Remove Congratulations import for now unless we decide to use it
-// import Congratulations from '../../components/dashboards/analytics/Congratulations';
 
 // Remove helper functions (moved to KeyMetricsSection)
 // const formatCurrency = ...
@@ -79,64 +70,15 @@ import UpdateMetricsModal from '../../components/modals/UpdateMetricsModal';
 // const FundingReadinessSection = ...
 // const InvestorInterestSection = ...
 
-// Helper CardBox component (optional, for consistent card styling)
-const CardBox: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 h-full ${className}`}>
-        {children}
-    </div>
-);
+// Removed unused CardBox component
+// const CardBox: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+//     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 h-full ${className}`}>
+//         {children}
+//     </div>
+// );
 
-// --- Modern Dashboard Card Base Component ---
-const DashboardCard: React.FC<{
-  children: React.ReactNode; 
-  className?: string;
-  title?: string;
-  icon?: React.ReactNode;
-  actions?: React.ReactNode;
-  loading?: boolean;
-  minHeight?: string;
-}> = ({ 
-  children, 
-  className = '', 
-  title, 
-  icon, 
-  actions,
-  loading = false,
-  minHeight = 'min-h-[16rem]'
-}) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden ${className}`}>
-    {/* Card with subtle gradient border effect */}
-    <div className="p-0.5 rounded-xl bg-gradient-to-br from-transparent via-transparent to-transparent hover:from-blue-50 hover:via-purple-50 hover:to-transparent dark:hover:from-blue-900/20 dark:hover:via-purple-900/20 dark:hover:to-transparent">
-      <div className="bg-white dark:bg-gray-800 rounded-[0.65rem] p-4 sm:p-6">
-        {/* Header Section */}
-        {(title || actions) && (
-          <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
-            {title && (
-              <h5 className="text-lg font-bold leading-none text-gray-900 dark:text-white flex items-center">
-                {icon && <span className="mr-2">{icon}</span>}
-                {title}
-              </h5>
-            )}
-            {actions && <div className="flex items-center gap-2">{actions}</div>}
-          </div>
-        )}
-        
-        {/* Content Section */}
-        <div className={`${minHeight} ${loading ? 'opacity-60' : ''}`}>
-          {loading ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="animate-pulse space-y-4 w-full">
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mx-auto"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mx-auto"></div>
-              </div>
-            </div>
-          ) : children}
-        </div>
-      </div>
-    </div>
-  </div>
-);
+// Removed unused DashboardCard component
+// const DashboardCard: React.FC<{ ... }> = ({ ... }) => ( ... );
 
 // --- Main StartupDashboard Component ---
 
@@ -177,7 +119,7 @@ const StartupDashboard = () => {
   // UI State
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
-  const [notificationCount, setNotificationCount] = useState<number>(0); // Mock count
+  const [notificationCount] = useState<number>(0); // Removed unused setter
 
   // Realtime subscription reference
   const realtimeChannel = useRef<any>(null);
@@ -294,7 +236,7 @@ const StartupDashboard = () => {
 
   // --- Action Handlers (Defined before render functions) ---
 
-  const handleRefreshDashboard = useCallback(() => {
+  const handleRefreshDashboard = () => {
     toast.loading("Refreshing dashboard data...", { id: 'refresh-dashboard' });
     fetchStartupData(false).then(() => {
       toast.dismiss('refresh-dashboard');
@@ -303,7 +245,7 @@ const StartupDashboard = () => {
     }).catch(() => {
         toast.dismiss('refresh-dashboard');
     });
-  }, [fetchStartupData]);
+  };
 
   const handleAnalysisRefresh = async () => {
     if (!startupData?.id) {
@@ -534,7 +476,11 @@ const StartupDashboard = () => {
                    <AIInsightsSection startupData={startupData} isLoading={false} />
                    <hr className="my-4 border-gray-200 dark:border-gray-600"/>
                    <h6 className="text-lg font-semibold text-gray-800 dark:text-white -mt-2">AI Suggested KPIs & Financials</h6>
-                   <KeyMetricsSection analysisData={parsedAnalysisData} isLoading={false} />
+                   <KeyMetricsSection
+                       analysisData={parsedAnalysisData}
+                       startupData={startupData}
+                       isLoading={isInitialLoading || isRefreshingAnalysis}
+                   />
                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                        {/* ++ Wrap components to apply hover effect ++ */}
                        <div className="transition-shadow hover:shadow-md rounded-lg overflow-hidden"><FundingReadinessCard analysisData={parsedAnalysisData} isLoading={false} /></div>
@@ -585,8 +531,8 @@ const StartupDashboard = () => {
                                label: 'Retention Rate', value: formatPercentage(startupData.kpi_retention_rate), icon: IconArrowUpRight
                             },{
                                 label: 'Conversion Rate', value: formatPercentage(startupData.kpi_conversion_rate), icon: IconArrowsExchange
-                           }].map((kpi, index) => (
-                                <div key={index} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-start gap-3 border border-gray-200 dark:border-gray-600 transform transition-transform hover:scale-[1.02]">
+                           }].map((kpi) => (
+                                <div key={kpi.label} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-start gap-3 border border-gray-200 dark:border-gray-600 transform transition-transform hover:scale-[1.02]">
                                     <div className="flex-shrink-0 text-blue-600 dark:text-blue-400 mt-1">
                                         <kpi.icon size={20} />
                 </div>
@@ -699,7 +645,7 @@ const StartupDashboard = () => {
                        { id: 3, action: 'Added Sarah Chen to Team Members', timestamp: '3 days ago', user: 'You', icon: IconUserCheck },
                        { id: 4, action: 'AI analysis request completed', timestamp: '4 days ago', user: 'System', icon: IconRobot },
                        { id: 5, action: 'Opened connection request from Horizon Capital', timestamp: '1 week ago', user: 'System', icon: IconMail },
-                     ].map((activity, index) => (
+                     ].map((activity) => (
                        <Timeline.Item key={activity.id} className="mb-4">
                          <Timeline.Point icon={() => <div className="flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full ring-4 ring-white dark:ring-gray-800 dark:bg-gray-700"><activity.icon size={12} className="text-gray-600 dark:text-gray-400"/></div>} />
                          <Timeline.Content className="ml-3">

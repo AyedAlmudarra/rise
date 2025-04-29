@@ -1,14 +1,12 @@
-import { uniqueId } from "lodash";
-
-// Define unique IDs for each icon/section
-export const DASHBOARD_ID = uniqueId('dashboard_');
-export const PROFILE_ID = uniqueId('profile_');
-export const RELATIONS_ID = uniqueId('relations_'); // Startup only
-export const DEALFLOW_ID = uniqueId('dealflow_');   // Investor only
-export const PORTFOLIO_ID = uniqueId('portfolio_'); // Investor only
-export const SETTINGS_ID = uniqueId('settings_');
-export const HELP_ID = uniqueId('help_');         // New Help Section ID
-export const RESOURCES_ID = uniqueId('resources_'); // New Resources Section ID
+// Define unique IDs using static strings
+export const DASHBOARD_ID = 'dashboard';
+export const PROFILE_ID = 'profile';
+export const RELATIONS_ID = 'relations'; // Startup only
+export const DEALFLOW_ID = 'dealflow';   // Investor only
+export const PORTFOLIO_ID = 'portfolio'; // Investor only
+export const SETTINGS_ID = 'settings';
+export const HELP_ID = 'help';         // New Help Section ID
+export const RESOURCES_ID = 'resources'; // New Resources Section ID
 
 // Define the type for MiniSidebar icons, including roles
 interface MiniiconsType {

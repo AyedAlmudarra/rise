@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
 import { Sidebar } from "flowbite-react";
 import { IconSidebar } from "./IconSidebar";
-import SidebarContent, { MenuItem, ChildItem } from "./Sidebaritems";
+import SidebarContent from "./Sidebaritems";
 import NavItems from "./NavItems";
 import NavCollapse from "./NavCollapse";
 import SimpleBar from "simplebar-react";
 import { CustomizerContext } from "../../../../context/CustomizerContext";
-import { useAuth } from "src/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 const MobileSidebar = () => {
-  const { selectedIconId } = useContext(CustomizerContext) || {};
+  const { selectedIconId } = useContext(CustomizerContext);
   const { userRole } = useAuth();
 
   const filterByRole = <T extends { roles?: ('startup' | 'investor' | 'all')[] }>(item: T): boolean => {
@@ -49,13 +49,11 @@ const MobileSidebar = () => {
                         {item.children
                           ?.filter(filterByRole)
                           .map((child) => (
-                            <React.Fragment key={child.id ?? child.name}>
-                              {child.children ? (
-                                <NavCollapse item={child} />
-                              ) : (
-                                <NavItems item={child} />
-                              )}
-                            </React.Fragment>
+                            child.children ? (
+                              <NavCollapse item={child} key={child.id ?? child.name} />
+                            ) : (
+                              <NavItems item={child} key={child.id ?? child.name} />
+                            )
                           ))}
                       </React.Fragment>
                     ))}

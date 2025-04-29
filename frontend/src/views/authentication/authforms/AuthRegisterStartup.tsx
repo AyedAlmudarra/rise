@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "src/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../components/shadcn-ui/Default-Ui/button";
-import { Input } from "../../../components/shadcn-ui/Default-Ui/input";
-import { Label } from "../../../components/shadcn-ui/Default-Ui/label";
-import { Textarea } from "../../../components/shadcn-ui/Default-Ui/textarea";
-import { Checkbox } from "../../../components/shadcn-ui/Default-Ui/checkbox";
-import { Alert, AlertDescription, AlertTitle } from "../../../components/shadcn-ui/Default-Ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/shadcn-ui/Default-Ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/shadcn-ui/Default-Ui/tabs";
-import { Loader2, AlertCircle, UserCircle, Building, Info, CheckCircle2, Key, DollarSign, Tags, Users, Target, Mail, FileText, FileUp, LineChart, CircleDollarSign, ChevronLeft, ChevronRight, BarChart2 } from "lucide-react";
-import FormSectionCard from "../../../components/shared/FormSectionCard";
+import { Button } from "@/components/shadcn-ui/Default-Ui/button";
+import { Checkbox } from "@/components/shadcn-ui/Default-Ui/checkbox";
+import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn-ui/Default-Ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn-ui/Default-Ui/tabs";
+import { Loader2, AlertCircle, Building, CheckCircle2, Users, Mail, FileText, FileUp, LineChart, CircleDollarSign, ChevronLeft, ChevronRight, BarChart2 } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startupRegistrationSchema, StartupRegistrationData } from "../../../types/startupRegistration";
-import { Progress } from "../../../components/shadcn-ui/Default-Ui/progress";
+import { startupRegistrationSchema, StartupRegistrationData } from "@/types/startupRegistration";
+import { Progress } from "@/components/shadcn-ui/Default-Ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { StartupProfile } from '@/types/database'; // Import StartupProfile
 
 // Import all form components
 import AuthInfoForm from "./AuthInfoForm";
@@ -27,52 +22,10 @@ import MarketAnalysisForm from "./MarketAnalysisForm";
 import KeyMetricsForm from "./KeyMetricsForm";
 import FundingForm from "./FundingForm";
 import DocumentsForm from "./DocumentsForm";
-
-// Define the structure for the startup profile data we want to insert
-// Based on StartupProfile type in database.ts, focusing on registration fields
-interface StartupProfileData {
-  user_id: string;
-  name: string;
-  description: string;
-  industry: string;
-  sector?: string | null;
-  operational_stage: string;
-  location_city: string;
-  website?: string | null; // Added website field
-  num_employees?: number | null;
-  annual_revenue?: number | null;
-  // logo_url and pitch_deck_url will likely be handled post-registration
-  business_model?: string | null;
-  target_market?: string | null;
-}
+import { useState } from "react";
 
 // Dropdown options (can be moved to constants file later)
-const INDUSTRIES = [
-  { value: "fintech", label: "FinTech" },
-  { value: "healthtech", label: "HealthTech" },
-  { value: "edtech", label: "EdTech" },
-  { value: "ecommerce", label: "E-Commerce" },
-  { value: "saas", label: "SaaS" },
-  { value: "other", label: "Other" }
-];
 
-const OPERATIONAL_STAGES = [
-  { value: "idea", label: "Idea Stage" },
-  { value: "pre-seed", label: "Pre-Seed" },
-  { value: "seed", label: "Seed" },
-  { value: "series-a", label: "Series A" },
-  { value: "growth", label: "Growth Stage" },
-  { value: "other", label: "Other" }
-];
-
-const SAUDI_CITIES = [
-  { value: "riyadh", label: "Riyadh" },
-  { value: "jeddah", label: "Jeddah" },
-  { value: "dammam", label: "Dammam" },
-  { value: "khobar", label: "Khobar" },
-  { value: "other-sa", label: "Other Saudi City" },
-  { value: "outside-sa", label: "Outside Saudi Arabia" }
-];
 
 // Tab order and definitions
 const tabOrder = ['auth-info', 'basic-info', 'company-details', 'team', 'market-analysis', 'key-metrics', 'funding', 'documents'];
@@ -193,7 +146,7 @@ const AuthRegisterStartup = () => {
     }
   });
 
-  const { handleSubmit, trigger, formState: { isSubmitting, errors } } = methods;
+  const { handleSubmit, trigger, formState: { isSubmitting } } = methods;
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
@@ -255,31 +208,6 @@ const AuthRegisterStartup = () => {
     return 'pending';
   };
 
-  const uploadFile = async (file: File, bucketName: string): Promise<string | null> => {
-    if (!file) return null;
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    console.log(`Uploading ${filePath} to ${bucketName}...`);
-    try {
-        const { data, error } = await supabase.storage
-            .from(bucketName)
-            .upload(filePath, file);
-
-        if (error) {
-            throw error;
-        }
-        console.log("Upload successful:", data);
-        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-        return urlData?.publicUrl || null;
-    } catch (error: any) {
-        console.error("Error uploading file:", error.message);
-        toast.error(`Failed to upload ${file.name}: ${error.message}`);
-        return null;
-    }
-  };
-
   const onSubmit = async (data: StartupRegistrationData) => {
     setSubmissionError(null);
     // console.log("Form Data:", data); // Keep for debugging if needed
@@ -311,7 +239,13 @@ const AuthRegisterStartup = () => {
 
     // 5. Prepare Startup Profile Data for Insertion
     // Map form data (data) to the columns in the 'startups' table
-    const startupProfileData: Partial<StartupProfile> = { // Use Partial<StartupProfile> from types/database
+    const safeParseNumber = (value: any): number | null => {
+      if (value === null || value === undefined || value === '') return null;
+      const num = Number(value);
+      return isNaN(num) ? null : num;
+    };
+    
+    const startupProfileData: Partial<StartupProfile> = { // Use imported StartupProfile
       user_id: userId,
       name: data.startupName,
       description: data.companyDescription,
@@ -320,14 +254,31 @@ const AuthRegisterStartup = () => {
       operational_stage: data.operationalStage,
       location_city: data.locationCity,
       website: data.website || null,
-      num_employees: data.numEmployees ? parseInt(data.numEmployees, 10) : null, // Parse to int or null
-      num_customers: data.numCustomers ? parseInt(data.numCustomers, 10) : null, // Parse to int or null
-      annual_revenue: data.annualRevenue ? parseFloat(data.annualRevenue) : null, // Parse to float or null
-      annual_expenses: data.annualExpenses ? parseFloat(data.annualExpenses) : null, // Parse to float or null
+      // Use the numeric values directly from data, handle undefined/null/empty string
+      num_employees: safeParseNumber(data.numEmployees),
+      num_customers: safeParseNumber(data.numCustomers),
+      annual_revenue: safeParseNumber(data.annualRevenue),
+      annual_expenses: safeParseNumber(data.annualExpenses),
       // Map other relevant fields from 'data' to 'startupProfileData' as needed
-      // Example: kpi_cac: data.kpi_cac ? parseFloat(data.kpi_cac) : null,
-      // ... map all relevant fields collected by the form ...
-      // Note: logo_url and pitch_deck_url are handled separately (if implemented)
+      // Ensure types match between StartupRegistrationData and StartupProfile
+      kpi_cac: safeParseNumber(data.kpi_cac),
+      kpi_clv: safeParseNumber(data.kpi_clv),
+      kpi_retention_rate: safeParseNumber(data.kpi_retention_rate),
+      kpi_conversion_rate: safeParseNumber(data.kpi_conversion_rate),
+      // business_model: data.businessModel || null, // Commented out - Check schema
+      // target_market: data.targetMarket || null,   // Commented out - Check schema
+      // foundingDate might need conversion if schema stores string but DB expects date/timestamp
+      // founding_date: data.foundingDate ? new Date(data.foundingDate).toISOString() : null,
+      // Example: Assuming schema provides numbers for these
+      kpi_monthly_growth: safeParseNumber(data.kpi_monthly_growth),
+      kpi_payback_period: safeParseNumber(data.kpi_payback_period),
+      kpi_churn_rate: safeParseNumber(data.kpi_churn_rate),
+      kpi_nps: safeParseNumber(data.kpi_nps),
+      kpi_tam_size: data.kpi_tam_size ?? null, // Assuming TAM might be large number string not covered by safeParseNumber logic if not coerced by zod, or already number
+      kpi_avg_order_value: safeParseNumber(data.kpi_avg_order_value),
+      kpi_market_share: safeParseNumber(data.kpi_market_share),
+      kpi_yoy_growth: safeParseNumber(data.kpi_yoy_growth),
+      // ... ensure all other relevant fields are mapped correctly ...
     };
 
     // 6. Insert Startup Profile Data into Supabase
@@ -488,15 +439,15 @@ const AuthRegisterStartup = () => {
                   </TabsContent>
 
                   <TabsContent value="market-analysis" className="mt-0 outline-none">
-                    <MarketAnalysisForm isRegistrationFlow={true} />
+                    <MarketAnalysisForm />
                   </TabsContent>
 
                   <TabsContent value="key-metrics" className="mt-0 outline-none">
-                    <KeyMetricsForm isRegistrationFlow={true} />
+                    <KeyMetricsForm />
                   </TabsContent>
 
                   <TabsContent value="funding" className="mt-0 outline-none">
-                    <FundingForm isRegistrationFlow={true} />
+                    <FundingForm />
                   </TabsContent>
 
                   <TabsContent value="documents" className="mt-0 outline-none">

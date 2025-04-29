@@ -135,13 +135,15 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose, us
              </div>
           )}
 
-          {/* Description */}
-          {profileData.company_description && (
-             <div className="mt-4"> {/* Added margin-top */}
+          {/* Description - Conditional Access */}
+          {(role === 'startup' && profileData.description) || (role === 'investor' && profileData.company_description) ? (
+             <div className="mt-4"> 
                  <h4 className="font-semibold mb-1 text-gray-800 dark:text-white">About {role === 'startup' ? 'the Company' : profileData.company_name || 'Them'}</h4>
-                 <p className="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded">{profileData.company_description}</p>
+                 <p className="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                    {role === 'startup' ? profileData.description : profileData.company_description}
+                 </p>
              </div>
-          )}
+          ) : null}
 
            {/* Investor Specific Preferences */}
            {role === 'investor' && (profileData.preferred_industries?.length || profileData.preferred_geography?.length || profileData.preferred_stage?.length) && (

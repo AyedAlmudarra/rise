@@ -1,8 +1,5 @@
 import { Link } from "react-router-dom";
-import * as QuicklinksData from "./Data";
-import React from "react";
-import { Badge, Dropdown } from "flowbite-react";
-import { IconListDetails } from "@tabler/icons-react";
+import { pageLinks } from "./Data";
 
 const Quicklinks = () => {
   return (
@@ -11,8 +8,8 @@ const Quicklinks = () => {
         Quick Links
       </h5>
       <ul>
-        {QuicklinksData.pageLinks.map((links, index) => (
-          <li className="mb-4" key={index}>
+        {pageLinks.map((links) => (
+          <li className="mb-4" key={links.href}>
             <Link
                to={links.href}
               className="text-sm font-semibold text-link dark:text-darklink hover:text-primary dark:hover:text-primary"

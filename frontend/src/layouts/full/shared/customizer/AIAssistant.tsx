@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
-import { Button, Drawer, Avatar } from "flowbite-react";
+import React from "react";
+import { Button, Drawer } from "flowbite-react";
 import { useState } from "react";
 import { IconRobot, IconSend, IconRefresh } from "@tabler/icons-react";
 import SimpleBar from "simplebar-react";
-import { useAIAssistant } from "src/context/AIAssistantContext";
+import { useAIAssistant } from "@/context/AIAssistantContext";
 import ReactMarkdown from 'react-markdown';
 
 export const AIAssistant = () => {

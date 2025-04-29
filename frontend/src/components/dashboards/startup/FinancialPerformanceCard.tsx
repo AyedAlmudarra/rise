@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Button } from 'flowbite-react';
+import { Card } from 'flowbite-react';
 import { IconCurrencyDollar, IconRobot } from '@tabler/icons-react';
 import { AIAnalysisData } from '../../../types/database';
 

@@ -1,4 +1,3 @@
-
 import  { createContext, useState, ReactNode, } from 'react';
 import React from "react";
 
@@ -10,8 +9,13 @@ interface DashboardContextState {
   setIsMobileSidebarOpen: (isOpen: boolean) => void;
 }
 
-// Create the context with an initial value
-export const DashboardContext = createContext<DashboardContextState | any>(undefined);
+// Create the context with a proper default value matching the interface
+export const DashboardContext = createContext<DashboardContextState>({
+  isSidebarOpen: false, 
+  setIsSidebarOpen: () => {},
+  isMobileSidebarOpen: false,
+  setIsMobileSidebarOpen: () => {},
+});
 
 // Define the type for the children prop
 interface DashboardContextProps {

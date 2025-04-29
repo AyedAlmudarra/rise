@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
-import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
+import React from 'react';
+import { Input } from '@/components/shadcn-ui/Default-Ui/input';
 import { useFormContext } from 'react-hook-form';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/shadcn-ui/Default-Ui/form";
-import { StartupRegistrationData } from '../../../types/startupRegistration';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/shadcn-ui/Default-Ui/form";
+import { StartupRegistrationData } from '@/types/startupRegistration';
 import { DollarSign, Users, Percent, TrendingUp, Clock, RefreshCw, TrendingDown, Award, ShoppingCart, BarChart2, Globe, Info, Database, PieChart, ArrowUpRight } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
-import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/shadcn-ui/Default-Ui/select";
-import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn-ui/Default-Ui/tooltip";
+import { Card } from "@/components/shadcn-ui/Default-Ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn-ui/Default-Ui/select";
 
-type KeyMetricsFormProps = {
-  isRegistrationFlow?: boolean;
-};
+type KeyMetricsFormProps = {};
 
 const InfoTooltip: React.FC<{ description: string }> = ({ description }) => (
   <TooltipProvider>
@@ -26,8 +23,8 @@ const InfoTooltip: React.FC<{ description: string }> = ({ description }) => (
   </TooltipProvider>
 );
 
-const KeyMetricsForm: React.FC<KeyMetricsFormProps> = ({ isRegistrationFlow = true }) => {
-  const { control, formState: { errors } } = useFormContext<StartupRegistrationData>();
+const KeyMetricsForm: React.FC<KeyMetricsFormProps> = () => {
+  const { control } = useFormContext<StartupRegistrationData>();
 
   const renderFormField = ({ field, label, placeholder, type = "number", description, icon: Icon, currency = false, percent = false, min, max }: any) => (
      <FormItem className="space-y-1">

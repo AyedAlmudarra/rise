@@ -1,8 +1,5 @@
-import CardBox from "src/components/shared/CardBox";
+import CardBox from "@/components/shared/CardBox";
 import { Link } from "react-router-dom";
-import { Badge } from "flowbite-react";
-import img1 from "/src/assets/images/profile/user-1.jpg";
-import img5 from "/src/assets/images/profile/user-5.jpg";
 
 const RecentTransactionData = [
   {

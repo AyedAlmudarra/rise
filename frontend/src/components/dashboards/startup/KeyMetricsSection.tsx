@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
-import { Card, Badge, Tooltip, Dropdown, Button, Spinner, Alert } from 'flowbite-react';
-import { StartupProfile } from '../../../types/database';
-import { AIAnalysisData, SuggestedKpiItem } from '../../../types/database';
+import React from 'react';
+import { Card, Tooltip, Dropdown, Button, Alert } from 'flowbite-react';
+import { StartupProfile } from '@/types/database';
+import { AIAnalysisData, SuggestedKpiItem } from '@/types/database';
 import { 
-  IconTrendingUp, IconTrendingDown, IconUser, IconTargetArrow, 
-  IconUsers, IconCheck, IconEye, IconDots, IconCalendar, 
-  IconChevronDown, IconChartBar, IconCurrencyDollar, IconInfoCircle,
-  IconChartPie, IconArrowsExchange, IconDownload, IconMaximize,
-  IconChartLine
+  IconDots, IconInfoCircle,
+  IconChartPie, IconDownload, IconMaximize,
 } from "@tabler/icons-react";
-import Chart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
 
 // Helper function to format numbers
 const formatCurrency = (value: number | null | undefined): string => {
@@ -32,11 +27,50 @@ const formatPercentage = (value: number | null | undefined): string => {
 
 interface KeyMetricsSectionProps {
     analysisData: AIAnalysisData | null;
+    startupData: StartupProfile | null;
     isLoading: boolean;
 }
 
-const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, isLoading }) => {
-  const [timeRange, setTimeRange] = useState<'Last 30 Days' | 'Last Quarter' | 'Last Year' | 'All Time'>('Last Year');
+// Helper mapping from AI-suggested KPI names to StartupProfile keys
+// NOTE: This needs to be kept in sync with the AI prompt and the StartupProfile type
+const kpiNameToDataKey: { [key: string]: keyof StartupProfile | null } = {
+  // Standard KPIs
+  "Customer Acquisition Cost": "kpi_cac",
+  "Customer Lifetime Value": "kpi_clv",
+  "Retention Rate": "kpi_retention_rate",
+  "Conversion Rate": "kpi_conversion_rate",
+  "Monthly Growth Rate": "kpi_monthly_growth",
+  "Payback Period (Months)": "kpi_payback_period",
+  "Churn Rate": "kpi_churn_rate",
+  "Net Promoter Score": "kpi_nps",
+  "Average Order Value": "kpi_avg_order_value",
+  "Market Share": "kpi_market_share",
+  "Year-over-Year Growth": "kpi_yoy_growth",
+  // Financials often used as KPIs
+  "Annual Revenue": "annual_revenue",
+  "Annual Expenses": "annual_expenses",
+  "Monthly Burn Rate": null, // Example: Might need calculation, not direct field
+  "Revenue Growth Rate": "kpi_yoy_growth", // Alias or similar
+  // Add other mappings as needed based on AI output...
+};
+
+// Helper to determine formatting based on key
+const getFormatFunction = (key: keyof StartupProfile | null): ((value: number | null | undefined) => string) => {
+  if (!key) return formatNumber; // Default
+  if (key.includes('revenue') || key.includes('expenses') || key.includes('cac') || key.includes('clv') || key.includes('order_value')) {
+    return formatCurrency;
+  }
+  if (key.includes('rate') || key.includes('share') || key.includes('growth')) {
+    return formatPercentage;
+  }
+  // Add more specific formatting rules if needed (e.g., for payback period months)
+  if (key === 'kpi_payback_period') {
+      return (val) => val ? `${val} months` : 'N/A';
+  }
+  return formatNumber; // Default for others like NPS, counts
+};
+
+const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, startupData, isLoading }) => {
   // Chart state can be added later if needed
 
   if (isLoading) {
@@ -61,6 +95,26 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, isL
 
   // Render function for individual AI suggested KPI
   const renderSuggestedKpi = (kpiItem: SuggestedKpiItem, index: number) => {
+    const kpiName = kpiItem.kpi || 'Unknown KPI';
+    const dataKey = kpiNameToDataKey[kpiName] || null;
+    let actualValue: number | string | null = 'N/A'; // Default
+    let formatFunc = formatNumber; // Default format
+
+    if (dataKey && startupData && startupData[dataKey] !== undefined) {
+      const rawValue = startupData[dataKey];
+      // Ensure the value is treated as a number for formatting functions if it's not null
+      const numericValue = typeof rawValue === 'number' ? rawValue : null;
+      formatFunc = getFormatFunction(dataKey);
+      actualValue = formatFunc(numericValue);
+    } else if (dataKey === null) {
+      // Handle KPIs that need calculation or have no direct field yet
+      // You could add logic here to calculate 'Monthly Burn Rate' for example
+      actualValue = 'N/A (Calc. Req)';
+    }
+
+    // Use the determined actualValue
+    const actualValueDisplay = actualValue;
+
     return (
       <div key={`kpi-${index}`} className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
           <h6 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">{kpiItem.kpi || 'Unnamed KPI'}</h6>
@@ -69,22 +123,11 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, isL
                   {kpiItem.justification || 'No justification provided.'}
               </p>
           </Tooltip>
-          {/* Placeholder for showing actual value if available/relevant */}
-          <p className="text-xl font-semibold text-gray-900 dark:text-white mt-2">N/A</p> 
-           {/* We might need to fetch the actual value for these suggested KPIs later */}
-           {/* Or display trend icons based on some other data source */}
-      </div>
-    );
-  }
-
-  const renderTimeRangeSelector = () => (
-    <Dropdown label={timeRange} size="xs" color="light">
-      <Dropdown.Item onClick={() => setTimeRange('Last 30 Days')}>Last 30 Days</Dropdown.Item>
-      <Dropdown.Item onClick={() => setTimeRange('Last Quarter')}>Last Quarter</Dropdown.Item>
-      <Dropdown.Item onClick={() => setTimeRange('Last Year')}>Last Year</Dropdown.Item>
-      <Dropdown.Item onClick={() => setTimeRange('All Time')}>All Time</Dropdown.Item>
-    </Dropdown>
-  );
+          <p className="text-xl font-semibold text-gray-900 dark:text-white mt-2">{actualValueDisplay}</p> 
+           {/* Optional: Add trend icons later based on historical data */}
+        </div>
+      );
+    }
 
   return (
     <Card>
@@ -104,9 +147,12 @@ const KeyMetricsSection: React.FC<KeyMetricsSectionProps> = ({ analysisData, isL
                         </Button>
                     )}
                 >
-                    <Dropdown.Item icon={IconDownload}>Export Data (CSV)</Dropdown.Item>
-                    <Dropdown.Item icon={IconMaximize}>View Full Report</Dropdown.Item>
-                    <Dropdown.Item icon={IconInfoCircle}>Metric Definitions</Dropdown.Item>
+                    {/* TODO: Implement Export Data functionality (e.g., generate CSV from `suggestedKpis` or related actual data) */}
+                    <Dropdown.Item icon={IconDownload} onClick={() => alert('TODO: Implement Export Data functionality')}>Export Data (CSV)</Dropdown.Item>
+                    {/* TODO: Implement View Full Report functionality (e.g., navigate to a detailed report page/view) */}
+                    <Dropdown.Item icon={IconMaximize} onClick={() => alert('TODO: Implement View Full Report functionality')}>View Full Report</Dropdown.Item>
+                    {/* TODO: Implement Metric Definitions functionality (e.g., show a modal with definitions based on kpiItem.kpi) */}
+                    <Dropdown.Item icon={IconInfoCircle} onClick={() => alert('TODO: Implement Metric Definitions functionality')}>Metric Definitions</Dropdown.Item>
           </Dropdown>
         </div>
       </div>

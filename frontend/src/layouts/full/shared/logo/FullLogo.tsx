@@ -1,10 +1,8 @@
-
-
 import { useContext } from "react";
-import DarkLogo from "/src/assets/images/logos/dark-logo.svg";
-import LightLogo from "/src/assets/images/logos/light-logo.svg";
-import { Link } from "react-router";
-import { CustomizerContext } from "src/context/CustomizerContext";
+import DarkLogo from "@/assets/images/logos/dark-logo.svg";
+import LightLogo from "@/assets/images/logos/light-logo.svg";
+import { Link } from "react-router-dom";
+import { CustomizerContext } from "@/context/CustomizerContext";
 const FullLogo = () => {
   const {activeMode}  = useContext(CustomizerContext);
   return (

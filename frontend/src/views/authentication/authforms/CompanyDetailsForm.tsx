@@ -1,18 +1,18 @@
 import React from 'react';
-import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
-import { Textarea } from '../../../components/shadcn-ui/Default-Ui/textarea';
+import { Input } from '@/components/shadcn-ui/Default-Ui/input';
+import { Textarea } from '@/components/shadcn-ui/Default-Ui/textarea';
 import { useFormContext } from 'react-hook-form';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/shadcn-ui/Default-Ui/form";
-import { StartupRegistrationData } from '../../../types/startupRegistration';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/shadcn-ui/Default-Ui/select";
-import { Calendar, Building, BarChart, DollarSign, Users, FileText, Clock, CalendarClock, LayoutGrid, CalendarDays, Info } from "lucide-react";
-import { Calendar as CalendarComponent } from "../../../components/shadcn-ui/Default-Ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/shadcn-ui/Default-Ui/popover";
-import { Button } from "../../../components/shadcn-ui/Default-Ui/button";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/shadcn-ui/Default-Ui/form";
+import { StartupRegistrationData } from '@/types/startupRegistration';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn-ui/Default-Ui/select";
+import { Calendar, Building, BarChart, DollarSign, Users, FileText, Clock, LayoutGrid, CalendarDays, Info } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/shadcn-ui/Default-Ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/shadcn-ui/Default-Ui/popover";
+import { Button } from "@/components/shadcn-ui/Default-Ui/button";
 import { format } from "date-fns";
-import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
-import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
+import { Badge } from "@/components/shadcn-ui/Default-Ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn-ui/Default-Ui/tooltip";
+import { Card } from "@/components/shadcn-ui/Default-Ui/card";
 
 // Define operational stages options
 const operationalStages = [
@@ -26,8 +26,7 @@ const operationalStages = [
 ];
 
 const CompanyDetailsForm: React.FC = () => {
-  const { control, setValue, watch } = useFormContext<StartupRegistrationData>();
-  const foundingDate = watch('foundingDate');
+  const { control, setValue } = useFormContext<StartupRegistrationData>();
 
   return (
     <div>

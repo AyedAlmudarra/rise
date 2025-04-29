@@ -1,43 +1,24 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Logo from "src/layouts/full/shared/logo/Logo";
-import AuthTwoSteps from "../authforms/AuthTwoSteps";
-import LeftSidebarPart from "../LeftSidebarPart";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Spinner } from 'flowbite-react';
 
-const twoSteps = () => {
+const ObsoleteTwoStepsRedirect = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to the main login page as 2FA is not implemented
+    navigate('/auth/auth1/login', { replace: true });
+  }, [navigate]);
+
+  // Show a brief loading/redirecting message
   return (
-    <>
-      <div className="relative overflow-hidden h-screen">
-        <div className="grid grid-cols-12 gap-3 h-screen bg-white dark:bg-darkgray">
-          <div className="xl:col-span-4 lg:col-span-4 col-span-12 bg-dark lg:block hidden relative overflow-hidden">
-            <LeftSidebarPart />
-          </div>
-          <div className="xl:col-span-8 lg:col-span-8 col-span-12 sm:px-12 px-4">
-            <div className="flex h-screen items-center px-3 max-w-[460px] mx-auto">
-              <div className="w-full">
-                <Logo />
-                <h3 className="text-2xl font-bold my-3">
-                  Two Steps Verification
-                </h3>
-                <p className="text-darklink text-sm font-medium">
-                  We sent a verification code to your mobile. Enter the code
-                  from the mobile in the field below.
-                </p>
-                <h6 className="text-sm font-bold my-4">******1234</h6>
-                <AuthTwoSteps />
-                <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-left">
-                  <p>Didn't get the code?</p>
-                  <Link to={"/"} className="text-primary text-sm font-medium">
-                    Resend
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="flex items-center justify-center h-screen w-screen bg-gray-100 dark:bg-darkgray">
+      <div className="text-center">
+        <Spinner size="xl" color="purple" className="mb-4" />
+        <p className="text-gray-600 dark:text-gray-300">Redirecting to login...</p>
       </div>
-    </>
+    </div>
   );
 };
 
-export default twoSteps;
+export default ObsoleteTwoStepsRedirect;

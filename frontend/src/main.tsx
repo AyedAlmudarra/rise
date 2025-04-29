@@ -1,12 +1,12 @@
 import { Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import '../src/css/globals.css'
-import App from './App.tsx'
-import Spinner from './views/spinner/Spinner.tsx'
-import { CustomizerContextProvider } from './context/CustomizerContext.tsx'
-import './utils/i18n';
-import { DashboardContextProvider } from './context/DashboardContext/DashboardContext.tsx'
-import { AuthProvider } from './context/AuthContext';
+import '@/css/globals.css'
+import App from '@/App.tsx'
+import Spinner from '@/views/spinner/Spinner.tsx'
+import { CustomizerContextProvider } from '@/context/CustomizerContext.tsx'
+import '@/utils/i18n';
+import { DashboardContextProvider } from '@/context/DashboardContext/DashboardContext.tsx'
+import { AuthProvider } from '@/context/AuthContext';
 
 async function deferRender(){
   // Check environment variable

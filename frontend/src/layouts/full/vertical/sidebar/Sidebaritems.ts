@@ -1,6 +1,5 @@
-import { uniqueId } from "lodash";
 // Import explicit IDs and the icon data (though we mainly need the IDs)
-import MiniSidebarIcons, {
+import {
   DASHBOARD_ID,
   PROFILE_ID,
   RELATIONS_ID,
@@ -10,9 +9,7 @@ import MiniSidebarIcons, {
   HELP_ID,
   RESOURCES_ID
 } from './MiniSidebar'; 
-// Remove Tabler icon import as we will use solar strings
-// import { IconChartPie, IconBriefcase, IconCalendarEvent, IconSettings } from "@tabler/icons-react";
-import { IconMessages, IconUserSearch, IconUserCheck, IconBuildingCommunity, IconBriefcase, IconDashboard, IconHelp, IconSettings, IconDatabaseExport } from '@tabler/icons-react';
+// Removed Tabler icon imports
 
 // Define allowed roles explicitly
 type UserRole = 'startup' | 'investor' | 'all';
@@ -21,10 +18,10 @@ type UserRole = 'startup' | 'investor' | 'all';
 export interface ChildItem {
   id?: string; // Use string for unique IDs
   name?: string;
-  icon?: any;
+  icon?: string; // Changed from any to string
   children?: ChildItem[];
   item?: any;
-  url?: any;
+  url?: string; // Changed from any to string
   color?: string;
   roles?: UserRole[]; // Use the specific type
 }
@@ -32,85 +29,80 @@ export interface ChildItem {
 export interface MenuItem {
   heading?: string;
   name?: string;
-  icon?: any;
+  icon?: string; // Changed from any to string
   id?: string; // Use string for unique IDs
   to?: string;
   items?: MenuItem[];
   children?: ChildItem[];
-  url?: any;
+  url?: string; // Changed from any to string
   roles?: UserRole[]; // Use the specific type
 }
 
 // Helper function to explicitly type roles array
 const roles = (r: UserRole[]): UserRole[] => r;
 
+// Removed NETWORK_ID constant as the section is removed
+
 const SidebarContent: MenuItem[] = [
   {
     // === Dashboard ===
-    id: DASHBOARD_ID, // Use imported constant
+    id: DASHBOARD_ID, 
     name: "Dashboard",
     roles: roles(['all']),
     items: [
+      // Common Dashboard items first
       {
+        heading: "Workspace", 
         roles: roles(['all']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'dashboard-ai-insights', 
             name: "AI Insights",
             icon: "solar:lightbulb-bolt-line-duotone",
-            url: "/ai-insights",
+            url: "/app/ai-insights", 
             roles: roles(['all']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'dashboard-calendar', 
             name: "Calendar",
             icon: "solar:calendar-line-duotone",
-            url: "/calendar",
+            url: "/app/calendar", 
             roles: roles(['all']),
           },
         ]
       },
+      // Startup specific Dashboard items
       {
+        heading: "Startup View", 
         roles: roles(['startup']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'startup-dashboard-overview', 
             name: "Overview",
             icon: "solar:home-smile-angle-line-duotone",
-            url: "/startup/dashboard",
+            url: "/app/startup/dashboard", 
             roles: roles(['startup']),
           },
-          {
-            id: uniqueId('link-'),
-            name: "Metrics & Performance",
-            icon: "solar:chart-line-duotone",
-            url: "/startup/metrics",
-            roles: roles(['startup']),
-          },
-          {
-            id: uniqueId('link-'),
-            name: "Activity & Tasks",
-            icon: "solar:checklist-minimalistic-line-duotone",
-            url: "/startup/activity",
-            roles: roles(['startup']),
-          },
+          // Removed 'startup-metrics' and 'startup-activity'
         ],
       },
+      // Investor specific Dashboard items
       {
+        heading: "Investor View", 
         roles: roles(['investor']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'investor-dashboard-overview', 
             name: "Overview",
             icon: "solar:home-smile-angle-line-duotone",
-            url: "/investor/dashboard",
+            url: "/app/investor/dashboard",
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
-            name: "AI Suggestions",
+            id: 'investor-ai-suggestions',
+            name: "AI Suggestions", 
             icon: "solar:chat-bot-line-duotone",
-            url: "/investor/ai-suggestions",
+            url: "/app/investor/ai-recommendations", 
             roles: roles(['investor']),
           },
         ],
@@ -119,7 +111,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === Profile ===
-    id: PROFILE_ID, // Use imported constant
+    id: PROFILE_ID, 
     name: "Profile",
     roles: roles(['all']),
     items: [
@@ -128,24 +120,24 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['all']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'profile-view',
             name: "View Profile",
             icon: "solar:user-id-line-duotone",
-            url: "/profile/view", // Needs role-specific target or logic
+            url: "/app/profile/view", 
             roles: roles(['all']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'profile-edit', 
             name: "Edit Profile",
             icon: "solar:document-add-line-duotone",
-            url: "/profile/edit", // Needs role-specific target or logic
+            url: "/app/profile/edit", 
             roles: roles(['all']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'profile-documents', 
             name: "Manage Documents",
             icon: "solar:folder-with-files-line-duotone",
-            url: "/profile/documents",
+            url: "/app/profile/documents",
             roles: roles(['startup']), // Only for startups
           },
         ],
@@ -154,7 +146,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === Investor Relations (Startup Only) ===
-    id: RELATIONS_ID, // Use imported constant
+    id: RELATIONS_ID, 
     name: "Investor Relations",
     roles: roles(['startup']),
     items: [
@@ -163,18 +155,33 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['startup']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'startup-find-investors', 
             name: "Find Investors",
             icon: "solar:magnifer-zoom-in-line-duotone",
-            url: "/startup/find-investors",
+            url: "/app/startup/find-investors", 
             roles: roles(['startup']),
           },
           {
-            id: uniqueId('link-'),
-            name: "Track Outreach",
+            id: 'startup-track-outreach', 
+            name: "Track Outreach", 
             icon: "solar:notebook-line-duotone",
-            url: "/startup/investor-outreach",
+            url: "/app/startup/track-outreach", 
             roles: roles(['startup']),
+          },
+          // Re-added Connections and Messages for Startups
+          {
+            id: 'startup-connections-manage', 
+            name: "Manage Connections",
+            icon: "solar:users-group-rounded-line-duotone", 
+            url: "/app/connections", 
+            roles: roles(['startup', 'investor']), // Keep shared role marker
+          },
+          {
+            id: 'startup-messages', 
+            name: "Messages",
+            icon: "solar:chat-line-line-duotone", 
+            url: "/app/messages",
+            roles: roles(['startup', 'investor']), // Keep shared role marker
           },
         ],
       },
@@ -182,7 +189,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === Deal Flow (Investor Only) - Enhanced ===
-    id: DEALFLOW_ID, // Use imported constant
+    id: DEALFLOW_ID, 
     name: "Deal Flow",
     roles: roles(['investor']),
     items: [
@@ -191,65 +198,66 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['investor']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'investor-browse-startups', 
             name: "Browse All",
             icon: "solar:list-check-minimalistic-line-duotone",
-            url: "/investor/browse-startups",
+            url: "/app/investor/browse-startups", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-ai-recommendations', 
             name: "AI Recommendations",
-            icon: "solar:lightbulb-minimalistic-line-duotone", // Updated icon
-            url: "/investor/ai-recommendations",
+            icon: "solar:lightbulb-minimalistic-line-duotone", 
+            url: "/app/investor/ai-recommendations", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
-            name: "Saved Searches", // New
+            id: 'investor-saved-searches', 
+            name: "Saved Searches", 
             icon: "solar:bookmark-circle-line-duotone", 
-            url: "/investor/saved-searches",
+            url: "/app/investor/saved-searches", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-watchlist', 
             name: "My Watchlist",
-            icon: "solar:eye-line-duotone", // Updated icon
-            url: "/investor/watchlist",
+            icon: "solar:eye-line-duotone", 
+            url: "/app/investor/watchlist", 
             roles: roles(['investor']),
           },
+          // Re-added Connections and Messages for Investors
           {
-            id: uniqueId('link-'),
+            id: 'investor-connections-manage', // Use different ID to avoid key conflicts if filtering logic changes
             name: "Manage Connections",
-            icon: "solar:users-group-rounded-line-duotone", // Icon representing connections/users
-            url: "/connections",
-            roles: roles(['startup', 'investor']), // Accessible by both roles
+            icon: "solar:users-group-rounded-line-duotone", 
+            url: "/app/connections", 
+            roles: roles(['startup', 'investor']), // Keep shared role marker
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-messages', // Use different ID
             name: "Messages",
-            icon: IconMessages,
-            url: "/messages",
-            roles: roles(['startup', 'investor']),
+            icon: "solar:chat-line-line-duotone", 
+            url: "/app/messages",
+            roles: roles(['startup', 'investor']), // Keep shared role marker
           },
         ],
       },
       {
-        heading: "Due Diligence", // New Section
+        heading: "Due Diligence", 
         roles: roles(['investor']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'investor-active-deals', 
             name: "Active Deals",
             icon: "solar:clipboard-text-line-duotone",
-            url: "/investor/active-deals",
+            url: "/app/investor/active-deals", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-data-rooms', 
             name: "Data Rooms",
             icon: "solar:archive-check-line-duotone",
-            url: "/investor/data-rooms",
+            url: "/app/investor/data-rooms", 
             roles: roles(['investor']),
           },
         ]
@@ -258,7 +266,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === My Portfolio (Investor Only) - NEW ===
-    id: PORTFOLIO_ID, // Use imported constant
+    id: PORTFOLIO_ID, 
     name: "My Portfolio",
     roles: roles(['investor']),
     items: [
@@ -267,17 +275,17 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['investor']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'investor-portfolio-summary', 
             name: "Summary",
             icon: "solar:pie-chart-2-line-duotone",
-            url: "/investor/portfolio/summary",
+            url: "/app/investor/portfolio/summary", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-portfolio-performance', 
             name: "Performance",
             icon: "solar:graph-up-line-duotone",
-            url: "/investor/portfolio/performance",
+            url: "/app/investor/portfolio/performance", 
             roles: roles(['investor']),
           },
         ],
@@ -286,20 +294,18 @@ const SidebarContent: MenuItem[] = [
         heading: "Investments",
         roles: roles(['investor']),
         children: [
-          // Potentially list invested companies dynamically here later,
-          // or provide links to manage them.
           {
-            id: uniqueId('link-'),
+            id: 'investor-portfolio-manage', 
             name: "Manage Companies",
             icon: "solar:buildings-2-line-duotone",
-            url: "/investor/portfolio/manage",
+            url: "/app/investor/portfolio/manage", 
             roles: roles(['investor']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'investor-portfolio-reporting', 
             name: "Reporting",
             icon: "solar:document-text-line-duotone",
-            url: "/investor/portfolio/reporting",
+            url: "/app/investor/portfolio/reporting", 
             roles: roles(['investor']),
           },
         ],
@@ -308,7 +314,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === Settings ===
-    id: SETTINGS_ID, // Use imported constant
+    id: SETTINGS_ID, 
     name: "Settings",
     roles: roles(['all']),
     items: [
@@ -317,27 +323,26 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['all']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'settings-account', 
             name: "Account",
             icon: "solar:shield-user-line-duotone",
-            url: "/settings/account",
+            url: "/app/settings/account", 
             roles: roles(['all']),
           },
           {
-            id: uniqueId('link-'),
+            id: 'settings-notifications', 
             name: "Notifications",
             icon: "solar:bell-bing-line-duotone",
-            url: "/settings/notifications",
+            url: "/app/settings/notifications", 
             roles: roles(['all']),
           },
-          // Add more settings links here
         ],
       },
     ],
   },
   {
     // === Help Section (New) ===
-    id: HELP_ID, // Use imported constant
+    id: HELP_ID, 
     name: "Help",
     roles: roles(['all']),
     items: [
@@ -346,31 +351,31 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['all']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'help-faq', 
             name: "FAQ",
             icon: "solar:question-circle-line-duotone",
-            url: "/help/faq",
+            url: "/app/help/faq", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'help-docs', 
             name: "Knowledge Base",
             icon: "solar:notebook-minimalistic-line-duotone",
-            url: "/help/docs",
+            url: "/app/help/docs", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'help-contact', 
             name: "Contact Support",
             icon: "solar:mailbox-line-duotone",
-            url: "/help/contact",
+            url: "/app/help/contact", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'help-getting-started', 
             name: "Getting Started",
             icon: "solar:rocket-line-duotone",
-            url: "/help/getting-started",
+            url: "/app/help/getting-started", 
             roles: roles(['all'])
           },
         ],
@@ -379,7 +384,7 @@ const SidebarContent: MenuItem[] = [
   },
   {
     // === Resources Section (New) ===
-    id: RESOURCES_ID, // Use imported constant
+    id: RESOURCES_ID, 
     name: "Resources",
     roles: roles(['all']),
     items: [
@@ -388,31 +393,31 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['all']),
         children: [
           {
-            id: uniqueId('link-'),
+            id: 'resources-market-insights', 
             name: "Market Insights",
-            icon: "solar:chart-line-duotone", // Reusing icon, consider a unique one if available
-            url: "/resources/market-insights",
+            icon: "solar:chart-line-duotone",
+            url: "/app/resources/market-insights", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'resources-templates', 
             name: "Templates",
             icon: "solar:file-text-line-duotone",
-            url: "/resources/templates",
+            url: "/app/resources/templates", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'resources-startup-guides', 
             name: "Startup Guides",
             icon: "solar:notebook-bookmark-line-duotone",
-            url: "/resources/startup-guides",
+            url: "/app/resources/startup-guides", 
             roles: roles(['all'])
           },
           {
-            id: uniqueId('link-'),
+            id: 'resources-investor-guides', 
             name: "Investor Guides",
-            icon: "solar:notebook-bookmark-line-duotone", // Could be same icon or different
-            url: "/resources/investor-guides",
+            icon: "solar:notebook-bookmark-line-duotone", 
+            url: "/app/resources/investor-guides", 
             roles: roles(['all'])
           },
         ],

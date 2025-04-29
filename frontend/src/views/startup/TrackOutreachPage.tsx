@@ -12,8 +12,8 @@ import {
   Textarea
 } from 'flowbite-react';
 import { HiPlus } from 'react-icons/hi';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
+// import { supabase } from '@/lib/supabaseClient';
 
 // Define the structure for an outreach record (including investor details)
 interface OutreachRecord {

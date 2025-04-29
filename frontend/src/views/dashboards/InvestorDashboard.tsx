@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
-import { InvestorProfile } from '../../types/database';
-import { Spinner, Alert, Avatar, Button, Badge, Tabs, Dropdown, Timeline } from 'flowbite-react';
-import { mockInvestorData, generateMockData } from '../../api/mocks/data/investorDashboardMockData';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { InvestorProfile } from '@/types/database';
+import { Spinner, Alert, Avatar, Button, Badge, Tabs, Dropdown, Card } from 'flowbite-react';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   IconBell, 
   IconRefresh, 
-  IconBuildingSkyscraper, 
   IconSettings,
-  IconDots,
   IconUser,
   IconBriefcase,
   IconLayoutDashboard,
@@ -21,17 +17,15 @@ import {
   IconUsers
 } from "@tabler/icons-react";
 
-// Import the new investor dashboard components
-import {
-  InvestorProfileCard,
-  DealFlowSection,
-  WatchlistSection,
-  MarketInsightsSection
-} from '../../components/dashboards/investor';
+// Import the investor dashboard components directly from their files
+import InvestorProfileCard from '@/components/dashboards/investor/InvestorProfileCard';
+// Comment out problematic imports until components are verified/created
+// import DealFlowSection from '../../components/dashboards/investor/DealFlowSection';
+// import WatchlistSection from '../../components/dashboards/investor/WatchlistSection';
+// import MarketInsightsSection from '../../components/dashboards/investor/MarketInsightsSection';
 
 const InvestorDashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [investorData, setInvestorData] = useState<InvestorProfile | null>(null);
   const [dataLoading, setDataLoading] = useState<boolean>(true);
   const [dataError, setDataError] = useState<string | null>(null);
@@ -42,16 +36,6 @@ const InvestorDashboard = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
   
-  // Generate dynamic mock data based on the fetched investor profile
-  const [mockData, setMockData] = useState(mockInvestorData);
-  
-  // Update mock data whenever investorData changes
-  useEffect(() => {
-    if (investorData) {
-      setMockData(generateMockData(investorData));
-    }
-  }, [investorData]);
-
   // Mock notifications data
   const notifications = [
     { id: 1, type: 'startup', message: 'New startup match: CloudScale', time: '10 minutes ago', read: false },
@@ -128,10 +112,6 @@ const InvestorDashboard = () => {
     
     try {
       await fetchInvestorData();
-      // Regenerate mock data
-      if (investorData) {
-        setMockData(generateMockData(investorData));
-      }
       toast.dismiss(); // Clear loading toast
       toast.success("Dashboard data refreshed!");
     } catch (error) {
@@ -407,71 +387,49 @@ const InvestorDashboard = () => {
   };
 
   const renderDashboardContent = () => {
-    if (activeTab === 'overview') {
-      return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left column */}
-          <div className="lg:col-span-1 space-y-6">
-            <InvestorProfileCard 
-              investorData={investorData} 
-              isLoading={dataLoading} 
-              error={dataError}
-              userName={user?.user_metadata?.full_name}
-              userEmail={user?.email}
-            />
-            
-            <MarketInsightsSection 
-              insightsData={mockData.marketInsights}
-              isLoading={dataLoading}
-              onRefresh={refreshData}
-            />
-          </div>
-          
-          {/* Right column */}
-          <div className="lg:col-span-2 space-y-6">
-            <DealFlowSection 
-              dealFlowData={mockData.dealFlow}
-              isLoading={dataLoading}
-            />
-            
-            <div className="grid grid-cols-1 xl:grid-cols-1 gap-6">
-              <WatchlistSection 
-                watchlistData={mockData.watchlist}
-                isLoading={dataLoading}
-                onAddToWatchlist={() => toast.success("Watchlist feature coming soon!")}
+    // Render content based ONLY on the activeTab
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <InvestorProfileCard 
+                investorData={investorData} 
+                isLoading={dataLoading} 
+                error={dataError}
+                userName={user?.user_metadata?.full_name}
+                userEmail={user?.email}
               />
             </div>
+            <div className="lg:col-span-2 space-y-6">
+              {/* Placeholder for Market Insights */}
+              <Card><div className="p-4 text-gray-500">Market Insights Section (Placeholder)</div></Card>
+               {/* Placeholder for Watchlist */}
+               <Card><div className="p-4 text-gray-500">Watchlist Section (Placeholder)</div></Card>
+               {/* <MarketInsightsSection .../> */}
+               {/* <WatchlistSection .../> */}
+            </div>
           </div>
-        </div>
-      );
+        );
+      case 'deals':
+        return (
+          <Card><div className="p-4 text-gray-500">Deal Flow Section (Placeholder)</div></Card>
+          /* <DealFlowSection .../> */
+        );
+      case 'suggestions':
+         return (
+           <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+              <Alert color="info">AI Suggestions have moved to the dedicated <a href="/ai-insights" className="font-medium underline hover:text-blue-700">AI Insights page</a>.</Alert>
+           </div>
+         );
+      case 'watchlist':
+        return (
+           <Card><div className="p-4 text-gray-500">Watchlist Section (Placeholder)</div></Card>
+          /* <WatchlistSection .../> */
+        );
+      default:
+        return null;
     }
-    
-    if (activeTab === 'deals') {
-      return (
-        <DealFlowSection 
-          dealFlowData={mockData.dealFlow}
-          isLoading={dataLoading}
-        />
-      );
-    }
-    
-    if (activeTab === 'suggestions') {
-      return (
-        <Alert color="info">AI Suggestions have moved to the dedicated AI Insights page.</Alert>
-      );
-    }
-    
-    if (activeTab === 'watchlist') {
-      return (
-        <WatchlistSection 
-          watchlistData={mockData.watchlist}
-          isLoading={dataLoading}
-          onAddToWatchlist={() => toast.success("Watchlist feature coming soon!")}
-        />
-      );
-    }
-    
-    return null;
   };
 
   return (
@@ -479,7 +437,9 @@ const InvestorDashboard = () => {
       {renderWelcomeHeader()}
       {renderStatusIndicators()}
       {renderDashboardTabs()}
-      {renderDashboardContent()}
+      <div className="mt-6"> {/* Add margin for content below tabs */} 
+        {renderDashboardContent()}
+      </div>
       
       <WelcomeModal 
         show={showWelcomeModal} 

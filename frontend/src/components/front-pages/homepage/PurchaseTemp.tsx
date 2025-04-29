@@ -1,15 +1,14 @@
-
 import { Button } from "flowbite-react";
 import leftWidget from "/src/assets/images/front-pages/background/left-widget.png";
 import rightWidget from "/src/assets/images/front-pages/background/right-widget.png";
 import Logo from "src/layouts/full/shared/logo/Logo";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 
 const PurchaseTemp = () => {
   return (
     <>
-      <div className="bg-primary lg:py-24 py-12 relative overflow-x-hidden">
+      <div id="get-started" className="bg-primary lg:py-24 py-12 relative overflow-x-hidden">
         <div className="absolute -start-10 top-24 xl:block hidden">
           <img
             src={leftWidget}
@@ -24,14 +23,18 @@ const PurchaseTemp = () => {
               <Logo />
             </div>
             <h3 className="sm:text-44 text-3xl font-bold !leading-[48px] text-white lg:px-20 py-6">
-              Focus on what truly matters—creating stunning, functional designs.
+              Unlock Investment Opportunities & Fuel Startup Growth in Saudi Arabia.
             </h3>
             <p className="text-lg text-white lg:px-64 leading-8">
-              Designed for ease of use and customization, this template help you
-              build professional dashboards faster.
+              RISE connects innovative startups with informed investors, powered by AI-driven insights and analysis tailored for the Saudi market.
             </p>
-            <Button color={"outlinewhite"} as={Link} to="/auth/auth1/register" target="_blank" className="mt-5 px-4 sm:w-auto w-full">
-              Register
+            <Button
+              color={"outlinewhite"}
+              as={Link}
+              to="/auth/auth1/login"
+              className="mt-5 px-6 py-2.5 font-semibold sm:w-auto w-full"
+            >
+              Get Started / Log In
             </Button>
           </div>
         </div>

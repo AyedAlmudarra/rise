@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Card,
   Spinner,
   Alert,
   TextInput,
@@ -10,10 +9,10 @@ import {
   Dropdown,
   Badge,
 } from 'flowbite-react';
-import { HiOutlineSearch, HiOutlineFilter, HiOutlineUserGroup, HiLink, HiLocationMarker, HiBriefcase, HiOutlineBriefcase } from 'react-icons/hi';
-import { supabase } from '../../lib/supabaseClient';
-import { InvestorProfile } from '../../types/database';
-import { useAuth } from '../../context/AuthContext';
+import { HiOutlineSearch, HiOutlineFilter, HiOutlineUserGroup, HiLocationMarker, HiBriefcase, HiOutlineBriefcase } from 'react-icons/hi';
+import { supabase } from '@/lib/supabaseClient';
+import { InvestorProfile } from '@/types/database';
+// import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 // Helper Function to get unique filter options
@@ -28,7 +27,7 @@ const investorTypes = ['Personal', 'Angel', 'VC'] as const;
 type InvestorType = typeof investorTypes[number];
 
 const FindInvestorsPage: React.FC = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [investors, setInvestors] = useState<InvestorProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

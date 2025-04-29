@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'src/context/AuthContext';
-import { Card, Avatar, Spinner, Alert, Button, Label, TextInput, FileInput, Textarea, Checkbox, Select } from 'flowbite-react';
-import { IconAlertCircle, IconUserCircle, IconDeviceFloppy, IconInfoCircle } from '@tabler/icons-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
-import OutlineCard from 'src/components/shared/OutlineCard';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { Avatar, Spinner, Alert, Button, Label, TextInput, FileInput, Textarea, Checkbox, Select } from 'flowbite-react';
+import { IconAlertCircle, IconDeviceFloppy } from '@tabler/icons-react';
+import BreadcrumbComp from '@/layouts/full/shared/breadcrumb/BreadcrumbComp';
+import OutlineCard from '@/components/shared/OutlineCard';
 import { toast } from 'react-hot-toast';
-import { supabase } from 'src/lib/supabaseClient';
-import userImg from "/src/assets/images/profile/user-1.jpg"; // Default fallback avatar
-import { StartupProfile, InvestorProfile } from 'src/types/database'; // Import types
+import { supabase } from '@/lib/supabaseClient';
+import userImg from "@/assets/images/profile/user-1.jpg"; // Default fallback avatar
+import { StartupProfile, InvestorProfile } from '@/types/database'; // Import types
 
 // Assuming these constants exist and are imported or defined here
 // Example:
@@ -274,7 +274,7 @@ const EditProfilePage: React.FC = () => {
     const newAvatarUrl = urlData.publicUrl;
 
     // Update user metadata
-    const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+    const { error: updateError } = await supabase.auth.updateUser({
       data: { avatar_url: newAvatarUrl }, 
     });
 

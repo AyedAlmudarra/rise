@@ -1,4 +1,4 @@
-import { StartupProfile } from 'src/types/database'; // Assuming path is correct
+import { StartupProfile } from '@/types/database'; // Assuming path is correct
 
 // Helper functions for generating realistic mock data
 const randomInRange = (min: number, max: number): number => {

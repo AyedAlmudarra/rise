@@ -1,5 +1,5 @@
-import RollBaseIndex from "src/components/theme-pages/casl";
-import BreadcrumbComp from "src/layouts/full/shared/breadcrumb/BreadcrumbComp";
+import RollBaseIndex from "@/components/theme-pages/casl";
+import BreadcrumbComp from "@/layouts/full/shared/breadcrumb/BreadcrumbComp";
 
 const BCrumb = [
   {

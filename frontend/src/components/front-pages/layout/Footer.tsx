@@ -1,105 +1,92 @@
-
-import { Tooltip } from "flowbite-react";
-import FullLogo from "/src/assets/images/logos/light-logo.svg";
-import { Link } from "react-router";
-import Logo from "src/layouts/full/shared/logo/Logo";
-import facebook from "/src/assets/images/front-pages/background/facebook.svg";
-import twitter from "/src/assets/images/front-pages/background/twitter.svg";
-import instagram from "/src/assets/images/front-pages/background/instagram.svg"
+// import { Tooltip } from "flowbite-react"; // Temporarily removed as part of commenting out social icons
+import { Link } from "react-router-dom";
+import Logo from "@/layouts/full/shared/logo/Logo";
+// import linkedin from "@/assets/images/front-pages/background/linkedin.svg"; // Placeholder for LinkedIn - Commented out
+// import instagram from "@/assets/images/front-pages/background/instagram.svg"
 
 
 export const Footer = () => {
-  const navLinks1 = [
+  const riseLinksCompany = [
     {
-      key: "link1",
-      title: "Cards",
-      link: "/widgets/cards",
+      key: "home",
+      title: "Home",
+      link: "/",
     },
     {
-      key: "link2",
-      title: "Pricing",
-      link: "/theme-pages/pricing",
+      key: "about",
+      title: "About RISE",
+      link: "/about",
     },
     {
-      key: "link3",
-      title: "Account Settings",
-      link: "/theme-pages/account-settings",
+      key: "contact",
+      title: "Contact Us",
+      link: "/app/help/contact",
+    },
+  ];
+  const riseLinksStartups = [
+    {
+      key: "startup-register",
+      title: "Register as Startup",
+      link: "/auth/register/startup",
     },
     {
-      key: "link4",
+      key: "startup-features",
+      title: "Startup Features",
+      link: "/#features",
+    },
+     {
+      key: "startup-guides",
+      title: "Startup Guides",
+      link: "/app/resources/startup-guides",
+    },
+  ];
+  const riseLinksInvestors = [
+    {
+      key: "investor-register",
+      title: "Register as Investor",
+      link: "/auth/register/investor",
+    },
+    {
+      key: "investor-features",
+      title: "Investor Features",
+      link: "/#features",
+    },
+    {
+      key: "investor-guides",
+      title: "Investor Guides",
+      link: "/app/resources/investor-guides",
+    },
+  ];
+  const riseLinksLegal = [
+     {
+      key: "faq",
       title: "FAQ",
-      link: "/theme-pages/faq",
+      link: "/#faq",
     },
-    {
-      key: "link5",
-      title: "Casl",
-      link: "/theme-pages/casl",
+     {
+      key: "privacy",
+      title: "Privacy Policy",
+      link: "/privacy-policy",
     },
-  ];
-  const navLinks2 = [
-    {
-      key: "link1",
-      title: "Banners",
-      link: "/widgets/banners",
-    },
-    {
-      key: "link2",
-      title: "Charts",
-      link: "/widgets/charts",
-    },
-    {
-      key: "link3",
-      title: "Headless Radio",
-      link: "/headless-form/radiogroup",
-    },
-    {
-      key: "link4",
-      title: "Gallery",
-      link: "/apps/user-profile/gallery",
-    },
-    {
-      key: "link5",
-      title: "Buttons",
-      link: "/ui-components/buttons",
+     {
+      key: "terms",
+      title: "Terms of Service",
+      link: "/terms-of-service",
     },
   ];
-  const navLinks3 = [
-    {
-      key: "link1",
-      title: "Form Layouts",
-      link: "/forms/form-layouts",
-    },
-    {
-      key: "link2",
-      title: "Tables",
-      link: "/tables/basic",
-    },
-    {
-      key: "link3",
-      title: "React Table",
-      link: "/react-tables/basic",
-    },
-    {
-      key: "link4",
-      title: "Form Elements",
-      link: "/forms/form-elements",
-    },
-    {
-      key: "link5",
-      title: "Validation",
-      link: "/forms/form-validation",
-    },
-  ];
+
   return (
     <>
       <div className="bg-dark">
         <div className="container-1218 mx-auto ">
           <div className="border-b border-darkborder lg:py-24 py-12">
-            <div className="grid grid-cols-12 gap-30 ">
+            <div className="grid grid-cols-12 gap-y-10 sm:gap-x-6 md:gap-x-8 lg:gap-x-12 ">
               <div className="lg:col-span-3 sm:col-span-6 col-span-12">
-                <img src={FullLogo} alt="logo" className="mb-8" />
+                 <h4 className="text-17 text-white font-semibold mb-8">
+                  RISE Platform
+                </h4>
                 <div className="flex flex-col gap-4">
-                  {navLinks1.map((item) => {
+                  {riseLinksCompany.map((item) => {
                     return (
                       <Link
                         key={item.key}
@@ -114,87 +101,154 @@ export const Footer = () => {
               </div>
               <div className="lg:col-span-3 sm:col-span-6 col-span-12">
                 <h4 className="text-17 text-white font-semibold mb-8">
-                  Features
+                  For Startups
                 </h4>
                 <div className="flex flex-col gap-4">
-                  {navLinks2.map((item) => {
-                    return (
-                      <Link
-                        key={item.key}
-                        to={item.link}
-                        className="text-sm text-lightmuted hover:text-primary block"
-                      >
-                        {item.title}
-                      </Link>
+                  {riseLinksStartups.map((item) => {
+                    const isScrollLink = item.link.startsWith('#');
+                    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+                       if (isScrollLink) {
+                          e.preventDefault();
+                          const element = document.getElementById(item.link.substring(1));
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                       }
+                    };
+                    return isScrollLink ? (
+                        <a
+                          key={item.key}
+                          href={item.link}
+                          onClick={handleScroll}
+                          className="text-sm text-lightmuted hover:text-primary block cursor-pointer"
+                        >
+                          {item.title}
+                        </a>
+                      ) : (
+                        <Link
+                          key={item.key}
+                          to={item.link}
+                          className="text-sm text-lightmuted hover:text-primary block"
+                        >
+                          {item.title}
+                        </Link>
                     );
                   })}
                 </div>
               </div>
               <div className="lg:col-span-3 sm:col-span-6 col-span-12">
                 <h4 className="text-17 text-white font-semibold mb-8">
-                  Resources
+                  For Investors
                 </h4>
                 <div className="flex flex-col gap-4">
-                  {navLinks3.map((item) => {
-                    return (
-                      <Link
-                        key={item.key}
-                        to={item.link}
-                        className="text-sm text-lightmuted hover:text-primary block"
-                      >
-                        {item.title}
-                      </Link>
+                  {riseLinksInvestors.map((item) => {
+                     const isScrollLink = item.link.startsWith('#');
+                    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+                       if (isScrollLink) {
+                          e.preventDefault();
+                          const element = document.getElementById(item.link.substring(1));
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                       }
+                    };
+                     return isScrollLink ? (
+                        <a
+                          key={item.key}
+                          href={item.link}
+                          onClick={handleScroll}
+                          className="text-sm text-lightmuted hover:text-primary block cursor-pointer"
+                        >
+                          {item.title}
+                        </a>
+                      ) : (
+                        <Link
+                          key={item.key}
+                          to={item.link}
+                          className="text-sm text-lightmuted hover:text-primary block"
+                        >
+                          {item.title}
+                        </Link>
                     );
                   })}
                 </div>
               </div>
               <div className="lg:col-span-3 sm:col-span-6 col-span-12">
                 <h4 className="text-17 text-white font-semibold mb-8">
-                  Follow us
+                   Help & Legal
+                </h4>
+                 <div className="flex flex-col gap-4 mb-8">
+                  {riseLinksLegal.map((item) => {
+                     const isScrollLink = item.link.startsWith('#');
+                     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+                       if (isScrollLink) {
+                          e.preventDefault();
+                          const element = document.getElementById(item.link.substring(1));
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                       }
+                    };
+                     return isScrollLink ? (
+                        <a
+                          key={item.key}
+                          href={item.link}
+                          onClick={handleScroll}
+                          className="text-sm text-lightmuted hover:text-primary block cursor-pointer"
+                        >
+                          {item.title}
+                        </a>
+                      ) : (
+                        <Link
+                          key={item.key}
+                          to={item.link}
+                          className="text-sm text-lightmuted hover:text-primary block"
+                        >
+                          {item.title}
+                        </Link>
+                    );
+                  })}
+                </div>
+                <h4 className="text-17 text-white font-semibold mb-4">
+                  Follow Us
                 </h4>
                 <div className="flex items-center gap-5">
+                  {/* Update href with actual RISE social links */}
+                  {/* Temporarily commented out LinkedIn icon due to missing SVG */}
+                  {/* 
                   <Tooltip
-                    content="Facebook"
+                    content="LinkedIn"
                     placement="bottom"
                     className="shrink-0"
                   >
-                    <Link to="/">
+                    <a href="#" target="_blank" rel="noopener noreferrer">
                       <img
-                        src={facebook}
+                        src={linkedin} // Use imported LinkedIn icon
                         height={22}
                         width={22}
-                        alt="icon"
+                        alt="LinkedIn icon"
                       />
-                    </Link>
+                    </a>
                   </Tooltip>
+                  */}
+                  {/* Temporarily commented out Twitter icon as well for consistency - uncomment when ready */}
+                  {/* 
                   <Tooltip
-                    content="Twitter"
+                    content="Twitter (X)"
                     placement="bottom"
                     className="shrink-0"
                   >
-                    <Link to="/">
+                    <a href="#" target="_blank" rel="noopener noreferrer">
                       <img
                         src={twitter}
                         height={22}
                         width={22}
-                        alt="icon"
+                        alt="Twitter icon"
                       />
-                    </Link>
+                    </a>
                   </Tooltip>
-                  <Tooltip
-                    content="Instagram"
-                    placement="bottom"
-                    className="shrink-0"
-                  >
-                    <Link to="/">
-                      <img
-                        src={instagram}
-                        height={22}
-                        width={22}
-                        alt="icon"
-                      />
-                    </Link>
-                  </Tooltip>
+                  */}
+                  {/* Removed Instagram */}
                 </div>
               </div>
             </div>
@@ -205,18 +259,9 @@ export const Footer = () => {
             <div className="flex items-center gap-3">
                <Logo/>
               <p className="text-15 text-lightmuted ">
-                All rights reserved by MaterialM.
+                © {new Date().getFullYear()} RISE Platform. All rights reserved.
               </p>
             </div>
-            <p className="text-15 text-lightmuted  flex items-center gap-1 md:pt-0 pt-3">
-              Produced by{" "}
-              <Link
-                className="text-white text-primary-ld"
-                to="https://www.wrappixel.com/"
-              >
-                Wrappixel
-              </Link>{" "}
-            </p>
           </div>
         </div>
       </div>

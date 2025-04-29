@@ -1,32 +1,5 @@
 import { http, HttpResponse } from 'msw';
 
-// Mock user data (adjust as needed for RISE)
-const mockUser = {
-  id: 'mock-user-uuid-123',
-  aud: 'authenticated',
-  role: 'authenticated',
-  email: 'user@rise.example',
-  email_confirmed_at: new Date().toISOString(),
-  phone: '',
-  confirmed_at: new Date().toISOString(),
-  last_sign_in_at: new Date().toISOString(),
-  app_metadata: { provider: 'email', providers: ['email'] },
-  user_metadata: { name: 'Mock RISE User' }, // Add relevant user metadata
-  identities: [],
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-};
-
-// Mock session data (adjust token/expiry as needed)
-const mockSession = {
-  access_token: 'mock-access-token-riseriserise',
-  token_type: 'bearer',
-  expires_in: 3600,
-  expires_at: Math.floor(Date.now() / 1000) + 3600,
-  refresh_token: 'mock-refresh-token-supabase',
-  user: mockUser,
-};
-
 // --- Mock User Definitions ---
 const mockUsers = {
   'startup@rise.com': {

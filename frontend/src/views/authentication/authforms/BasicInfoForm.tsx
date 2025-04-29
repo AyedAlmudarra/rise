@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
-import FormSectionCard from '../../../components/shared/FormSectionCard';
+// import FormSectionCard from '../../../components/shared/FormSectionCard'; // Removed unused import
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "../../../components/shadcn-ui/Default-Ui/form";
 import { StartupRegistrationData } from '../../../types/startupRegistration';

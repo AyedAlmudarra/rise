@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from 'src/layouts/full/shared/logo/Logo';
+import Logo from '@/layouts/full/shared/logo/Logo';
 import LeftSidebarPart from './LeftSidebarPart'; // Reusing the same sidebar component
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/shadcn-ui/Default-Ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn-ui/Default-Ui/tabs";
 import AuthInfoInvestorForm from './authforms/AuthInfoInvestorForm';
 import InvestorProfileForm from './authforms/InvestorProfileForm';
 import InvestorPreferencesForm from './authforms/InvestorPreferencesForm';
-import { Button } from '../../components/shadcn-ui/Default-Ui/button';
+import { Button } from "@/components/shadcn-ui/Default-Ui/button";
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { investorRegistrationSchema, InvestorRegistrationData } from '../../types/investorRegistration';
-import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../context/AuthContext';
-import { Alert, AlertDescription, AlertTitle } from "../../components/shadcn-ui/Default-Ui/alert";
-import { Mail, Briefcase, CheckSquare, Terminal, ArrowLeft, ArrowRight, Send, Check, ChevronLeft, ChevronRight, Info, Users, Shield, Lock, Unlock } from "lucide-react";
-import { Progress } from '../../components/shadcn-ui/Default-Ui/progress';
-import { Separator } from "../../components/shadcn-ui/Default-Ui/separator";
-import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from "../../components/shadcn-ui/Default-Ui/card";
+import { investorRegistrationSchema, InvestorRegistrationData } from '@/types/investorRegistration';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
+import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn-ui/Default-Ui/alert";
+import { Mail, Briefcase, CheckSquare, Send, Check, ChevronLeft, ChevronRight, Shield, Lock, Unlock } from "lucide-react";
+import { Progress } from "@/components/shadcn-ui/Default-Ui/progress";
+import { Separator } from "@/components/shadcn-ui/Default-Ui/separator";
+import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from "@/components/shadcn-ui/Default-Ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Investor registration tab order
@@ -33,7 +33,7 @@ const RegisterInvestor = () => {
   const [currentTab, setCurrentTab] = useState(tabOrder[0]);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const [isFormDirty, setIsFormDirty] = useState(false);
+
   const navigate = useNavigate();
   const { user } = useAuth(); // Check if user is already logged in
 
@@ -69,11 +69,7 @@ const RegisterInvestor = () => {
     },
   });
 
-  const { handleSubmit, trigger, formState: { isSubmitting, errors, isDirty } } = methods;
-
-  useEffect(() => {
-    setIsFormDirty(isDirty);
-  }, [isDirty]);
+  const { handleSubmit, trigger, formState: { isSubmitting, isDirty } } = methods;
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
@@ -384,7 +380,7 @@ const RegisterInvestor = () => {
                               className="mb-6"
                             >
                               <Alert variant="destructive">
-                                <Terminal className="h-4 w-4" />
+                                <Shield className="h-4 w-4" />
                                 <AlertTitle>Registration Failed</AlertTitle>
                                 <AlertDescription>{submissionError}</AlertDescription>
                               </Alert>

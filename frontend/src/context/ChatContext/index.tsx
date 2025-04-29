@@ -9,13 +9,13 @@ import { getFetcher, postFetcher } from 'src/api/globalFetcher';
 // Define context props interface
 export interface ChatContextProps {
     chatData: ChatsType[];
-    chatContent: any[];
+    chatContent: MessageType[];
     chatSearch: string;
     selectedChat: ChatsType | null;
     loading: boolean;
     error: string;
     activeChatId: number | null;
-    setChatContent: Dispatch<SetStateAction<any[]>>;
+    setChatContent: Dispatch<SetStateAction<MessageType[]>>;
     setChatSearch: Dispatch<SetStateAction<string>>;
     setSelectedChat: Dispatch<SetStateAction<ChatsType | null>>;
     setActiveChatId: Dispatch<SetStateAction<number | null>>;
@@ -45,43 +45,63 @@ export const ChatContext = createContext<ChatContextProps>({
 // Create the provider component
 export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chatData, setChatData] = useState<ChatsType[]>([]);
-    const [chatContent, setChatContent] = useState<any[]>([]);
+    const [chatContent, setChatContent] = useState<MessageType[]>([]);
     const [chatSearch, setChatSearch] = useState<string>('');
     const [selectedChat, setSelectedChat] = useState<ChatsType | null>(null);
-    const [activeChatId, setActiveChatId] = useState<number | null>(1);
+    const [activeChatId, setActiveChatId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
 
-    const { data: ChatsData, isLoading: isChatsLoading, error: Chatserror, mutate } = useSWR('/api/data/chat/ChatData', getFetcher);
+    const { data: ChatsData, isLoading: isChatsLoading, error: ChatsError, mutate } = useSWR('/api/data/chat/ChatData', getFetcher);
 
     // Fetch chat data from the API
     useEffect(() => {
+        setLoading(isChatsLoading);
+        setError('');
+
         if (ChatsData) {
-            setLoading(isChatsLoading);
-            const chatsData = ChatsData.data;
-            if (chatData.length === 0) {
+            const chatsData: ChatsType[] = ChatsData.data;
+            if (chatData.length === 0 && chatsData && chatsData.length > 0) {
                 let specificChat = chatsData[0];
                 setSelectedChat(specificChat);
+                let initialChatId: number | null = null;
+                if (typeof specificChat.id === 'number') {
+                    initialChatId = specificChat.id;
+                } else if (typeof specificChat.id === 'string') {
+                    const parsedId = parseInt(specificChat.id, 10);
+                    if (!isNaN(parsedId)) {
+                        initialChatId = parsedId;
+                    }
+                }
+                setActiveChatId(initialChatId);
             }
-            setChatData(chatsData);
-        } else if (Chatserror) {
-            setError(Chatserror)
-            setLoading(isChatsLoading);
-            console.log("Failed to fetch the data")
+            setChatData(chatsData || []);
+        } else if (ChatsError) {
+            const errorMsg = `Failed to fetch chat data: ${ChatsError.message || 'Unknown error'}`;
+            setError(errorMsg);
+            console.error(errorMsg, ChatsError);
         }
-        else {
-            setLoading(isChatsLoading);
-        }
-    }, [ChatsData, Chatserror, isChatsLoading, chatData.length]);
+    }, [ChatsData, ChatsError, isChatsLoading]);
 
     // Function to send a message to a chat identified by `chatId` using an API call.
     const sendMessage = async (chatId: number | string, message: MessageType) => {
+        setError('');
         try {
-            let { data } = await mutate(postFetcher('/api/sendMessage', { chatId, message }));
-            let chat = data.find((chat: any) => chat.id === chatId)
-            setSelectedChat(chat);
-        } catch (error) {
-            console.error('Error sending message:', error);
+            const { data: updatedChatsData } = await mutate(
+                postFetcher('/api/sendMessage', { chatId, message }),
+            );
+
+            const chat: ChatsType | undefined = updatedChatsData?.find((c: ChatsType) => c.id === chatId);
+            if (chat) {
+                setSelectedChat(chat);
+            } else {
+                console.warn(`Chat with ID ${chatId} not found in response after sending message.`);
+                mutate();
+            }
+        } catch (err: any) {
+            const errorMsg = `Error sending message: ${err.message || 'Unknown error'}`;
+            setError(errorMsg);
+            console.error(errorMsg, err);
         }
     };
 

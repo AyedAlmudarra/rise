@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { Badge, Button, Dropdown, Spinner, Alert } from 'flowbite-react';
 import SimpleBar from 'simplebar-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../../../../lib/supabaseClient'; // Adjust path if necessary
-import { useAuth } from '../../../../context/AuthContext'; // Adjust path if necessary
-import { AppNotification } from '../../../../types/database'; // Adjust path if necessary
+import { supabase } from '@/lib/supabaseClient'; // Adjust path if necessary
+import { useAuth } from '@/context/AuthContext'; // Adjust path if necessary
+import { AppNotification } from '@/types/database'; // Adjust path if necessary
 import { toast } from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 

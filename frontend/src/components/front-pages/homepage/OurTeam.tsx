@@ -1,8 +1,8 @@
 
-import leader1 from "/src/assets/images/front-pages/team/leader1.png";
-import leader2 from "/src/assets/images/front-pages/team/leader2.png";
-import leader3 from "/src/assets/images/front-pages/team/leader3.png";
-import leader4 from "/src/assets/images/front-pages/team/leader4.png";
+import leader1 from "@/assets/images/front-pages/team/leader1.png";
+import leader2 from "@/assets/images/front-pages/team/leader2.png";
+import leader3 from "@/assets/images/front-pages/team/leader3.png";
+import leader4 from "@/assets/images/front-pages/team/leader4.png";
 
 const OurTeam = () => {
   const team = [

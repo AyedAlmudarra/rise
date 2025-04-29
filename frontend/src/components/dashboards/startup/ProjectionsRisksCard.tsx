@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, Badge, Button } from 'flowbite-react';
+import { Card, Badge } from 'flowbite-react';
 import { IconAlertTriangle, IconCalendarStats, IconChartBar, IconRobot } from '@tabler/icons-react';
-import { AIAnalysisData } from '../../../types/database';
+import { AIAnalysisData } from '@/types/database';
 
 interface ProjectionsRisksCardProps {
   analysisData: AIAnalysisData | null;

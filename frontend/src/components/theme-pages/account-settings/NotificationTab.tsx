@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
-  Label,
-  TextInput,
   ToggleSwitch,
-  Tooltip,
   Spinner
 } from "flowbite-react";
 import {
-  IconArticle,
   IconCheckbox,
-  IconClock,
-  IconDownload,
-  IconMail,
-  IconPlayerPause,
-  IconTruckDelivery,
   IconAlertCircle,
   IconMessage2,
   IconReceiptDollar,
   IconSpeakerphone
 } from "@tabler/icons-react";
-import OutlineCard from "src/components/shared/OutlineCard";
-import { useAuth } from "src/context/AuthContext";
-import { supabase } from "src/lib/supabaseClient";
+import OutlineCard from "@/components/shared/OutlineCard";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-hot-toast";
 
 // Define the shape of preferences data
@@ -173,7 +164,7 @@ const NotificationTab = () => {
         </p>
         
         <div className="mt-6 space-y-6">
-          {notificationOptions.map((item, i) => (
+          {notificationOptions.map((item) => (
             <div className="flex items-center justify-between" key={item.title}>
               <div className="flex gap-3.5 items-center">
                 <div className="flex-shrink-0 flex justify-center items-center h-10 w-10 rounded-md bg-muted dark:bg-darkmuted text-dark dark:text-white">

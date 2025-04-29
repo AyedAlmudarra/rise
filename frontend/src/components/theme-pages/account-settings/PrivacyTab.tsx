@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Label, Radio, Spinner } from 'flowbite-react';
-import OutlineCard from "../../shared/OutlineCard";
-import { useAuth } from 'src/context/AuthContext';
-import { supabase } from 'src/lib/supabaseClient';
+import OutlineCard from "@/components/shared/OutlineCard";
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
 import { IconAlertCircle } from '@tabler/icons-react';
 

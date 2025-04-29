@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from "react";
 import { Sidebar } from "flowbite-react";
 import { IconSidebar } from "./IconSidebar";
-import SidebarContent, { MenuItem, ChildItem } from "./Sidebaritems";
+import SidebarContent from "./Sidebaritems";
 import NavItems from "./NavItems";
 import NavCollapse from "./NavCollapse";
 import SimpleBar from "simplebar-react";
-import { CustomizerContext } from "src/context/CustomizerContext";
-import { useAuth } from "src/context/AuthContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "react-router";
 import SideProfile from "./SideProfile/SideProfile";
 
@@ -16,7 +16,7 @@ const isValidRole = (role: string | null): role is 'startup' | 'investor' => {
 };
 
 const SidebarLayout = () => {
-  const { selectedIconId, setSelectedIconId } = useContext(CustomizerContext) || {};
+  const { selectedIconId, setSelectedIconId } = useContext(CustomizerContext);
   const { userRole } = useAuth();
 
   // --- Role-Based Filtering Logic ---
@@ -39,41 +39,48 @@ const SidebarLayout = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
-  // Function to find the top-level icon ID based on the active child URL
-  function findActiveIconId(content: MenuItem[], targetUrl: string, currentRole: 'startup' | 'investor' | null): string | null {
-    for (const topLevelItem of content) {
-      // Check if top-level item is visible for the role
-      if (!filterByRole(topLevelItem)) {
-        continue; // Skip if not visible
-      }
-      
-      if (topLevelItem.items) {
-        for (const section of topLevelItem.items) {
-          // Check if section is visible for the role
-          if (!filterByRole(section)) {
-            continue; // Skip section if not visible
-          }
-          
-          if (section.children) {
-            for (const child of section.children) {
-              // Check if child item is visible for the role
-              if (!filterByRole(child)) {
-                continue; // Skip child if not visible
-              }
-              
-              if (child.url === targetUrl) {
-                return topLevelItem.id ?? null;
-              }
-              // Recursive check for nested children (if applicable)
-              // if (child.children && findNestedActiveIconId(child.children, targetUrl, currentRole)) {
-              //   return topLevelItem.id ?? null;
-              // }
+  // Refactored function to find the top-level icon ID
+  function findActiveIconId(content: any[], targetUrl: string, currentRole: 'startup' | 'investor' | null): string | null {
+    // Define filter function based on role
+    const filterFn = (item: any): boolean => {
+        if (!item?.roles) return true; // Allow items without roles defined
+        if (item.roles.includes('all')) return true;
+        if (currentRole && isValidRole(currentRole) && item.roles.includes(currentRole)) return true;
+        return false;
+    };
+
+    // Recursive helper to search within children or items arrays
+    function searchChildren(items: any[]): boolean {
+        for (const item of items) {
+            if (!filterFn(item)) continue; // Skip invisible items
+
+            // Direct match at this level
+            if (item.url === targetUrl) {
+                return true;
             }
-          }
+            // Recursively search in children array
+            if (item.children && searchChildren(item.children)) {
+                return true;
+            }
+            // Recursively search in items array (for top-level structure)
+            if (item.items && searchChildren(item.items)) {
+                return true;
+            }
         }
-      }
+        return false; // Not found in this branch
     }
-    return null; // URL not found or no matching icon
+
+    // Iterate through top-level items only
+    for (const topLevelItem of content) {
+        if (!filterFn(topLevelItem)) continue; // Skip invisible top-level items
+
+        // Check if the target URL exists within the descendants of this top-level item
+        if (topLevelItem.items && searchChildren(topLevelItem.items)) {
+            return topLevelItem.id ?? null;
+        }
+    }
+
+    return null; // URL not found in any visible top-level item's descendants
   }
 
   useEffect(() => {

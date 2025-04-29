@@ -1,4 +1,3 @@
-
 import "flowbite";
 import { useState, useEffect, useContext } from "react";
 import { Navbar } from "flowbite-react";
@@ -15,8 +14,8 @@ import MobileHeaderItems from "./MobileHeaderItems";
 import { Drawer } from "flowbite-react";
 import MobileSidebar from "../sidebar/MobileSidebar";
 import HorizontalMenu from "../../horizontal/header/HorizontalMenu";
-import { CustomizerContext } from "src/context/CustomizerContext";
-import { DashboardContext } from "src/context/DashboardContext/DashboardContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
+import { DashboardContext } from "@/context/DashboardContext/DashboardContext";
 
 interface HeaderPropsType {
   layoutType: string;
@@ -55,7 +54,7 @@ const Header = ({ layoutType }: HeaderPropsType) => {
   };
 
   const toggleMode = () => {
-    setActiveMode((prevMode: string) => (prevMode === "light" ? "dark" : "light"));
+    setActiveMode(activeMode === "light" ? "dark" : "light");
   };
 
   // mobile-sidebar

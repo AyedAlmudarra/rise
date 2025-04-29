@@ -5,10 +5,10 @@ import { Icon } from "@iconify/react";
 import { last } from "lodash";
 import { formatDistanceToNowStrict } from "date-fns";
 import SimpleBar from "simplebar-react";
-import { ChatContext } from "src/context/ChatContext";
+import { ChatContext, ChatContextProps } from "@/context/ChatContext";
 import React from "react";
-import profileImg from "/src/assets/images/profile/user-1.jpg"
-import { ChatsType } from "src/types/apps/chat";
+import profileImg from "@/assets/images/profile/user-1.jpg"
+import { ChatsType } from "@/types/apps/chat";
 
 
 const ChatListing = () => {
@@ -39,17 +39,26 @@ const ChatListing = () => {
       divider: false,
     },
   ];
-  const lastActivity = (chat: ChatsType) => last(chat.messages)?.createdAt;
+  const lastActivity = (chat: ChatsType): Date | null => {
+    if (!chat.messages || chat.messages.length === 0) {
+      return null;
+    }
+    const lastMsg = last(chat.messages);
+    return lastMsg?.createdAt ? new Date(lastMsg.createdAt) : null;
+  };
 
-  const getDetails = (conversation: ChatsType) => {
+  const getDetails = (conversation: ChatsType): string => {
+    if (!conversation.messages || conversation.messages.length === 0) {
+      return "No messages yet";
+    }
+
     let displayText = "";
-
     const lastMessage = conversation.messages[conversation.messages.length - 1];
+
     if (lastMessage) {
       const sender = lastMessage.senderId === conversation.id ? "You: " : "";
-      const message =
-        lastMessage.type === "image" ? "Sent a photo" : lastMessage.msg;
-      displayText = `${sender}${message}`;
+      const message = lastMessage.type === "image" ? "Sent a photo" : lastMessage.msg;
+      displayText = `${sender}${message || ''}`;
     }
 
     return displayText;
@@ -61,7 +70,7 @@ const ChatListing = () => {
     setSelectedChat,
     setActiveChatId,
     activeChatId,
-  } = useContext(ChatContext);
+  } = useContext<ChatContextProps>(ChatContext);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChatSearch(event.target.value);
@@ -201,9 +210,14 @@ const ChatListing = () => {
                 </div>
               </div>
               <div className="text-xs pt-1">
-                {formatDistanceToNowStrict(new Date(lastActivity(chat)), {
-                  addSuffix: false,
-                })}
+                {(() => {
+                  const lastActivityDate = lastActivity(chat);
+                  return lastActivityDate
+                    ? formatDistanceToNowStrict(lastActivityDate, {
+                        addSuffix: false,
+                      })
+                    : "";
+                })()}
               </div>
             </div>
           ))}

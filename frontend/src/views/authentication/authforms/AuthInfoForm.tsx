@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
+import { Input } from '@/components/shadcn-ui/Default-Ui/input';
 import { useFormContext } from 'react-hook-form';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "../../../components/shadcn-ui/Default-Ui/form";
-import { StartupRegistrationData } from '../../../types/startupRegistration';
-import { Mail, Lock, Eye, EyeOff, User, Briefcase, GraduationCap, Calendar, Code, Globe, Shield, CheckCircle } from 'lucide-react';
-import { Button } from '../../../components/shadcn-ui/Default-Ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/shadcn-ui/Default-Ui/select";
-import { Textarea } from '../../../components/shadcn-ui/Default-Ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/shadcn-ui/Default-Ui/popover";
-import { Checkbox } from "../../../components/shadcn-ui/Default-Ui/checkbox";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/shadcn-ui/Default-Ui/form";
+import { StartupRegistrationData } from '@/types/startupRegistration';
+import { Mail, Lock, Eye, EyeOff, User, Briefcase, GraduationCap, Calendar, Code, Shield, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/shadcn-ui/Default-Ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn-ui/Default-Ui/select";
+import { Textarea } from '@/components/shadcn-ui/Default-Ui/textarea';
+import { Checkbox } from "@/components/shadcn-ui/Default-Ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn-ui/Default-Ui/tooltip";
 import { motion } from "framer-motion";
-import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
+import { Badge } from "@/components/shadcn-ui/Default-Ui/badge";
 
 const educationLevels = [
   { value: "high_school", label: "High School" },

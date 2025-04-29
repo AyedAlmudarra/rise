@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Badge, Button, Drawer } from "flowbite-react";
 import { IconMenu2 } from "@tabler/icons-react";
-import FullLogo from "src/layouts/full/shared/logo/FullLogo";
-import { Link, useLocation } from "react-router";
+import FullLogo from "@/layouts/full/shared/logo/FullLogo";
+import { Link, useLocation } from "react-router-dom";
+
 const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 

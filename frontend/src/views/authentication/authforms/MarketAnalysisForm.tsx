@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/shadcn-ui/Default-Ui/form";
-import { StartupRegistrationData } from '../../../types/startupRegistration';
-import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
-import { Textarea } from '../../../components/shadcn-ui/Default-Ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/shadcn-ui/Default-Ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
-import { Users, TrendingUp, Briefcase, LineChart, Building, Target, Sparkles, Activity, ShieldCheck, Zap, Lightbulb, Info, PlusCircle } from 'lucide-react';
-import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/shadcn-ui/Default-Ui/tabs";
-import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
-import { Button } from "../../../components/shadcn-ui/Default-Ui/button";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/shadcn-ui/Default-Ui/form";
+import { StartupRegistrationData } from '@/types/startupRegistration';
+import { Input } from '@/components/shadcn-ui/Default-Ui/input';
+import { Textarea } from '@/components/shadcn-ui/Default-Ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn-ui/Default-Ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn-ui/Default-Ui/tooltip";
+import { TrendingUp, Briefcase, LineChart, Building, Target, Sparkles, Activity, ShieldCheck, Zap, Lightbulb, Info, PlusCircle } from 'lucide-react';
+import { Card } from "@/components/shadcn-ui/Default-Ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn-ui/Default-Ui/tabs";
+import { Badge } from "@/components/shadcn-ui/Default-Ui/badge";
+import { Button } from "@/components/shadcn-ui/Default-Ui/button";
 
-type MarketAnalysisFormProps = {
-  isRegistrationFlow?: boolean;
-};
+type MarketAnalysisFormProps = {};
 
 // Help tooltip component
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
@@ -176,8 +174,8 @@ const CompetitorFields: React.FC<CompetitorCardProps> = ({ number, title }) => {
   );
 };
 
-const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ isRegistrationFlow = true }) => {
-  const { control, formState: { errors }, getValues, watch } = useFormContext<StartupRegistrationData>();
+const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = () => {
+  const { control } = useFormContext<StartupRegistrationData>();
   // Add state for managing visible competitor forms
   const [visibleCompetitors, setVisibleCompetitors] = useState(1); 
   // Add state for active tab

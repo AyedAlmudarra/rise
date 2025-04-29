@@ -1,4 +1,3 @@
-
 import  { useState, useContext } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { Icon } from "@iconify/react";
@@ -6,14 +5,14 @@ import { Badge, Button, Drawer, HR } from "flowbite-react";
 import SimpleBar from "simplebar-react";
 import ChatInsideSidebar from "./ChatInsideSidebar";
 import { formatDistanceToNowStrict } from "date-fns";
-import { ChatContext } from "src/context/ChatContext";
+import { ChatContext, ChatContextProps } from "@/context/ChatContext";
 import React from 'react';
 
 type Props = {
   onClickMobile: (event: React.MouseEvent<HTMLElement>) => void;
 };
 const ChatContent = ({ onClickMobile }: Props) => {
-  const { selectedChat }: any = useContext(ChatContext);
+  const { selectedChat } = useContext<ChatContextProps>(ChatContext);
 
 
   const [isRightSide, setIsRightSide] = useState(true);

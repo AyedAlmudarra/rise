@@ -1,6 +1,6 @@
-import { Button, Checkbox, Label, TextInput, Alert } from "flowbite-react";
+import { Button, Label, TextInput, Alert } from "flowbite-react";
 import React, { useState } from "react";
-import { supabase } from "src/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 // Import Link from react-router-dom if needed later
 // import { Link } from "react-router-dom";
@@ -30,9 +30,9 @@ const AuthLogin = () => {
         console.log('Supabase Sign In Success:', data);
         const role = data.user.user_metadata?.role;
         if (role === 'startup') {
-          navigate('/startup/dashboard');
+          navigate('/app/startup/dashboard');
         } else if (role === 'investor') {
-          navigate('/investor/dashboard');
+          navigate('/app/investor/dashboard');
         } else {
           console.warn('User has unknown or missing role:', role);
           navigate('/');

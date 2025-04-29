@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button } from 'flowbite-react';
+import { Card } from 'flowbite-react';
 import { IconCalendarEvent, IconCircleCheck, IconRobot } from '@tabler/icons-react';
 import { AIAnalysisData } from '../../../types/database';
 

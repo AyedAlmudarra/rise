@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Label, Radio } from 'flowbite-react';
-import OutlineCard from "../../shared/OutlineCard";
-import { CustomizerContext } from 'src/context/CustomizerContext';
+import OutlineCard from "@/components/shared/OutlineCard";
+import { CustomizerContext } from '@/context/CustomizerContext';
 
 const PlatformSettingsTab = () => {
   const { activeMode, setActiveMode } = useContext(CustomizerContext);

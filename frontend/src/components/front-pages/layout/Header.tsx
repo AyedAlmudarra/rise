@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import "flowbite";
 import { Button } from "flowbite-react";
 import Navigation from "./Navigation";
 import MobileMenu from "./MobileMenu";
-import FullLogo from "src/layouts/full/shared/logo/FullLogo";
-import { Link } from "react-router";
+import FullLogo from "@/layouts/full/shared/logo/FullLogo";
+import { Link } from "react-router-dom";
 
 const FrontHeader = () => {
   const [isSticky, setIsSticky] = useState(false);

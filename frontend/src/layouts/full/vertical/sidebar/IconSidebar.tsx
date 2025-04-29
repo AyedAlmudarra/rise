@@ -1,12 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Icon } from "@iconify/react";
 import MiniSidebarIcons from "./MiniSidebar";
 import SimpleBar from "simplebar-react";
 import { Button, Tooltip } from "flowbite-react";
-import { CustomizerContext } from "src/context/CustomizerContext";
-import { useAuth } from "src/context/AuthContext";
+import { CustomizerContext } from "@/context/CustomizerContext";
+import { useAuth } from "@/context/AuthContext";
 import Logo from "../../shared/logo/Logo";
 
 export const IconSidebar = () => {
@@ -30,7 +28,7 @@ export const IconSidebar = () => {
         <Logo />
       </div>
       <SimpleBar className="miniicons relative">
-        {visibleIcons.map((link, index) => (
+        {visibleIcons.map((link) => (
           <Tooltip key={link.id} content={link.tooltip} placement="right" className="flowbite-tooltip">
             <Button
               className={`h-12 w-12 hover:text-primary text-darklink hover:bg-lightprimary rounded-full flex justify-center items-center mx-auto mb-2 ${link.id === selectedIconId ? "text-primary bg-lightprimary" : "text-darklink bg-transparent"}`}

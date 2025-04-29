@@ -1,18 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
+import { Input } from '@/components/shadcn-ui/Default-Ui/input';
 import { useFormContext } from 'react-hook-form';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "../../../components/shadcn-ui/Default-Ui/form";
-import { StartupRegistrationData } from '../../../types/startupRegistration';
-import { Button } from '../../../components/shadcn-ui/Default-Ui/button';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/shadcn-ui/Default-Ui/form";
+import { StartupRegistrationData } from '@/types/startupRegistration';
+import { Button } from '@/components/shadcn-ui/Default-Ui/button';
 import { FileUp, Trash2, Link, Linkedin, Twitter, Upload, Check, AlertTriangle, FileType, Info, Image, Globe, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Badge } from "../../../components/shadcn-ui/Default-Ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/shadcn-ui/Default-Ui/tooltip";
-import { Progress } from '../../../components/shadcn-ui/Default-Ui/progress';
-import { Alert, AlertDescription, AlertTitle } from "../../../components/shadcn-ui/Default-Ui/alert";
-import { Card } from "../../../components/shadcn-ui/Default-Ui/card";
-import { supabase } from '../../../lib/supabaseClient';
-import { useAuth } from '../../../context/AuthContext';
+import { motion } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/shadcn-ui/Default-Ui/tooltip";
+import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn-ui/Default-Ui/alert";
+import { Card } from "@/components/shadcn-ui/Default-Ui/card";
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 
 // File type definitions
 const ALLOWED_LOGO_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
@@ -69,7 +67,7 @@ const DocumentsForm: React.FC = () => {
     const filePath = `public/${user.id}/${fileType}-${Date.now()}.${fileExt}`; 
 
     try {
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('startup')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -181,7 +179,7 @@ const DocumentsForm: React.FC = () => {
               <FormField
                 control={control}
                 name="logo_url"
-                render={({ field, fieldState }) => (
+                render={({ fieldState }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <Image className="h-4 w-4 text-amber-500" />
@@ -278,7 +276,7 @@ const DocumentsForm: React.FC = () => {
               <FormField
                 control={control}
                 name="pitch_deck_url"
-                render={({ field, fieldState }) => (
+                render={({ fieldState }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <FileUp className="h-4 w-4 text-amber-500" />

@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { Card, Timeline, Badge } from 'flowbite-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
+import BreadcrumbComp from '@/layouts/full/shared/breadcrumb/BreadcrumbComp';
 import {
   IconArrowRight,
   IconCalendar,

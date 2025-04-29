@@ -3,11 +3,11 @@ import moment from "moment";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { TbCheck } from "react-icons/tb";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { supabase } from 'src/lib/supabaseClient';
-import { useAuth } from 'src/context/AuthContext';
-import { CalendarEvent as DbEventType } from 'src/types/database';
+import { supabase } from '../../../lib/supabaseClient';
+import { useAuth } from '../../../context/AuthContext';
+import { CalendarEvent as DbEventType } from '../../../types/database';
 import { HiInformationCircle } from 'react-icons/hi';
 
 import {
@@ -229,7 +229,7 @@ const CalendarApp = () => {
         all_day: false,
       };
 
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('calendar_events')
         .insert([eventDataToInsert])
         .select(); // Optionally get inserted row back
@@ -326,6 +326,13 @@ const CalendarApp = () => {
   return (
     <>
       <CardBox>
+        {/* Loading Indicator Overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-black/50 flex items-center justify-center z-10">
+            <Spinner aria-label="Loading events..." size="xl" />
+          </div>
+        )}
+        {/* End Loading Indicator */}
         <Calendar
           selectable
           events={calevents}
@@ -336,7 +343,7 @@ const CalendarApp = () => {
           onSelectEvent={(event: CalendarAppStateEvent) => editEvent(event)}
           onSelectSlot={(slotInfo: any) => addNewEventAlert(slotInfo)}
           eventPropGetter={(event: any) => eventColors(event)}
-          className="min-h-[900px]"
+          className="min-h-[900px] relative"
         />
       </CardBox>
       {/* Dialog/Modal */}
@@ -352,6 +359,13 @@ const CalendarApp = () => {
             </p>
           </Modal.Header>
           <Modal.Body className="pt-0">
+            {/* Display Modal Error */}
+            {error && (
+              <Alert color="failure" icon={HiInformationCircle} className="mb-4">
+                <span className="font-medium">Error:</span> {error}
+              </Alert>
+            )}
+            {/* End Display Modal Error */}
             <div className="flex flex-col gap-3">
               <div>
                 <div className="mb-2 block">

@@ -1,75 +1,58 @@
-
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
-import mainbanner from "/src/assets/images/front-pages/background/feature-image.png";
-import mainbanner2 from "/src/assets/images/front-pages/background/widget_materialM_2.png";
-import mainbanner3 from "/src/assets/images/front-pages/background/widget_materialM_3.png";
-import mainbanner4 from "/src/assets/images/front-pages/background/widget_materialM_4.png";
+import featureImage from "@/assets/images/front-pages/background/feature-image.png";
+import placeholderImage2 from "@/assets/images/front-pages/background/widget_materialM_2.png";
+import placeholderImage3 from "@/assets/images/front-pages/background/widget_materialM_3.png";
 import { Accordion, Button, HR } from "flowbite-react";
+
 const FeatureTabs = () => {
-  // Custom Tab
-  const [activeTab, setActiveTab] = useState("Team Scheduling");
+  const [activeTab, setActiveTab] = useState("AI Startup Analysis");
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
 
-  const Tab1 = [
+  const aiAnalysisFeatures = [
     {
-      title: "Combine teammate schedules",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "In-Depth Company Evaluation",
+      desc: "Receive comprehensive AI-generated reports covering SWOT analysis, market positioning, scalability, and more.",
     },
     {
-      title: "Factor in outside colleagues",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Funding Readiness Score",
+      desc: "Understand your startup's investment potential with an objective, data-driven readiness score.",
     },
     {
-      title: "Round robin pooling",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
-    },
-  ];
-
-  const Tab2 = [
-    {
-      title: "Combine teammate schedules 2",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
-    },
-    {
-      title: "Factor in outside colleagues",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
-    },
-    {
-      title: "Round robin pooling",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Actionable Recommendations",
+      desc: "Get tailored suggestions from our AI to improve your business model, strategy, and investor pitch.",
     },
   ];
 
-  const Tab3 = [
+  const investorMatchingFeatures = [
     {
-      title: "Combine teammate schedules 3",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Targeted Investor Discovery",
+      desc: "Connect with investors whose preferences align with your startup's industry, stage, and funding needs.",
     },
     {
-      title: "Factor in outside colleagues",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Verified Investor Profiles",
+      desc: "Access detailed profiles of vetted investors, including their investment thesis and past deals.",
     },
     {
-      title: "Round robin pooling",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Streamlined Communication",
+      desc: "Initiate contact and manage conversations with potential investors directly through the platform.",
     },
   ];
 
-  const Tab4 = [
+  const curatedDealFlowFeatures = [
     {
-      title: "Combine teammate schedules 4",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "AI-Filtered Opportunities",
+      desc: "Discover promising startups tailored to your investment criteria, powered by intelligent filtering.",
     },
     {
-      title: "Factor in outside colleagues",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Comprehensive Startup Data",
+      desc: "Access detailed profiles, AI analyses, and key metrics for potential investment targets.",
     },
     {
-      title: "Round robin pooling",
-      desc: "Factor in availability for required attendees, and skip checking for conflicts for optional attendees.",
+      title: "Efficient Due Diligence",
+      desc: "Utilize platform tools and data insights to streamline your evaluation and decision-making process.",
     },
   ];
 
@@ -81,76 +64,62 @@ const FeatureTabs = () => {
           <div className="overflow-x-auto ">
             <div className="flex shrink-0 gap-4 md:pb-14 pb-8">
               <div
-                onClick={() => handleTabClick("Team Scheduling")}
+                onClick={() => handleTabClick("AI Startup Analysis")}
                 className={` py-4 px-6 whitespace-nowrap w-full rounded-tw cursor-pointer text-dark text-base font-semibold text-center flex gap-2 justify-center items-center  md:hover:bg-lightprimary md:dark:hover:bg-lightprimary md:hover:text-primary shadow-elevation2 ${
-                  activeTab == "Team Scheduling"
+                  activeTab == "AI Startup Analysis"
                     ? "text-white bg-primary dark:bg-primary shadow-elevation3 hover:!bg-primaryemphasis hover:!text-white"
                     : "dark:text-white bg-white dark:bg-dark"
                 }`}
               >
                 <Icon
-                  icon="material-symbols:groups-outline-rounded"
+                  icon="fluent:brain-circuit-20-regular"
                   height={22}
                 />
-                Team Scheduling
+                AI Startup Analysis
               </div>
               <div
-                onClick={() => handleTabClick("Payments")}
+                onClick={() => handleTabClick("Investor Matching")}
                 className={`py-4 px-6 whitespace-nowrap w-full rounded-tw cursor-pointer text-dark text-base font-semibold text-center flex gap-2 justify-center items-center  md:hover:bg-lightprimary md:dark:hover:bg-lightprimary md:hover:text-primary shadow-elevation2 ${
-                  activeTab == "Payments"
+                  activeTab == "Investor Matching"
                     ? "text-white bg-primary dark:bg-primary shadow-elevation3 hover:!bg-primaryemphasis hover:!text-white"
                     : "dark:text-white bg-white dark:bg-dark"
                 }`}
               >
                 <Icon
-                  icon="material-symbols:account-balance-outline"
+                  icon="mdi:handshake-outline"
                   height={22}
                 />{" "}
-                Payments
+                Investor Matching
               </div>
               <div
-                onClick={() => handleTabClick("Embedding")}
+                onClick={() => handleTabClick("Curated Deal Flow")}
                 className={`py-4 px-6 whitespace-nowrap w-full rounded-tw cursor-pointer text-dark text-base font-semibold text-center flex gap-2 justify-center items-center   md:hover:bg-lightprimary md:dark:hover:bg-lightprimary md:hover:text-primary shadow-elevation2 ${
-                  activeTab == "Embedding"
+                  activeTab == "Curated Deal Flow"
                     ? "text-white bg-primary dark:bg-primary shadow-elevation3 hover:!bg-primaryemphasis hover:!text-white"
                     : "dark:text-white bg-white dark:bg-dark"
                 }`}
               >
                 <Icon
-                  icon="material-symbols-light:photo-frame-outline-sharp"
+                  icon="carbon:analytics"
                   height={22}
                 />{" "}
-                Embedding
-              </div>
-              <div
-                onClick={() => handleTabClick("Workflows")}
-                className={`py-4 px-6 whitespace-nowrap w-full rounded-tw cursor-pointer text-dark text-base font-semibold text-center flex gap-2 justify-center items-center  md:hover:bg-lightprimary md:dark:hover:bg-lightprimary md:hover:text-primary shadow-elevation2  ${
-                  activeTab == "Workflows"
-                    ? "text-white bg-primary dark:bg-primary shadow-elevation3 hover:!bg-primaryemphasis hover:!text-white"
-                    : "dark:text-white bg-white dark:bg-dark"
-                }`}
-              >
-                <Icon
-                  icon="material-symbols:widgets-outline-rounded"
-                  height={22}
-                />{" "}
-                Workflows
+                Curated Deal Flow
               </div>
             </div>
           </div>
           <div className="grid grid-cols-12 gap-30">
               {/* Tabs Content */}
-              {activeTab === "Team Scheduling" && (
+              {activeTab === "AI Startup Analysis" && (
                  <>
             <div className="lg:col-span-6 col-span-12">
-              <img src={mainbanner} className="w-full" alt="banner" />
+              <img src={featureImage} className="w-full" alt="AI Analysis Feature" />
             </div>
             <div className="lg:col-span-6 col-span-12 lg:ps-7">
                   <h2 className="sm:text-44 text-3xl font-bold !leading-[48px] text-dark dark:text-white pb-6">
-                    Protect your focus.
+                    Unlock Deep Startup Insights with AI
                   </h2>
                   <Accordion className="shadow-none dark:shadow-none divide-y-0 !rounded-none">
-                    {Tab1.map((item, i) => (
+                    {aiAnalysisFeatures.map((item, i) => (
                       <Accordion.Panel
                         key={i}
                         className="bg-white dark:bg-dark"
@@ -168,23 +137,23 @@ const FeatureTabs = () => {
                     ))}
                   </Accordion>
                   <Button color={"primary"} className="font-bold mt-6">
-                    Learn More
+                    Explore AI Features
                   </Button>
                 </div>
                  </>
 
               )}
-              {activeTab === "Payments" && (
+              {activeTab === "Investor Matching" && (
                  <>
             <div className="lg:col-span-6 col-span-12">
-              <img src={mainbanner2} className="w-full" alt="banner" />
+              <img src={placeholderImage2} className="w-full" alt="Investor Matching Feature" />
             </div>
             <div className="lg:col-span-6 col-span-12 lg:ps-7">
                   <h2 className="sm:text-44 text-3xl font-bold !leading-[48px] text-dark dark:text-white pb-6">
-                    Protect your focus.
+                    Connect with the Right Investors
                   </h2>
                   <Accordion className="shadow-none dark:shadow-none divide-y-0 !rounded-none">
-                    {Tab2.map((item, i) => (
+                    {investorMatchingFeatures.map((item, i) => (
                       <Accordion.Panel
                         key={i}
                         className="bg-white dark:bg-dark"
@@ -202,23 +171,23 @@ const FeatureTabs = () => {
                     ))}
                   </Accordion>
                   <Button color={"primary"} className="font-bold mt-6">
-                    Learn More
+                    Find Investors
                   </Button>
                 </div>
                  </>
 
               )}
-              {activeTab === "Embedding" && (
+              {activeTab === "Curated Deal Flow" && (
                  <>
             <div className="lg:col-span-6 col-span-12">
-              <img src={mainbanner3} className="w-full" alt="banner" />
+              <img src={placeholderImage3} className="w-full" alt="Curated Deal Flow Feature" />
             </div>
             <div className="lg:col-span-6 col-span-12 lg:ps-7">
                   <h2 className="sm:text-44 text-3xl font-bold !leading-[48px] text-dark dark:text-white pb-6">
-                    Protect your focus.
+                    Access Tailored Investment Opportunities
                   </h2>
                   <Accordion className="shadow-none dark:shadow-none divide-y-0 !rounded-none">
-                    {Tab3.map((item, i) => (
+                    {curatedDealFlowFeatures.map((item, i) => (
                       <Accordion.Panel
                         key={i}
                         className="bg-white dark:bg-dark"
@@ -236,45 +205,10 @@ const FeatureTabs = () => {
                     ))}
                   </Accordion>
                   <Button color={"primary"} className="font-bold mt-6">
-                    Learn More
+                    Discover Startups
                   </Button>
                 </div>
                  </>
-
-              )}
-              {activeTab === "Workflows" && (
-                 <>
-            <div className="lg:col-span-6 col-span-12">
-              <img src={mainbanner4} className="w-full" alt="banner" />
-            </div>
-            <div className="lg:col-span-6 col-span-12 lg:ps-7">
-                  <h2 className="sm:text-44 text-3xl font-bold !leading-[48px] text-dark dark:text-white pb-6">
-                    Protect your focus.
-                  </h2>
-                  <Accordion className="shadow-none dark:shadow-none divide-y-0 !rounded-none">
-                    {Tab4.map((item, i) => (
-                      <Accordion.Panel
-                        key={i}
-                        className="bg-white dark:bg-dark"
-                      >
-                        <Accordion.Title className="focus:ring-0 px-0 text-17 font-semibold text-ld py-5 ">
-                          {item.title}
-                        </Accordion.Title>
-                        <Accordion.Content className="px-0 pt-0 !rounded-none">
-                          <p className="text-base text-darklink leading-7 ">
-                            {item.desc}
-                          </p>
-                        </Accordion.Content>
-                        <HR className="my-0" />
-                      </Accordion.Panel>
-                    ))}
-                  </Accordion>
-                  <Button color={"primary"} className="font-bold mt-6">
-                    Learn More
-                  </Button>
-                </div>
-                 </>
-
               )}
           </div>
         </div>

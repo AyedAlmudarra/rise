@@ -1,12 +1,10 @@
-
 import  { createContext, useState, ReactNode, useEffect } from 'react';
 import config from './config'
-import React from "react";
 
 // Define the shape of the context state
 interface CustomizerContextState {
-  selectedIconId: number;
-  setSelectedIconId: (id: number) => void;
+  selectedIconId: string | null;
+  setSelectedIconId: (id: string | null) => void;
   activeDir: string;
   setActiveDir: (dir: string) => void;
   activeMode: string;
@@ -23,19 +21,37 @@ interface CustomizerContextState {
   setIsBorderRadius: (radius: number) => void;
   isCollapse: string;
   setIsCollapse: (collapse: string) => void;
-
 }
 
-// Create the context with an initial value
-export const CustomizerContext = createContext<CustomizerContextState | any>(undefined);
+// Create the context with a proper default value matching the interface
+export const CustomizerContext = createContext<CustomizerContextState>({
+    selectedIconId: null,
+    setSelectedIconId: () => {},
+    activeDir: config.activeDir,
+    setActiveDir: () => {},
+    activeMode: config.activeMode,
+    setActiveMode: () => {},
+    activeTheme: config.activeTheme,
+    setActiveTheme: () => {},
+    activeLayout: config.activeLayout,
+    setActiveLayout: () => {},
+    isCardShadow: config.isCardShadow,
+    setIsCardShadow: () => {},
+    isLayout: config.isLayout,
+    setIsLayout: () => {},
+    isBorderRadius: config.isBorderRadius,
+    setIsBorderRadius: () => {},
+    isCollapse: config.isCollapse,
+    setIsCollapse: () => {},
+});
 
 // Define the type for the children prop
 interface CustomizerContextProps {
   children: ReactNode;
 }
 // Create the provider component
-export const CustomizerContextProvider: React.FC<CustomizerContextProps> = ({ children }) => {
-  const [selectedIconId, setSelectedIconId] = useState<number>(1);
+export const CustomizerContextProvider = ({ children }: CustomizerContextProps) => {
+  const [selectedIconId, setSelectedIconId] = useState<string | null>(null);
   const [activeDir, setActiveDir] = useState<string>(config.activeDir);
   const [activeMode, setActiveMode] = useState<string>(config.activeMode);
   const [activeTheme, setActiveTheme] = useState<string>(config.activeTheme);
@@ -44,7 +60,6 @@ export const CustomizerContextProvider: React.FC<CustomizerContextProps> = ({ ch
   const [isLayout, setIsLayout] = useState<string>(config.isLayout);
   const [isBorderRadius, setIsBorderRadius] = useState<number>(config.isBorderRadius);
   const [isCollapse, setIsCollapse] = useState<string>(config.isCollapse);
-  const [isLanguage, setIsLanguage] = useState<string>(config.isLanguage);
 
 
   // Set attributes immediately
@@ -79,9 +94,6 @@ export const CustomizerContextProvider: React.FC<CustomizerContextProps> = ({ ch
         setIsBorderRadius,
         isCollapse,
         setIsCollapse,
-        isLanguage,
-        setIsLanguage,
-
       }}
     >
       {children}

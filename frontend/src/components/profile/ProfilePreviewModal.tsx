@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Spinner, Alert, Avatar, Badge, Button } from 'flowbite-react';
-import { supabase } from '../../lib/supabaseClient';
-import { StartupProfile, InvestorProfile } from '../../types/database'; // Assuming these types exist
+import { supabase } from '@/lib/supabaseClient';
+import { StartupProfile, InvestorProfile } from '@/types/database'; // Assuming these types exist
 import {
-    HiOutlineOfficeBuilding,
     HiUserCircle,
-    HiOutlineX,
     HiOutlineBriefcase,
     HiOutlineCalendar,
     HiOutlineLocationMarker,
@@ -141,7 +139,7 @@ const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
             </div>
         );
     } else if (profileRole === 'investor') {
-        const { full_name, job_title, company_name, investor_type, company_description, website, linkedin_profile, preferred_industries, preferred_geography, preferred_stage } = profileData;
+        const { full_name, job_title, company_name, investor_type, company_description, website, linkedin_profile } = profileData;
         return (
             <div className="p-4 space-y-4">
                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -166,8 +164,6 @@ const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
                     </p>
                 </div>
 
-                {/* Optional: Display Preferences */}
-                {/* ... Add rendering for preferred_industries, etc. if desired ... */}
 
             </div>
         );

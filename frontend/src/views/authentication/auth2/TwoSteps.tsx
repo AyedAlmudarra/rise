@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import CardBox from "src/components/shared/CardBox";
-import Logo from "src/layouts/full/shared/logo/Logo";
-import AuthTwoSteps from "../authforms/AuthTwoSteps";
+import CardBox from "@/components/shared/CardBox";
+import Logo from "@/layouts/full/shared/logo/Logo";
+
 
 const TwoSteps = () => {
   return (
@@ -17,7 +17,7 @@ const TwoSteps = () => {
               the mobile in the field below.
             </p>
             <h6 className="text-sm font-bold my-4 text-center">******1234</h6>
-            <AuthTwoSteps />
+            
             <div className="flex gap-2 text-base text-ld font-medium mt-6 items-center justify-left">
               <p>Didn't get the code?</p>
               <Link to={"/"} className="text-primary text-sm font-medium">

@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, Spinner, Alert, Badge, Button, Tooltip, Tabs } from 'flowbite-react';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
-import { StartupProfile } from '../../types/database';
-import AIInsightsSection from '../../components/dashboards/startup/AIInsightsSection';
-import AISuggestionsSection from '../../components/dashboards/investor/AISuggestionsSection';
-import { mockInvestorData } from '../../api/mocks/data/investorDashboardMockData';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { StartupProfile } from '@/types/database';
+import AIInsightsSection from '@/components/dashboards/startup/AIInsightsSection';
+import AISuggestionsSection from '@/components/dashboards/investor/AISuggestionsSection';
 import {
   IconBrain,
   IconBulb,
@@ -14,22 +13,18 @@ import {
   IconArrowRight,
   IconReportAnalytics,
   IconScale,
-  IconChartPie,
   IconCurrencyDollar,
-  IconTrendingUp,
-  IconShare,
   IconDownload
 } from "@tabler/icons-react";
 import {
   KeyMetricsSection,
-  FundingReadinessCard,
   FinancialPerformanceCard,
   GrowthPlanCard,
   ProjectionsRisksCard
-} from "../../components/dashboards/startup";
+} from "@/components/dashboards/startup";
 import { toast } from 'react-hot-toast';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import AnalysisReportDocument from '../../components/pdf/AnalysisReportDocument';
+import AnalysisReportDocument from '@/components/pdf/AnalysisReportDocument';
 
 const AIInsightsPage: React.FC = () => {
   const { user, userRole } = useAuth();
@@ -196,11 +191,7 @@ const AIInsightsPage: React.FC = () => {
     }
   };
 
-  // ++ Placeholder Functions ++
-  const handleShareReport = () => {
-    toast.success('Share functionality coming soon!'); // Placeholder feedback
-    console.log("Share Report button clicked - Implementation needed (requires backend).");
-  };
+ 
 
   // Dummy refresh function for AISuggestionsSection
   const handleInvestorRefresh = () => {
@@ -318,7 +309,7 @@ const AIInsightsPage: React.FC = () => {
                         document={<AnalysisReportDocument startupData={startupData} analysisData={parsedAnalysisData} />}
                         fileName={`RISE-AI-Analysis-${startupData?.name || 'Startup'}.pdf`}
                        >
-                         {({ blob, url, loading, error }) => (
+                         {({ loading, error }) => (
                            <Tooltip content={loading ? "Generating PDF..." : error ? "PDF Error!" : "Export as PDF"}>
                              <Button
                                size="sm"
@@ -371,7 +362,11 @@ const AIInsightsPage: React.FC = () => {
                             </div> */}
                             {/* Ensure KeyMetricsSection is active */}
                             <div className="lg:col-span-2">
-                              <KeyMetricsSection analysisData={parsedAnalysisData} isLoading={dataLoading} />
+                              <KeyMetricsSection 
+                                analysisData={parsedAnalysisData} 
+                                startupData={startupData}
+                                isLoading={dataLoading} 
+                              />
                             </div>
                          </div>
                       </Tabs.Item>
@@ -420,9 +415,8 @@ const AIInsightsPage: React.FC = () => {
                 </div>
                 <div className="p-6">
                   <AISuggestionsSection
-                    suggestions={mockInvestorData.aiSuggestions}
-                    isLoading={false}
-                    onRefresh={handleInvestorRefresh}
+                    // isLoading is managed internally
+                    onRefreshProp={handleInvestorRefresh} 
                   />
                 </div>
               </div>

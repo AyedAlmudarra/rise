@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from 'src/context/AuthContext';
-import { Card, Avatar, Spinner, Alert, Badge, List, Tooltip, Label } from 'flowbite-react';
+import { useAuth } from '@/context/AuthContext';
+import { Card, Avatar, Spinner, Alert, Badge, List, Label } from 'flowbite-react';
 import {
-    IconUserCircle, IconMail, IconPhone, IconBuildingSkyscraper, IconBriefcase, IconUserScan, IconAlertCircle,
-    IconBuildingFactory2, IconTargetArrow, IconMapPin, IconUsers, IconReceipt, IconTrendingUp, IconLink, IconBrandLinkedin, IconListCheck, IconReportMoney, IconScale,
+    IconUserCircle, IconMail, IconPhone, IconBuildingSkyscraper, IconBriefcase, IconAlertCircle,
+    IconBuildingFactory2, IconTargetArrow, IconMapPin, IconUsers, IconReceipt, IconTrendingUp, IconLink, IconBrandLinkedin, IconReportMoney, IconScale,
     IconPresentationAnalytics, IconRepeat, IconRotateClockwise, IconChartArrowsVertical
 } from '@tabler/icons-react';
-import BreadcrumbComp from 'src/layouts/full/shared/breadcrumb/BreadcrumbComp';
-import userImg from "/src/assets/images/profile/user-1.jpg"; // Default fallback avatar
-import { StartupProfile, InvestorProfile } from 'src/types/database'; // Adjust path if needed
-import { supabase } from 'src/lib/supabaseClient';
+import BreadcrumbComp from '@/layouts/full/shared/breadcrumb/BreadcrumbComp';
+import userImg from "@/assets/images/profile/user-1.jpg"; // Default fallback avatar
+import { StartupProfile, InvestorProfile } from '@/types/database'; // Adjust path if needed
+import { supabase } from '@/lib/supabaseClient';
 
 const BCrumb = [
   {
@@ -20,11 +20,6 @@ const BCrumb = [
     title: 'My Profile',
   },
 ];
-
-// Helper function to format array data for display
-const formatArray = (arr: string[] | null | undefined): string => {
-    return arr && arr.length > 0 ? arr.join(', ') : 'N/A';
-};
 
 // Helper function to format numeric data
 const formatNumber = (num: number | null | undefined, type: 'currency' | 'percent' | 'integer' = 'integer'): string => {

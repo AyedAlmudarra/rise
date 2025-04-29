@@ -1,4 +1,4 @@
-import { InvestorProfile } from 'src/types/database';
+import { InvestorProfile } from '@/types/database';
 
 // Helper functions for generating realistic mock data
 const randomInRange = (min: number, max: number): number => {
@@ -222,7 +222,7 @@ export const generateMockData = (investorProfile?: InvestorProfile | null): Mock
     trendingIndustries: generateTrendingIndustries(preferredIndustries),
     fundingTrends: generateFundingTrends(),
     insights: template.insights,
-    recentExits: generateRecentExits(preferredIndustries)
+    recentExits: generateRecentExits()
   };
   
   return {
@@ -432,7 +432,6 @@ const generateFundingTrends = (): MockMarketInsights['fundingTrends'] => {
 
 // Helper function to generate recent exits
 const generateRecentExits = (
-  industries: string[]
 ): MockMarketInsights['recentExits'] => {
   const startupNames = [
     'Innovate AI', 'MedTech Solutions', 'GreenEnergy', 'CyberDefense', 
@@ -445,7 +444,7 @@ const generateRecentExits = (
     'IBM', 'Samsung', 'Saudi Aramco', 'STC', 'Careem', 'Noon', 'Talabat'
   ];
   
-  return Array.from({ length: 5 }).map((_, i) => ({
+  return Array.from({ length: 5 }).map((_) => ({
     company: randomChoice(startupNames),
     acquirer: randomChoice(acquirers),
     amount: randomInRange(5, 500) * 1000000, // $5M - $500M

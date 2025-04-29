@@ -4,23 +4,23 @@ import { sub } from 'date-fns';
 import { uniqueId } from 'lodash';
 
 
-import user2 from '/src/assets/images/profile/user-2.jpg';
-import user3 from '/src/assets/images/profile/user-3.jpg';
-import user4 from '/src/assets/images/profile/user-4.jpg';
-import user5 from '/src/assets/images/profile/user-5.jpg';
-import user8 from '/src/assets/images/profile/user-8.jpg';
-import user10 from "/src/assets/images/profile/user-10.jpg";
-import user9 from "/src/assets/images/profile/user-9.jpg";
-import s1 from '/src/assets/images/blog/blog-img1.jpg';
+import user2 from '@/assets/images/profile/user-2.jpg';
+import user3 from '@/assets/images/profile/user-3.jpg';
+import user4 from '@/assets/images/profile/user-4.jpg';
+import user5 from '@/assets/images/profile/user-5.jpg';
+import user8 from '@/assets/images/profile/user-8.jpg';
+import user10 from "@/assets/images/profile/user-10.jpg";
+import user9 from "@/assets/images/profile/user-9.jpg";
+import s1 from "@/assets/images/blog/blog-img1.jpg";
 
-import adobe from '/src/assets/images/chat/icon-adobe.svg';
-import chrome from '/src/assets/images/chat/icon-chrome.svg';
-import figma from '/src/assets/images/chat/icon-figma.svg';
-import java from '/src/assets/images/chat/icon-javascript.svg';
-import zip from '/src/assets/images/chat/icon-zip-folder.svg';
+import adobe from '@/assets/images/chat/icon-adobe.svg';
+import chrome from '@/assets/images/chat/icon-chrome.svg';
+import figma from '@/assets/images/chat/icon-figma.svg';
+import java from '@/assets/images/chat/icon-javascript.svg';
+import zip from '@/assets/images/chat/icon-zip-folder.svg';
 
 import { http, HttpResponse } from 'msw';
-import { ChatsType } from 'src/types/apps/chat';
+import { ChatsType } from '@/types/apps/chat';
 
 
 const chance = new Chance();

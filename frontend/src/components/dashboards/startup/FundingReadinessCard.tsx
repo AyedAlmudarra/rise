@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Progress, Tooltip, Badge, Button, Spinner } from 'flowbite-react';
-import { IconScale, IconInfoCircle, IconRobot } from '@tabler/icons-react';
+import { Card, Progress, Tooltip } from 'flowbite-react';
+import { IconScale, IconRobot } from '@tabler/icons-react';
 import { AIAnalysisData } from '../../../types/database';
 
 interface FundingReadinessCardProps {
@@ -84,7 +84,6 @@ const FundingReadinessCard: React.FC<FundingReadinessCardProps> = ({
                 placement="top"
                 style="light"
                 className="max-w-xs text-xs"
-                disabled={!justification || justification.length < 80} // Disable tooltip if text is short
               >
                 <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 hover:line-clamp-none cursor-help">
                   {justification || 'No justification provided.'}

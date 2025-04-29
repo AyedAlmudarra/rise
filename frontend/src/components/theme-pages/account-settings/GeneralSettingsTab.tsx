@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import OutlineCard from "../../shared/OutlineCard";
+import OutlineCard from "@/components/shared/OutlineCard";
 import { Button, Label, TextInput } from "flowbite-react";
-import { useAuth } from 'src/context/AuthContext';
-import { supabase } from 'src/lib/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
 
 const GeneralSettingsTab = () => {
@@ -28,7 +28,7 @@ const GeneralSettingsTab = () => {
     if (!user) return;
     setDetailsLoading(true);
     
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       phone: phone,
       data: { 
         full_name: fullName,

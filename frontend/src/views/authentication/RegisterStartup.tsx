@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import { useState } from 'react'; // Import useState and useEffect
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from 'src/layouts/full/shared/logo/Logo';
+import Logo from '@/layouts/full/shared/logo/Logo';
 import LeftSidebarPart from './LeftSidebarPart';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/shadcn-ui/Default-Ui/tabs'; // Import Tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn-ui/Default-Ui/tabs"; // Import Tabs
 import BasicInfoForm from './authforms/BasicInfoForm';
 import CompanyDetailsForm from './authforms/CompanyDetailsForm';
 import DocumentsForm from './authforms/DocumentsForm';
@@ -10,17 +10,16 @@ import TeamForm from './authforms/TeamForm';
 import KeyMetricsForm from './authforms/KeyMetricsForm';
 import FundingForm from './authforms/FundingForm';
 import AuthInfoForm from './authforms/AuthInfoForm'; // Import new AuthInfoForm
-import { Button } from '../../components/shadcn-ui/Default-Ui/button';
-import { useForm, FormProvider, SubmitHandler, FieldValues } from 'react-hook-form';
+import { Button } from "@/components/shadcn-ui/Default-Ui/button";
+import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { startupRegistrationSchema, StartupRegistrationData } from '../../types/startupRegistration'; // Import schema and type
-import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../context/AuthContext';
-import { Alert, AlertDescription, AlertTitle } from "../../components/shadcn-ui/Default-Ui/alert";
-import { Terminal, ArrowLeft, ArrowRight, Send, Info, Building, FileText, Users, BarChart2, CircleDollarSign, FileUp, Check, ChevronLeft, ChevronRight, Lock, Unlock, Mail, Shield, LineChart } from "lucide-react"; // Import more icons
-import { Progress } from '../../components/shadcn-ui/Default-Ui/progress';
-import { Separator } from "../../components/shadcn-ui/Default-Ui/separator";
-import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from "../../components/shadcn-ui/Default-Ui/card";
+import { startupRegistrationSchema, StartupRegistrationData } from '@/types/startupRegistration'; // Import schema and type
+import { supabase } from '@/lib/supabaseClient';
+import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn-ui/Default-Ui/alert";
+import {  Send, Info, Building, FileText, Users, BarChart2, CircleDollarSign, FileUp, Check, ChevronLeft, ChevronRight, Lock, Unlock, Mail, Shield, LineChart } from "lucide-react"; // Import more icons
+import { Progress } from "@/components/shadcn-ui/Default-Ui/progress";
+import { Separator } from "@/components/shadcn-ui/Default-Ui/separator";
+import { Card, CardContent, CardHeader, CardFooter, CardTitle, CardDescription } from "@/components/shadcn-ui/Default-Ui/card";
 import { motion, AnimatePresence } from "framer-motion"; // Import framer-motion for animations
 import MarketAnalysisForm from './authforms/MarketAnalysisForm';
 
@@ -43,9 +42,8 @@ const RegisterStartup = () => {
   const [currentTab, setCurrentTab] = useState(tabOrder[0]);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const [isFormDirty, setIsFormDirty] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  
   
   // Calculate progress percentage based on completed steps and current tab
   const progressPercentage = Math.max(
@@ -144,12 +142,7 @@ const RegisterStartup = () => {
     },
   });
 
-  const { handleSubmit, trigger, formState: { isSubmitting, errors, isDirty } } = methods;
-
-  // Update the form dirty state when isDirty changes
-  useEffect(() => {
-    setIsFormDirty(isDirty);
-  }, [isDirty]);
+  const { handleSubmit, trigger, formState: { isSubmitting } } = methods;
 
   const handleTabChange = (value: string) => {
     setCurrentTab(value);
@@ -663,7 +656,7 @@ const RegisterStartup = () => {
                         transition={{ duration: 0.3 }}
                       >
                         <Alert variant="destructive" className="mb-6 border-red-200 dark:border-red-800 rounded-lg">
-                          <Terminal className="h-4 w-4" />
+                          <Shield className="h-4 w-4" />
                           <AlertTitle>Error</AlertTitle>
                           <AlertDescription>{submissionError}</AlertDescription>
                         </Alert>

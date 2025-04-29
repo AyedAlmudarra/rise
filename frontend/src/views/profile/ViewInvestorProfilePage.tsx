@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  Card,
   Spinner,
   Alert,
   Button,
@@ -10,14 +9,12 @@ import {
   Modal,
   Textarea,
   Label,
-  ListGroup,
-  Tooltip,
   Breadcrumb
 } from 'flowbite-react';
-import { supabase } from '../../lib/supabaseClient';
-import { InvestorProfile, ConnectionRequest } from '../../types/database';
-import { useAuth } from '../../context/AuthContext';
-import { HiOutlineOfficeBuilding, HiOutlineLink, HiOutlineLocationMarker, HiOutlineUserGroup, HiOutlineChatAlt2, HiCheckCircle, HiClock, HiBan, HiX, HiExternalLink, HiUserCircle, HiTag, HiPaperClip, HiTrendingUp, HiGlobeAlt, HiHome } from 'react-icons/hi';
+import { supabase } from '@/lib/supabaseClient';
+import { InvestorProfile } from '@/types/database';
+import { useAuth } from '@/context/AuthContext';
+import { HiOutlineOfficeBuilding, HiOutlineLink, HiOutlineChatAlt2, HiCheckCircle, HiBan, HiX, HiExternalLink, HiUserCircle, HiTag, HiPaperClip, HiTrendingUp, HiGlobeAlt, HiHome } from 'react-icons/hi';
 import { toast } from 'react-hot-toast';
 import { differenceInDays } from 'date-fns';
 
@@ -45,7 +42,6 @@ const ViewInvestorProfilePage: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('loading');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
-  const [lastDeclinedDate, setLastDeclinedDate] = useState<Date | null>(null);
   const [showRequestModal, setShowRequestModal] = useState<boolean>(false);
   const [requestMessage, setRequestMessage] = useState<string>('');
 
@@ -110,7 +106,6 @@ const ViewInvestorProfilePage: React.FC = () => {
     }
 
     setConnectionStatus('loading');
-    setLastDeclinedDate(null);
 
     try {
       const { data, error } = await supabase
@@ -134,7 +129,6 @@ const ViewInvestorProfilePage: React.FC = () => {
           }
         } else if (latestRequest.status === 'declined') {
           const declinedDate = new Date(latestRequest.created_at);
-          setLastDeclinedDate(declinedDate);
           const daysSinceDecline = differenceInDays(new Date(), declinedDate);
           if (daysSinceDecline < 7) {
             setConnectionStatus('declined_recent'); // Within 1 week cooldown
@@ -171,7 +165,7 @@ const ViewInvestorProfilePage: React.FC = () => {
 
     try {
       // Call the Supabase function
-      const { data, error } = await supabase.rpc('create_connection_request', {
+      const { error } = await supabase.rpc('create_connection_request', {
         p_recipient_user_id: profileUserId,
         p_request_message: requestMessage || null // Pass message or null
       });

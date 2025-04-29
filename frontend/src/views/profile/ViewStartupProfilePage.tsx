@@ -11,11 +11,11 @@ import {
   Textarea,
   Label
 } from 'flowbite-react';
-import { supabase } from '../../lib/supabaseClient';
-import { StartupProfile, ConnectionRequest } from '../../types/database';
-import { useAuth } from '../../context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { StartupProfile } from '@/types/database';
+import { useAuth } from '@/context/AuthContext';
 // Corrected Icon Imports
-import { HiOutlineOfficeBuilding, HiOutlineLink, HiOutlineLocationMarker, HiOutlineChatAlt2, HiOutlineInformationCircle, HiExternalLink, HiHome, HiTag, HiCheckCircle, HiClock, HiBan, HiX } from 'react-icons/hi'; 
+import {  HiOutlineLink, HiOutlineChatAlt2, HiOutlineInformationCircle, HiExternalLink, HiHome, HiTag, HiCheckCircle, HiBan, HiX } from 'react-icons/hi'; 
 import { HiOutlineBuildingOffice2, HiCalendarDays } from 'react-icons/hi2'; // Moved HiCalendarDays here
 import { toast } from 'react-hot-toast';
 import { differenceInDays } from 'date-fns';
@@ -74,7 +74,7 @@ const ViewStartupProfilePage: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('loading');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
-  const [lastDeclinedDate, setLastDeclinedDate] = useState<Date | null>(null);
+
   const [showRequestModal, setShowRequestModal] = useState<boolean>(false);
   const [requestMessage, setRequestMessage] = useState<string>('');
 
@@ -146,7 +146,6 @@ const ViewStartupProfilePage: React.FC = () => {
     }
 
     setConnectionStatus('loading');
-    setLastDeclinedDate(null);
 
     try {
       const { data, error } = await supabase
@@ -170,7 +169,6 @@ const ViewStartupProfilePage: React.FC = () => {
           }
         } else if (latestRequest.status === 'declined') {
           const declinedDate = new Date(latestRequest.created_at);
-          setLastDeclinedDate(declinedDate);
           const daysSinceDecline = differenceInDays(new Date(), declinedDate);
           if (daysSinceDecline < 7) {
             setConnectionStatus('declined_recent');

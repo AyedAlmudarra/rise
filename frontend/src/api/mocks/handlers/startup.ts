@@ -1,42 +1,10 @@
-import { http, HttpResponse } from 'msw';
-import { StartupProfile } from '../../../types/database'; // Import the StartupProfile type
+// Import the StartupProfile type
 
 // Read Supabase URL directly from environment variables for mocking
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 if (!supabaseUrl) {
   throw new Error("[MSW Startup Handler] VITE_SUPABASE_URL environment variable not set. Mock handler cannot intercept requests.");
 }
-
-// --- Mock Startup Profile Data ---
-const mockStartupProfiles: { [userId: string]: StartupProfile } = {
-  'mock-startup-uuid-1': { // Corresponds to startup@rise.com
-    id: 1, // Mock DB ID
-    user_id: 'mock-startup-uuid-1',
-    created_at: '2024-01-01T10:00:00Z',
-    name: 'Glint Technologies',
-    description: 'Developing cutting-edge AI solutions for the fintech industry. Focused on predictive analytics and risk assessment.',
-    industry: 'Fintech',
-    sector: 'B2B AI',
-    operational_stage: 'Early Revenue',
-    location_city: 'Riyadh',
-    num_customers: 5,
-    num_employees: 12,
-    annual_revenue: 150000, 
-    annual_expenses: 120000, 
-    kpi_cac: 5000, 
-    kpi_clv: 25000, 
-    kpi_retention_rate: 85, 
-    kpi_conversion_rate: 5, 
-    logo_url: null, 
-    pitch_deck_url: null, 
-  },
-  // Add other mock startup profiles here if needed
-};
-
-// Helper function to log with context (optional, but good practice)
-const log = (message: string, data?: any) => {
-  console.log(`[MSW Startup Handler] ${message}`, data || '');
-};
 
 export const startupHandlers = [
   // Intercept GET requests to /rest/v1/startups for single record fetch by user_id
@@ -51,16 +19,16 @@ export const startupHandlers = [
 
     if (isSingleFetchByUserId) {
       const requestedUserId = userIdEq.split('eq.')[1];
-      log(`Intercepted GET /startups for user_id: ${requestedUserId}`);
+      console.log(`[MSW Startup Handler] Intercepted GET /startups for user_id: ${requestedUserId}`);
 
       const profile = mockStartupProfiles[requestedUserId];
 
       if (profile) {
-        log('Found mock startup profile, returning 200');
+        console.log('[MSW Startup Handler] Found mock startup profile, returning 200');
         // Supabase .single() returns the object directly, not in an array
         return HttpResponse.json(profile, { status: 200 });
       } else {
-        log('Mock startup profile not found, returning 406');
+        console.log('[MSW Startup Handler] Mock startup profile not found, returning 406');
         // Mimic .single() not finding a row
         return HttpResponse.json(
           { message: 'JSON object requested, multiple (or no) rows returned', code: 'PGRST116', details: null, hint: 'Results contain 0 rows' },
@@ -80,7 +48,7 @@ export const startupHandlers = [
   http.post(`${supabaseUrl}/rest/v1/startups`, async ({ request }) => {
     try {
       const requestBody = await request.json();
-      log('Received startup registration request:', requestBody);
+      console.log('[MSW Startup Handler] Received startup registration request:', requestBody);
 
       // --- Mock Success Response ---
       // Supabase typically returns the inserted data in an array on success
@@ -96,7 +64,7 @@ export const startupHandlers = [
         pitch_deck_url: null,
       };
 
-      log('Simulating successful insertion with data:', mockInsertedData);
+      console.log('[MSW Startup Handler] Simulating successful insertion with data:', mockInsertedData);
 
       return HttpResponse.json([mockInsertedData], {
         status: 201, // HTTP 201 Created
@@ -106,7 +74,7 @@ export const startupHandlers = [
       });
 
     } catch (error) {
-      log('Error processing startup registration request:', error);
+      console.log('[MSW Startup Handler] Error processing startup registration request:', error);
       return HttpResponse.json(
         { message: 'Mock Server Error: Failed to process startup registration', error },
         { status: 500 }
