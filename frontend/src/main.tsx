@@ -7,6 +7,7 @@ import { CustomizerContextProvider } from '@/context/CustomizerContext.tsx'
 import '@/utils/i18n';
 import { DashboardContextProvider } from '@/context/DashboardContext/DashboardContext.tsx'
 import { AuthProvider } from '@/context/AuthContext';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 async function deferRender(){
   // Check environment variable
@@ -27,6 +28,7 @@ async function deferRender(){
 deferRender().then(() => {
   createRoot(document.getElementById('root')!).render(
     <AuthProvider>
+      <SpeedInsights />
       <DashboardContextProvider>
       <CustomizerContextProvider>
     <Suspense fallback={<Spinner />}>
