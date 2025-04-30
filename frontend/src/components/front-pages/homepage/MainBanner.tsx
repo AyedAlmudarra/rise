@@ -58,7 +58,7 @@ const MainBanner = () => {
                 ))}
               </ul>
               <div className="flex flex-col sm:flex-row lg:justify-start justify-center gap-4">
-                 <Button
+                <Button
                   color={"primary"}
                   as={Link}
                    to="/auth/register/startup"

@@ -9,16 +9,16 @@ import {
 } from '@react-pdf/renderer';
 import { StartupProfile, AIAnalysisData } from '../../types/database';
 
-// Register Roboto font for better web compatibility
-Font.register({
-  family: 'Roboto',
-  fonts: [
-    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-400-normal.woff' }, // Regular
-    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-700-normal.woff', fontWeight: 'bold' }, // Bold
-    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-400-italic.woff', fontStyle: 'italic' }, // Italic
-    { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-700-italic.woff', fontWeight: 'bold', fontStyle: 'italic' }, // Bold Italic
-  ]
-});
+// // Register Roboto font for better web compatibility - COMMENTED OUT FOR VERCEL TEST
+// Font.register({
+//   family: 'Roboto',
+//   fonts: [
+//     { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-400-normal.woff' }, // Regular
+//     { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-700-normal.woff', fontWeight: 'bold' }, // Bold
+//     { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-400-italic.woff', fontStyle: 'italic' }, // Italic
+//     { src: 'https://cdn.jsdelivr.net/npm/@fontsource/roboto@4.5.8/files/roboto-latin-700-italic.woff', fontWeight: 'bold', fontStyle: 'italic' }, // Bold Italic
+//   ]
+// });
 
 // Define Color Palette - Copied from the last full version provided
 const colors = {
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     paddingTop: 35,
     paddingBottom: 65,
     paddingHorizontal: 40,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST
     fontSize: 10,
     lineHeight: 1.8,
     color: colors.text,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.primary,
     fontWeight: 'bold',
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     letterSpacing: 0.5,
   },
   section: {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 15,
     fontWeight: 'bold',
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     color: colors.primary,
     borderBottom: `1pt solid ${colors.borderDark}`,
     paddingBottom: 8,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   subheading: {
       fontSize: 11,
       fontWeight: 'bold',
-      fontFamily: 'Roboto',
+      // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
       marginBottom: 8,
       marginTop: 4,
       color: colors.secondary,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   bold: {
       fontWeight: 'bold',
-      fontFamily: 'Roboto',
+      // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
       color: colors.text,
       letterSpacing: 0.3,
   },
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   subSectionTitle: {
       fontSize: 10,
       fontWeight: 'bold',
-      fontFamily: 'Roboto',
+      // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
       marginBottom: 4,
       marginTop: 6,
       color: colors.secondary,
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   growthPhasePeriod: {
     fontSize: 10,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 3,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   growthPhaseFocus: {
     fontSize: 12,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 6,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     border: `1pt solid ${colors.primary}`,
   },
   logoText: {
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     fontSize: 18,
     color: colors.primary,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 3,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   overviewLabel: {
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     fontSize: 9,
     color: colors.secondary,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     borderTop: `1pt dashed ${colors.border}`,
   },
   overviewDescriptionLabel: {
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     fontSize: 9,
     color: colors.secondary,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   readinessScore: {
     fontSize: 28,
     fontWeight: 'bold',
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     textAlign: 'center',
     marginBottom: 6,
     color: colors.primary,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   swotTitle: {
     fontSize: 10,
     fontWeight: 'bold',
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     marginBottom: 8,
     textAlign: 'center',
     letterSpacing: 0.5,
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   progressStepNumber: {
     fontSize: 10,
     color: colors.primary,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     letterSpacing: 0.3,
   },
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   },
   financialValue: {
     fontSize: 16,
-    fontFamily: 'Roboto',
+    // fontFamily: 'Roboto', // COMMENTED OUT FOR VERCEL TEST (If present elsewhere, remove too)
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 5,

@@ -60,26 +60,6 @@ import ComingSoonPlaceholder from "@/components/placeholders/ComingSoonPlacehold
 import UpdateMetricsModal from "@/components/modals/UpdateMetricsModal";
 
 
-// Remove helper functions (moved to KeyMetricsSection)
-// const formatCurrency = ...
-// const formatPercentage = ...
-
-// Remove old section component definitions
-// const KeyMetricsSection = ...
-// const AIInsightsSection = ...
-// const FundingReadinessSection = ...
-// const InvestorInterestSection = ...
-
-// Removed unused CardBox component
-// const CardBox: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-//     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 h-full ${className}`}>
-//         {children}
-//     </div>
-// );
-
-// Removed unused DashboardCard component
-// const DashboardCard: React.FC<{ ... }> = ({ ... }) => ( ... );
-
 // --- Main StartupDashboard Component ---
 
 const StartupDashboard = () => {

@@ -205,7 +205,7 @@ const AIInsightsSection: React.FC<AIInsightsSectionProps> = ({ startupData, isLo
                     <h6 className="text-sm font-semibold mb-2 text-gray-800 dark:text-white flex items-center"><IconListCheck size={16} className="mr-2 text-lime-500"/> Suggested KPIs</h6>
                     <div className="space-y-2">
                         {analysisData.suggested_kpis.map((kpiItem, i) => (
-                            <div key={`kpi-${i}" className="text-sm`}>
+                            <div key={`kpi-${i}`} className="text-sm">
                                 <p className="font-medium text-gray-700 dark:text-gray-300">• {kpiItem.kpi || 'N/A'}</p>
                                 <p className="pl-4 text-xs text-gray-500 dark:text-gray-400">{kpiItem.justification || 'N/A'}</p>
                             </div>
