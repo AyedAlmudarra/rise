@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@casl/ability": "^6.3.3",
@@ -109,6 +110,10 @@
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@iconify/react": "^5.1.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/aos": "^3.0.7",
     "@types/canvas-confetti": "^1.9.0",
     "@types/chance": "^1.1.6",
@@ -126,11 +131,13 @@
     "autoprefixer": "^10.4.20",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "jsdom": "^26.1.0",
     "msw": "^2.7.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "typescript": "5.5.4",
-    "vite": "^6.2.6"
+    "vite": "^6.2.6",
+    "vitest": "^3.1.2"
   },
   "msw": {
     "workerDirectory": [
