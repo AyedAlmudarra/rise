@@ -1,10 +1,9 @@
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
-import ErrorImg from "/src/assets/images/backgrounds/maintenance.svg";
+import ErrorImg from "@/assets/images/backgrounds/maintenance.svg";
 
 const Maintenance = () => {
   return (
-    <>
     <div className="h-screen flex items-center  justify-center bg-white dark:bg-darkgray ">
       <div className="text-center max-w-lg mx-auto">
         <img src={ErrorImg} alt="error"  className="mb-4"/>
@@ -15,7 +14,6 @@ const Maintenance = () => {
           </Button>
       </div>
     </div>
-  </>
   )
 }
 

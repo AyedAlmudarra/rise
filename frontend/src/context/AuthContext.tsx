@@ -3,7 +3,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabaseClient';
 import { Spinner } from 'flowbite-react';
 
-interface AuthContextType {
+export interface AuthContextType {
   session: Session | null;
   user: User | null;
   userRole: 'startup' | 'investor' | null;

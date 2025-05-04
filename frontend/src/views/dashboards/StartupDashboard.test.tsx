@@ -1,6 +1,6 @@
 // Unit tests for StartupDashboard.tsx 
-import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+
+import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom'; // Needed if component uses Link/navigation
@@ -52,7 +52,7 @@ describe('StartupDashboard Unit Tests', () => {
 
     // Mock Supabase channel subscription
     mockChannel = {
-      subscribe: vi.fn((callback) => {
+      subscribe: vi.fn((_callback) => {
         // Optionally simulate receiving an event if needed for specific tests
         // callback('ok'); 
         return {

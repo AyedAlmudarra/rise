@@ -1,7 +1,7 @@
----
-description: 
-globs: 
-alwaysApply: true
+# Project Tasks
+
+This document outlines the development tasks for the RISE platform.
+
 ---
 # Project Tasks
 
@@ -288,5 +288,112 @@ This document outlines the development tasks for the RISE platform.
     6.  **Implement `InvestorInterestSection` (Placeholder/Initial):** Determine initial data source... (Done - Placeholder implemented)
     7.  **Update Task Definition:** Add this revised task definition. (Done)
     8.  **Commit:** Commit changes incrementally. (Done)
+
+---
+
+## Task 13: Merge Edit Profile into Account Settings
+
+*   **Status:** Done
+*   **Summary:** Merged user profile editing functionality into the Account Settings area. Moved avatar upload, bio editing, name, and phone editing to `GeneralSettingsTab.tsx`. Created a new `RoleProfileTab.tsx` to handle Startup/Investor specific field editing. Updated `AccountSettingIndex.tsx` to include the new tab conditionally. Simplified `SettingsPage.tsx` to render `AccountSettingIndex`. Removed the old `/app/profile/edit` route, sidebar link, and `EditProfilePage.tsx` file.
+*   **Goal:** Consolidate user profile and account management into a single settings area (`/app/settings/account`) using a tabbed interface, connected to the live Supabase backend.
+*   **Steps:**
+    *   Consolidate core account management (avatar, bio, name, phone, password) in `GeneralSettingsTab.tsx`. (Done)
+    *   Create `RoleProfileTab.tsx` for Startup/Investor specific data. (Done)
+    *   Integrate `RoleProfileTab` into `AccountSettingIndex.tsx` tabs. (Done)
+    *   Update `SettingsPage.tsx` to render `AccountSettingIndex`. (Done)
+    *   Remove "Edit Profile" link from `Sidebaritems.ts`. (Done)
+    *   Remove `/app/profile/edit` route from `Router.tsx`. (Done)
+    *   Delete `EditProfilePage.tsx` file. (Done)
+    *   Update task definition in `implementation-plan.mdc`. (Done)
+    *   Commit all changes. (Done)
+
+---
+
+## Component Implementation & Integration
+
+-   **Step 1: Implement Authentication**
+    -   Setup Supabase Auth (Email/Password, Google OAuth)
+    -   Create `AuthContext` for global state management.
+    -   Build `LoginPage`, `SignupPage`, `ForgotPasswordPage`.
+    -   Implement protected routes.
+    -   **Status:** Done
+        -   **Summary:** Authentication setup with Supabase (Email/Pass, Google) is complete. `AuthContext` manages state. Login, Signup, Forgot Password pages built. Protected routes implemented.
+
+-   **Step 2: Setup User Roles & Initial Profile Creation**
+    -   Create Supabase tables (`users`, `roles`, `user_roles`).
+    -   Implement logic during signup to assign a default role (e.g., 'pending_selection').
+    -   Create `RoleSelectionPage` after signup.
+    -   Create basic `investor_profiles` and `startup_profiles` tables.
+    -   Implement logic to create a basic profile entry when a role is selected.
+    -   **Status:** Done
+        -   **Summary:** Tables for users, roles, and profiles created. Signup assigns 'pending_selection', `RoleSelectionPage` allows role choice, basic profile entry created upon selection.
+
+-   **Step 3: Build Core Dashboard Layout**
+    -   Implement main `AppLayout` (Sidebar, Header, Content Area) based on MaterialM structure.
+    -   Fetch user role and display relevant sidebar links.
+    -   Create basic `InvestorDashboard` and `StartupDashboard` components.
+    -   **Status:** Done
+        -   **Summary:** Core `AppLayout` with Sidebar, Header, and Content area is built using MaterialM structure. Sidebar links dynamically adapt based on user role. Basic dashboard components created.
+
+-   **Step 4: Implement Profile Management (Account Settings)**
+    -   Build `AccountSettingsPage` accessible from the dashboard header/sidebar.
+    -   Include tabs/sections for:
+        -   User Profile (Name, contact, basic info)
+        -   Security (Password change)
+    -   Implement forms and Supabase logic to update user details (users table) and profile details (`investor_profiles` or `startup_profiles`).
+    -   Integrate profile picture upload (Supabase Storage).
+    -   **Status:** Done
+        -   **Summary:** `AccountSettingsPage` created with User Profile and Security sections. Forms connect to Supabase for updating user and profile tables. Profile picture upload is functional.
+
+-   **Step 5: Investor Dashboard - Core Features**
+    -   Display Investor Profile summary card.
+    -   Implement `DealFlowSection` (placeholder for now).
+    -   Implement `WatchlistSection` (placeholder for now).
+    -   Implement `MarketInsightsSection` (placeholder for now).
+    -   **Status:** Done
+        -   **Summary:** Reviewed `InvestorDashboard.tsx`. `InvestorProfileCard` is integrated. Other sections (`DealFlow`, `Watchlist`, `MarketInsights`) remain placeholders as corresponding components don't exist yet.
+
+-   **Step 6: Startup Dashboard - Core Features**
+    -   Display Startup Profile summary card.
+    -   Implement `FundingStatusSection` (placeholder).
+    -   Implement `InvestorMatchSection` (placeholder).
+    -   Implement `PitchDeckManagementSection` (placeholder).
+    -   **Status:** Pending
+
+-   **Step 7: AI Integration - Startup Suggestions (Investor)**
+    -   Develop backend function (e.g., Supabase Edge Function) to analyze investor preferences and startup data.
+    -   Implement logic to call OpenAI API for analysis/matching.
+    -   Create `AISuggestions` component/section on Investor Dashboard.
+    -   Display matched startups with reasoning.
+    -   **Status:** Pending
+
+-   **Step 8: AI Integration - Investor Recommendations (Startup)**
+    -   Develop backend function to analyze startup profile and investor criteria.
+    -   Implement logic to call OpenAI API for recommendations.
+    -   Display recommended investors on Startup Dashboard.
+    -   **Status:** Pending
+
+-   **Step 9: Implement Search & Filtering**
+    -   Add search functionality for startups (investors) / investors (startups).
+    -   Implement filters based on industry, stage, location, etc.
+    -   **Status:** Pending
+
+-   **Step 10: Notifications System**
+    -   Design DB schema for notifications.
+    -   Implement backend logic to generate notifications (new matches, status updates).
+    -   Create UI component for displaying notifications.
+    -   **Status:** Pending
+
+-   **Step 11: Refinement & Testing**
+    -   Conduct thorough manual testing of all features and user flows.
+    -   Address UI inconsistencies and bugs.
+    -   Optimize performance (DB queries, component rendering).
+    -   **Status:** Pending
+
+-   **Step 12: Deployment**
+    -   Configure deployment environment (e.g., Vercel, Netlify).
+    -   Set up environment variables.
+    -   Deploy frontend and backend (Supabase).
+    -   **Status:** Pending
 
 --- 

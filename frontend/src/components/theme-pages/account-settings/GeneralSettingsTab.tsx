@@ -1,46 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import OutlineCard from "@/components/shared/OutlineCard";
-import { Button, Label, TextInput } from "flowbite-react";
+import { Button, Label, TextInput, Spinner } from "flowbite-react";
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
 
 const GeneralSettingsTab = () => {
-  const { user } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    const fetchInitialData = async () => {
+      if (authLoading || !user) {
+        setInitialLoading(false);
+        return;
+      }
+      
+      setInitialLoading(true);
+      let nameToDisplay = user.user_metadata?.full_name || '';
+
+      if (userRole === 'startup') {
+        try {
+          const { data: startupData, error, status } = await supabase
+            .from('startups')
+            .select('founder_name')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          if (error && status !== 406) throw error;
+
+          nameToDisplay = startupData?.founder_name || user.user_metadata?.full_name || '';
+        } catch (err) {
+          console.error("Error fetching startup founder name:", err);
+          nameToDisplay = user.user_metadata?.full_name || '';
+        }
+      }
+
       setEmail(user.email || '');
-      setPhone(user.phone || '');
-      setFullName(user.user_metadata?.full_name || '');
-    }
-  }, [user]);
+      setFullName(nameToDisplay);
+      setInitialLoading(false);
+    };
+
+    fetchInitialData();
+  }, [user, userRole, authLoading]);
 
   const handleUpdateDetails = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user) return;
     setDetailsLoading(true);
-    
-    const { error } = await supabase.auth.updateUser({
-      phone: phone,
-      data: { 
-        full_name: fullName,
-      },
-    });
+    let updateError = null;
 
-    if (error) {
-      toast.error(`Error updating details: ${error.message}`);
-    } else {
-      toast.success('Details updated successfully!');
+    if (userRole !== 'startup') {
+        const authUpdatePayload: { data?: any } = {};
+        authUpdatePayload.data = { full_name: fullName };
+        try {
+            const { error } = await supabase.auth.updateUser(authUpdatePayload);
+            if (error) throw error;
+        } catch (err: any) {
+            console.error("Error updating auth user data:", err);
+            updateError = `Failed to save name: ${err.message}`;
+        }
     }
+
+    if (userRole === 'startup' && !updateError) {
+        try {
+            const { error: startupError } = await supabase
+                .from('startups')
+                .update({ founder_name: fullName, updated_at: new Date().toISOString() })
+                .eq('user_id', user.id);
+            
+            if (startupError) throw startupError;
+        } catch (err: any) {
+             console.error("Error updating startup founder name:", err);
+             const startupErrorMessage = `Failed to update founder name: ${err.message}`;
+             updateError = updateError ? `${updateError}\n${startupErrorMessage}` : startupErrorMessage;
+        }
+    }
+
     setDetailsLoading(false);
+
+    if (updateError) {
+        toast.error(updateError);
+    } else {
+        toast.success('Name updated successfully!');
+    }
   };
 
   const handleChangePassword = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -64,19 +113,29 @@ const GeneralSettingsTab = () => {
     setPasswordLoading(false);
   };
 
+  if (initialLoading) {
+    return (
+        <div className="flex justify-center items-center p-10">
+             <Spinner size="lg" />
+             <span className="ml-3">Loading settings...</span>
+        </div>
+       );
+  }
+
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="col-span-1 md:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <div className="lg:col-span-1"> 
           <OutlineCard>
-            <h5 className="card-title">General Details</h5>
+            <h5 className="card-title">Name & Email</h5>
             <p className="card-subtitle -mt-1">
-              Update your name and contact information.
+              Update your account.
             </p>
             <form onSubmit={handleUpdateDetails} className="mt-3">
               <div className="flex flex-col gap-y-4">
                 <div>
-                    <Label htmlFor="fullName" value="Full Name" className="mb-2 block" />
+                    <Label htmlFor="fullName" value={userRole === 'startup' ? "Founder Name" : "Full Name"} className="mb-2 block" />
                     <TextInput
                       id="fullName"
                       type="text"
@@ -98,29 +157,17 @@ const GeneralSettingsTab = () => {
                       disabled
                     />
                 </div>
-                <div>
-                    <Label htmlFor="ph" value="Phone" className="mb-2 block"/>
-                    <TextInput
-                      id="ph"
-                      type="tel"
-                      sizing="md"
-                      placeholder="+1 123 456 7890" 
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="form-control"
-                    />
-                </div>
               </div>
               <div className="flex justify-end mt-6">
                 <Button type="submit" color={"primary"} isProcessing={detailsLoading} disabled={detailsLoading}>
-                  Save Details
+                  Save
                 </Button>
               </div>
             </form>
           </OutlineCard>
         </div>
         
-        <div className="col-span-1 md:col-span-1">
+        <div className="lg:col-span-1"> 
           <OutlineCard>
             <h5 className="card-title">Change Password</h5>
             <p className="card-subtitle -mt-1">

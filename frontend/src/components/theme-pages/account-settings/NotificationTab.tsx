@@ -5,11 +5,12 @@ import {
   Spinner
 } from "flowbite-react";
 import {
-  IconCheckbox,
   IconAlertCircle,
   IconMessage2,
   IconReceiptDollar,
-  IconSpeakerphone
+  IconSpeakerphone,
+  IconUserSearch,
+  IconBriefcase,
 } from "@tabler/icons-react";
 import OutlineCard from "@/components/shared/OutlineCard";
 import { useAuth } from "@/context/AuthContext";
@@ -21,27 +22,21 @@ interface NotificationPreferences {
   id?: string;
   user_id?: string;
   new_match_email: boolean;
-  new_match_push: boolean;
   message_email: boolean;
-  message_push: boolean;
   funding_milestone_email: boolean;
-  funding_milestone_push: boolean;
   platform_updates_email: boolean;
 }
 
-const defaultPreferences: NotificationPreferences = {
+const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id'> = {
   new_match_email: true,
-  new_match_push: false,
   message_email: true,
-  message_push: true,
   funding_milestone_email: true,
-  funding_milestone_push: false,
   platform_updates_email: true,
 };
 
 const NotificationTab = () => {
-  const { user } = useAuth();
-  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences);
+  const { user, userRole } = useAuth();
+  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences as NotificationPreferences);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +46,6 @@ const NotificationTab = () => {
     const fetchPreferences = async () => {
       if (!user) {
         setLoading(false);
-        setError("User not found.");
         return;
       }
       setLoading(true);
@@ -69,8 +63,8 @@ const NotificationTab = () => {
         if (data) {
           setPreferences(data);
         } else {
-          // Prefs might not exist if trigger failed, use defaults
-          setPreferences({ ...defaultPreferences, user_id: user.id });
+          // Apply defaults if no record found
+          setPreferences({ ...defaultPreferences, user_id: user.id } as NotificationPreferences);
         }
       } catch (err: any) {
         console.error("Error fetching preferences:", err);
@@ -85,10 +79,12 @@ const NotificationTab = () => {
 
   // Handle toggle switch change
   const handleToggleChange = (field: keyof NotificationPreferences, checked: boolean) => {
-    setPreferences(prev => ({
-      ...prev,
-      [field]: checked,
-    }));
+    if (typeof preferences[field] === 'boolean') {
+      setPreferences(prev => ({
+        ...prev,
+        [field]: checked,
+      }));
+    }
   };
 
   // Handle saving preferences
@@ -97,9 +93,15 @@ const NotificationTab = () => {
     setSaving(true);
     setError(null);
     try {
+      const payloadToSave: Partial<NotificationPreferences> & { user_id: string } = {
+        ...preferences,
+        user_id: user.id,
+      };
+      delete payloadToSave.id;
+
       const { error: saveError } = await supabase
         .from('notification_preferences')
-        .upsert({ ...preferences, user_id: user.id }, { onConflict: 'user_id' }); // Use upsert
+        .upsert(payloadToSave, { onConflict: 'user_id' });
 
       if (saveError) {
         throw saveError;
@@ -114,52 +116,80 @@ const NotificationTab = () => {
     }
   };
 
+  // --- Define Role-Specific Notification Options --- 
+  const getNotificationOptions = () => {
+    const commonOptions = [
+        {
+          title: "New Messages",
+          subtitle: "Notify me when I receive a new message",
+          icon: <IconMessage2 />,
+          emailField: 'message_email',
+        },
+         {
+          title: "Platform Updates",
+          subtitle: "Receive news and updates about the RISE platform",
+          icon: <IconSpeakerphone />,
+          emailField: 'platform_updates_email',
+        },
+    ];
+
+    if (userRole === 'startup') {
+        return [
+            {
+              title: "Investor Matches",
+              subtitle: "Notify me about potential investor matches",
+              icon: <IconUserSearch />,
+              emailField: 'new_match_email',
+            },
+            {
+              title: "Engagement & Funding Updates",
+              subtitle: "Investor profile views, interest, or funding process updates",
+              icon: <IconBriefcase />,
+              emailField: 'funding_milestone_email',
+            },
+             ...commonOptions,
+        ];
+    } else if (userRole === 'investor') {
+         return [
+            {
+              title: "Startup Matches",
+              subtitle: "Notify me about recommended startups or matches",
+              icon: <IconUserSearch />,
+              emailField: 'new_match_email',
+            },
+            {
+              title: "Portfolio & Watchlist Updates",
+              subtitle: "Updates from startups in your portfolio or watchlist",
+              icon: <IconReceiptDollar />,
+              emailField: 'funding_milestone_email',
+            },
+             ...commonOptions,
+        ];
+    } else {
+        return commonOptions;
+    }
+  }
+
+  const notificationOptions = getNotificationOptions();
+
   if (loading) {
     return <div className="flex justify-center p-10"><Spinner /></div>;
   }
 
-  if (error) {
+  if (error && !loading) {
     return <div className="p-4 text-red-600"><IconAlertCircle className="inline mr-2"/> {error}</div>;
   }
 
-  // Define notification options structure
-  const notificationOptions = [
-    {
-      title: "New Matches",
-      subtitle: "Notify me about potential startup/investor matches",
-      icon: <IconCheckbox />,
-      emailField: 'new_match_email',
-      pushField: 'new_match_push', // Assuming you might add push later
-    },
-    {
-      title: "New Messages",
-      subtitle: "Notify me when I receive a new message",
-      icon: <IconMessage2 />,
-      emailField: 'message_email',
-      pushField: 'message_push',
-    },
-    {
-      title: "Funding Milestones",
-      subtitle: "Notify me about funding round updates or milestones",
-      icon: <IconReceiptDollar />,
-      emailField: 'funding_milestone_email',
-      pushField: 'funding_milestone_push',
-    },
-    {
-      title: "Platform Updates",
-      subtitle: "Receive news and updates about the RISE platform",
-      icon: <IconSpeakerphone />,
-      emailField: 'platform_updates_email',
-      // No push field for this example
-    },
-  ];
+  if (!userRole && !loading) {
+     return <div className="p-4 text-gray-600">Determining user role...</div>;
+  }
 
   return (
     <>
       <OutlineCard className="shadow-none">
         <h5 className="card-title">Notification Preferences</h5>
         <p className="card-subtitle -mt-1">
-          Select the notifications you would like to receive. 
+          Select the email notifications you would like to receive.
           Service messages (security, legal) cannot be opted out of.
         </p>
         
@@ -176,7 +206,6 @@ const NotificationTab = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4 ml-auto pl-4">
-                {/* Email Toggle */}
                 {item.emailField && (
                   <div className="flex flex-col items-center">
                      <ToggleSwitch
@@ -187,31 +216,16 @@ const NotificationTab = () => {
                     />
                   </div>
                 )}
-                 {/* Push Toggle (Placeholder/Future) */}
-                 {item.pushField && (
-                  <div className="flex flex-col items-center">
-                     <ToggleSwitch
-                      checked={!!preferences[item.pushField as keyof NotificationPreferences]}
-                      onChange={(checked) => handleToggleChange(item.pushField as keyof NotificationPreferences, checked)}
-                      label="Push" // Consider changing label if only using email for now
-                      disabled // Disable if push not implemented
-                      className="text-xs opacity-50"
-                    />
-                  </div>
-                )} 
               </div>
             </div>
           ))}
         </div>
       </OutlineCard>
       
-      {/* Removed Date/Time and Ignore Tracking sections as they might not be relevant */}
-
       <div className="flex justify-end gap-3 pt-7">
-        <Button color={"primary"} onClick={handleSave} isProcessing={saving} disabled={saving}>
+        <Button color={"primary"} onClick={handleSave} isProcessing={saving} disabled={saving || loading}>
           Save Preferences
         </Button>
-        {/* <Button color={"lighterror"}>Cancel</Button> // Optional cancel */}
       </div>
     </>
   );

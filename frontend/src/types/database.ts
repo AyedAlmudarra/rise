@@ -10,34 +10,44 @@ export interface StartupProfile {
   industry: string;
   sector: string | null;
   location_city: string;
-  country_of_operation: string;
+  country_of_operation: string | null;
+  founding_date: string | null;
 
   // Company Details
   description: string | null;
   operational_stage: string | null;
   num_employees: number | null;
   num_customers: number | null;
-  annual_revenue: number | null; // Representing numeric as number
-  annual_expenses: number | null; // Representing numeric as number
-  founding_date: string | null; // Representing date as string
+  annual_revenue: number | null;
+  annual_expenses: number | null;
+  website: string | null;
+  linkedin_profile: string | null;
+  twitter_profile: string | null;
+  logo_url: string | null;
+  pitch_deck_url: string | null;
 
   // Key Metrics
-  kpi_cac: number | null; // Representing numeric as number
-  kpi_clv: number | null; // Representing numeric as number
-  kpi_retention_rate: number | null; // Representing numeric as number
-  kpi_conversion_rate: number | null; // Representing numeric as number
-  kpi_monthly_growth: number | null; // Representing numeric as number
-  kpi_payback_period: number | null; // Representing numeric as number
-  kpi_churn_rate: number | null; // Representing numeric as number
-  kpi_nps: number | null; // Representing numeric as number
-  kpi_tam_size: string | null; // Representing text as string
-  kpi_avg_order_value: number | null; // Representing numeric as number
-  kpi_market_share: number | null; // Representing numeric as number
-  kpi_yoy_growth: number | null; // Representing numeric as number
+  kpi_cac: number | null;
+  kpi_clv: number | null;
+  kpi_retention_rate: number | null;
+  kpi_conversion_rate: number | null;
+  kpi_monthly_growth: number | null;
+  kpi_payback_period: number | null;
+  kpi_churn_rate: number | null;
+  kpi_nps: number | null;
+  kpi_tam_size: string | null;
+  kpi_avg_order_value: number | null;
+  kpi_market_share: number | null;
+  kpi_yoy_growth: number | null;
 
   // Team Information
   team_size: number | null;
   has_co_founder: boolean | null;
+  founder_name: string | null;
+  founder_title: string | null;
+  founder_education: string | null;
+  previous_startup_experience: string | null;
+  founder_bio: string | null;
 
   // Market Analysis
   market_growth_rate: string | null;
@@ -46,6 +56,8 @@ export interface StartupProfile {
   customer_pain_points: string | null;
   market_barriers: string | null;
   competitive_advantage: string | null;
+
+  // Competition
   competitor1_name: string | null;
   competitor1_size: string | null;
   competitor1_threat: string | null;
@@ -59,41 +71,23 @@ export interface StartupProfile {
   competitor3_threat: string | null;
   competitor3_differentiator: string | null;
 
-  // Documents & Links
-  website: string | null;
-  linkedin_profile: string | null;
-  twitter_profile: string | null;
-  logo_url: string | null;
-  pitch_deck_url: string | null;
-
-  // ADDED: Founder Background Fields (using snake_case)
-  founder_name: string | null;
-  founder_title: string | null;
-  founder_education: string | null;
-  previous_startup_experience: string | null;
-  founder_bio: string | null;
-  tech_skills: Record<string, boolean> | null; // Representing jsonb as object
-
   // Funding Status
   current_funding: string | null;
   seeking_investment: boolean | null;
-  target_raise_amount: number | null; // Representing numeric as number
+  target_raise_amount: number | null;
 
   // AI/Platform Generated Fields
-  ai_analysis: AIAnalysisData | null;        // Defined below
-  analysis_status: AnalysisStatus | null;    // Defined below
-  analysis_timestamp: string | null;       // ISO 8601 timestamp string
+  ai_analysis: AIAnalysisData | null;
+  analysis_status: AnalysisStatus | null;
+  analysis_timestamp: string | null;
 
   // New fields from the code block
   competitive_advantage_evaluation: CompetitiveAdvantageEvaluation;
   strategic_recommendations: string[];
   suggested_kpis: string[];
-  current_challenges?: string[];            // Added: Key challenges identified
-  what_if_scenarios?: WhatIfScenario[];   // Added: Hypothetical scenarios
-  key_risks?: string[];                    // Added: Specific risks identified
-  // Keep potentially missing older fields for backward compatibility if needed
-  // key_strengths?: string[]; // Example: Redundant if covered by SWOT
-  // market_positioning_summary?: string; // Example: Redundant if covered elsewhere
+  current_challenges?: string[];
+  what_if_scenarios?: WhatIfScenario[];
+  key_risks?: string[];
 }
 
 // Updated InvestorProfile interface to match the new SQL schema

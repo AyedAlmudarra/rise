@@ -21,13 +21,7 @@ const MiniSidebarIcons: MiniiconsType[] = [
   {
     id: DASHBOARD_ID,
     tooltip: "Dashboard",
-    icon: "solar:layers-minimalistic-line-duotone",
-    roles: ['all'],
-  },
-  {
-    id: PROFILE_ID,
-    tooltip: "My Profile",
-    icon: "solar:user-circle-line-duotone",
+    icon: "solar:home-smile-angle-line-duotone",
     roles: ['all'],
   },
   {
@@ -38,14 +32,8 @@ const MiniSidebarIcons: MiniiconsType[] = [
   },
   {
     id: DEALFLOW_ID,
-    tooltip: "Deal Flow",
-    icon: "solar:filter-line-duotone",
-    roles: ['investor'], // Specific to investors
-  },
-  {
-    id: PORTFOLIO_ID,
-    tooltip: "My Portfolio",
-    icon: "solar:pie-chart-2-line-duotone",
+    tooltip: "Opportunities",
+    icon: "solar:magnifer-zoom-in-line-duotone",
     roles: ['investor'], // Specific to investors
   },
   {

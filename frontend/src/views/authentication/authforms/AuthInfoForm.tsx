@@ -344,7 +344,7 @@ const AuthInfoForm: React.FC = () => {
                                 <User className="h-4 w-4" />
                               </div>
                               <Input 
-                                placeholder="John Smith" 
+                                placeholder="Ayed Almudarra" 
                                 {...field} 
                                 className="border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 bg-white dark:bg-gray-950 pl-10"
                               />

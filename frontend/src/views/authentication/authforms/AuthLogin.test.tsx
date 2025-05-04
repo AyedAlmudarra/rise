@@ -1,8 +1,8 @@
-import React from 'react';
+
 // Revert to standard destructuring import
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event'; // Use userEvent for more realistic interactions
-import { describe, test, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom'; // Needed for Link components
 import AuthLogin from './AuthLogin';

@@ -48,13 +48,14 @@ const RegisterStartup = Loadable(lazy(() => import('@/views/authentication/Regis
 const Homepage = Loadable(lazy(() => import('@/views/pages/frontend-pages/Homepage')));
 
 // --- RISE Specific Views ---
-const EditProfilePage = Loadable(lazy(() => import('@/views/profile/EditProfilePage')));
+// Removed import for deleted EditProfilePage
+// const EditProfilePage = Loadable(lazy(() => import('@/views/profile/EditProfilePage')));
 
 // --- RISE Dashboard Sub-Pages (Removed unused placeholders) ---
 
 // --- Startup Specific Views ---
 const FindInvestorsPage = Loadable(lazy(() => import('@/views/startup/FindInvestorsPage')));
-const TrackOutreachPage = Loadable(lazy(() => import('@/views/startup/TrackOutreachPage')));
+
 
 // --- Investor Specific Views ---
 const BrowseStartupsPage = Loadable(lazy(() => import('@/views/investor/BrowseStartupsPage')));
@@ -118,7 +119,8 @@ const Router = [
 
           // --- RISE Specific Routes ---
           { path: 'settings/:tab?', element: <SettingsPage /> },
-          { path: 'profile/edit', element: <EditProfilePage /> },
+          // Removed the dedicated edit profile route
+          // { path: 'profile/edit', element: <EditProfilePage /> },
 
           // --- Public Profile Views (within app context for now) ---
           { path: 'view/startup/:startupId', element: <ViewStartupProfilePage /> },
@@ -126,7 +128,7 @@ const Router = [
 
           // --- Startup Specific Routes ---
           { path: 'startup/find-investors', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <FindInvestorsPage /> }] },
-          { path: 'startup/track-outreach', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <TrackOutreachPage /> }] },
+          // { path: 'startup/track-outreach', element: <ProtectedRoute requiredRole='startup' />, children: [{ path: '', element: <TrackOutreachPage /> }] },
 
           // --- Investor Specific Routes ---
           { path: 'investor/browse-startups', element: <ProtectedRoute requiredRole='investor' />, children: [{ path: '', element: <BrowseStartupsPage /> }] },

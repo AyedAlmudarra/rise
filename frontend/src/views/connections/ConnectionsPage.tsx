@@ -288,7 +288,7 @@ const ConnectionsPage: React.FC = () => {
     const handleMessageClick = (otherUserId: string | undefined) => {
       if (!otherUserId) return;
       console.log(`Navigating to messages page (connection ID: ${item.id})`);
-      navigate('/messages');
+      navigate('/app/messages');
     };
 
     // --- Badge Color Helper (No Change) ---

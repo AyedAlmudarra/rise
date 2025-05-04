@@ -1,10 +1,8 @@
 // Import explicit IDs and the icon data (though we mainly need the IDs)
 import {
   DASHBOARD_ID,
-  PROFILE_ID,
   RELATIONS_ID,
   DEALFLOW_ID,
-  PORTFOLIO_ID,
   SETTINGS_ID,
   HELP_ID,
   RESOURCES_ID
@@ -46,104 +44,83 @@ const roles = (r: UserRole[]): UserRole[] => r;
 const SidebarContent: MenuItem[] = [
   {
     // === Dashboard ===
-    id: DASHBOARD_ID, 
+    id: DASHBOARD_ID,
     name: "Dashboard",
     roles: roles(['all']),
     items: [
-      // Common Dashboard items first
       {
-        heading: "Workspace", 
+        heading: "Overview",
         roles: roles(['all']),
         children: [
           {
-            id: 'dashboard-ai-insights', 
-            name: "AI Insights",
-            icon: "solar:lightbulb-bolt-line-duotone",
-            url: "/app/ai-insights", 
-            roles: roles(['all']),
-          },
-          {
-            id: 'dashboard-calendar', 
-            name: "Calendar",
-            icon: "solar:calendar-line-duotone",
-            url: "/app/calendar", 
-            roles: roles(['all']),
-          },
-        ]
-      },
-      // Startup specific Dashboard items
-      {
-        heading: "Startup View", 
-        roles: roles(['startup']),
-        children: [
-          {
-            id: 'startup-dashboard-overview', 
-            name: "Overview",
+            id: 'startup-dashboard-overview',
+            name: "Dashboard",
             icon: "solar:home-smile-angle-line-duotone",
-            url: "/app/startup/dashboard", 
+            url: "/app/startup/dashboard",
             roles: roles(['startup']),
           },
-          // Removed 'startup-metrics' and 'startup-activity'
-        ],
-      },
-      // Investor specific Dashboard items
-      {
-        heading: "Investor View", 
-        roles: roles(['investor']),
-        children: [
           {
-            id: 'investor-dashboard-overview', 
-            name: "Overview",
+            id: 'investor-dashboard-overview',
+            name: "Dashboard",
             icon: "solar:home-smile-angle-line-duotone",
             url: "/app/investor/dashboard",
             roles: roles(['investor']),
           },
-          {
-            id: 'investor-ai-suggestions',
-            name: "AI Suggestions", 
-            icon: "solar:chat-bot-line-duotone",
-            url: "/app/investor/ai-recommendations", 
-            roles: roles(['investor']),
-          },
-        ],
+        ]
       },
-    ],
-  },
-  {
-    // === Profile ===
-    id: PROFILE_ID, 
-    name: "Profile",
-    roles: roles(['all']),
-    items: [
       {
-        heading: "Profile Management",
+        // === Workspace ===
+        heading: "Workspace",
         roles: roles(['all']),
         children: [
           {
-            id: 'profile-view',
-            name: "View Profile",
-            icon: "solar:user-id-line-duotone",
-            url: "/app/profile/view", 
+            id: 'dashboard-ai-insights',
+            name: "AI Insights",
+            icon: "solar:lightbulb-bolt-line-duotone",
+            url: "/app/ai-insights",
             roles: roles(['all']),
           },
           {
-            id: 'profile-edit', 
-            name: "Edit Profile",
-            icon: "solar:document-add-line-duotone",
-            url: "/app/profile/edit", 
+            id: 'dashboard-calendar',
+            name: "Calendar",
+            icon: "solar:calendar-line-duotone",
+            url: "/app/calendar",
             roles: roles(['all']),
           },
-          {
-            id: 'profile-documents', 
-            name: "Manage Documents",
-            icon: "solar:folder-with-files-line-duotone",
-            url: "/app/profile/documents",
-            roles: roles(['startup']), // Only for startups
-          },
-        ],
+        ]
       },
     ],
   },
+  // REMOVE Profile Section Start
+  // {
+  //   // === Profile ===
+  //   id: PROFILE_ID, 
+  //   name: "Profile",
+  //   roles: roles(['all']),
+  //   items: [
+  //     {
+  //       heading: "Profile Management",
+  //       roles: roles(['all']),
+  //       children: [
+  //         {
+  //           id: 'profile-view',
+  //           name: "View Profile",
+  //           icon: "solar:user-id-line-duotone",
+  //           url: "/app/profile/view", 
+  //           roles: roles(['all']),
+  //         },
+  //         {
+  //           id: 'profile-documents', 
+  //           name: "Manage Documents",
+  //           icon: "solar:folder-with-files-line-duotone",
+  //           url: "/app/profile/documents",
+  //           roles: roles(['startup']), // Only for startups
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // REMOVE Profile Section End
   {
     // === Investor Relations (Startup Only) ===
     id: RELATIONS_ID, 
@@ -159,13 +136,6 @@ const SidebarContent: MenuItem[] = [
             name: "Find Investors",
             icon: "solar:magnifer-zoom-in-line-duotone",
             url: "/app/startup/find-investors", 
-            roles: roles(['startup']),
-          },
-          {
-            id: 'startup-track-outreach', 
-            name: "Track Outreach", 
-            icon: "solar:notebook-line-duotone",
-            url: "/app/startup/track-outreach", 
             roles: roles(['startup']),
           },
           // Re-added Connections and Messages for Startups
@@ -190,7 +160,7 @@ const SidebarContent: MenuItem[] = [
   {
     // === Deal Flow (Investor Only) - Enhanced ===
     id: DEALFLOW_ID, 
-    name: "Deal Flow",
+    name: "Opportunities",
     roles: roles(['investor']),
     items: [
       {
@@ -199,33 +169,11 @@ const SidebarContent: MenuItem[] = [
         children: [
           {
             id: 'investor-browse-startups', 
-            name: "Browse All",
+            name: "Find Startups",
             icon: "solar:list-check-minimalistic-line-duotone",
             url: "/app/investor/browse-startups", 
             roles: roles(['investor']),
           },
-          {
-            id: 'investor-ai-recommendations', 
-            name: "AI Recommendations",
-            icon: "solar:lightbulb-minimalistic-line-duotone", 
-            url: "/app/investor/ai-recommendations", 
-            roles: roles(['investor']),
-          },
-          {
-            id: 'investor-saved-searches', 
-            name: "Saved Searches", 
-            icon: "solar:bookmark-circle-line-duotone", 
-            url: "/app/investor/saved-searches", 
-            roles: roles(['investor']),
-          },
-          {
-            id: 'investor-watchlist', 
-            name: "My Watchlist",
-            icon: "solar:eye-line-duotone", 
-            url: "/app/investor/watchlist", 
-            roles: roles(['investor']),
-          },
-          // Re-added Connections and Messages for Investors
           {
             id: 'investor-connections-manage', // Use different ID to avoid key conflicts if filtering logic changes
             name: "Manage Connections",
@@ -242,76 +190,58 @@ const SidebarContent: MenuItem[] = [
           },
         ],
       },
-      {
-        heading: "Due Diligence", 
-        roles: roles(['investor']),
-        children: [
-          {
-            id: 'investor-active-deals', 
-            name: "Active Deals",
-            icon: "solar:clipboard-text-line-duotone",
-            url: "/app/investor/active-deals", 
-            roles: roles(['investor']),
-          },
-          {
-            id: 'investor-data-rooms', 
-            name: "Data Rooms",
-            icon: "solar:archive-check-line-duotone",
-            url: "/app/investor/data-rooms", 
-            roles: roles(['investor']),
-          },
-        ]
-      }
     ],
   },
-  {
-    // === My Portfolio (Investor Only) - NEW ===
-    id: PORTFOLIO_ID, 
-    name: "My Portfolio",
-    roles: roles(['investor']),
-    items: [
-      {
-        heading: "Portfolio Overview",
-        roles: roles(['investor']),
-        children: [
-          {
-            id: 'investor-portfolio-summary', 
-            name: "Summary",
-            icon: "solar:pie-chart-2-line-duotone",
-            url: "/app/investor/portfolio/summary", 
-            roles: roles(['investor']),
-          },
-          {
-            id: 'investor-portfolio-performance', 
-            name: "Performance",
-            icon: "solar:graph-up-line-duotone",
-            url: "/app/investor/portfolio/performance", 
-            roles: roles(['investor']),
-          },
-        ],
-      },
-      {
-        heading: "Investments",
-        roles: roles(['investor']),
-        children: [
-          {
-            id: 'investor-portfolio-manage', 
-            name: "Manage Companies",
-            icon: "solar:buildings-2-line-duotone",
-            url: "/app/investor/portfolio/manage", 
-            roles: roles(['investor']),
-          },
-          {
-            id: 'investor-portfolio-reporting', 
-            name: "Reporting",
-            icon: "solar:document-text-line-duotone",
-            url: "/app/investor/portfolio/reporting", 
-            roles: roles(['investor']),
-          },
-        ],
-      },
-    ],
-  },
+  // REMOVE My Portfolio Section Start
+  // {
+  //   // === My Portfolio (Investor Only) - NEW ===
+  //   id: PORTFOLIO_ID, 
+  //   name: "My Portfolio",
+  //   roles: roles(['investor']),
+  //   items: [
+  //     {
+  //       heading: "Portfolio Overview",
+  //       roles: roles(['investor']),
+  //       children: [
+  //         {
+  //           id: 'investor-portfolio-summary', 
+  //           name: "Summary",
+  //           icon: "solar:pie-chart-2-line-duotone",
+  //           url: "/app/investor/portfolio/summary", 
+  //           roles: roles(['investor']),
+  //         },
+  //         {
+  //           id: 'investor-portfolio-performance', 
+  //           name: "Performance",
+  //           icon: "solar:graph-up-line-duotone",
+  //           url: "/app/investor/portfolio/performance", 
+  //           roles: roles(['investor']),
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       heading: "Investments",
+  //       roles: roles(['investor']),
+  //       children: [
+  //         {
+  //           id: 'investor-portfolio-manage', 
+  //           name: "Manage Companies",
+  //           icon: "solar:buildings-2-line-duotone",
+  //           url: "/app/investor/portfolio/manage", 
+  //           roles: roles(['investor']),
+  //         },
+  //         {
+  //           id: 'investor-portfolio-reporting', 
+  //           name: "Reporting",
+  //           icon: "solar:document-text-line-duotone",
+  //           url: "/app/investor/portfolio/reporting", 
+  //           roles: roles(['investor']),
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // REMOVE My Portfolio Section End
   {
     // === Settings ===
     id: SETTINGS_ID, 
@@ -324,16 +254,9 @@ const SidebarContent: MenuItem[] = [
         children: [
           {
             id: 'settings-account', 
-            name: "Account",
+            name: "Account & Profile",
             icon: "solar:shield-user-line-duotone",
-            url: "/app/settings/account", 
-            roles: roles(['all']),
-          },
-          {
-            id: 'settings-notifications', 
-            name: "Notifications",
-            icon: "solar:bell-bing-line-duotone",
-            url: "/app/settings/notifications", 
+            url: "/app/settings/account",
             roles: roles(['all']),
           },
         ],
@@ -355,13 +278,6 @@ const SidebarContent: MenuItem[] = [
             name: "FAQ",
             icon: "solar:question-circle-line-duotone",
             url: "/app/help/faq", 
-            roles: roles(['all'])
-          },
-          {
-            id: 'help-docs', 
-            name: "Knowledge Base",
-            icon: "solar:notebook-minimalistic-line-duotone",
-            url: "/app/help/docs", 
             roles: roles(['all'])
           },
           {
@@ -393,13 +309,6 @@ const SidebarContent: MenuItem[] = [
         roles: roles(['all']),
         children: [
           {
-            id: 'resources-market-insights', 
-            name: "Market Insights",
-            icon: "solar:chart-line-duotone",
-            url: "/app/resources/market-insights", 
-            roles: roles(['all'])
-          },
-          {
             id: 'resources-templates', 
             name: "Templates",
             icon: "solar:file-text-line-duotone",
@@ -411,14 +320,14 @@ const SidebarContent: MenuItem[] = [
             name: "Startup Guides",
             icon: "solar:notebook-bookmark-line-duotone",
             url: "/app/resources/startup-guides", 
-            roles: roles(['all'])
+            roles: roles(['startup'])
           },
           {
             id: 'resources-investor-guides', 
             name: "Investor Guides",
             icon: "solar:notebook-bookmark-line-duotone", 
             url: "/app/resources/investor-guides", 
-            roles: roles(['all'])
+            roles: roles(['investor'])
           },
         ],
       },

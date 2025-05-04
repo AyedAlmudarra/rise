@@ -280,7 +280,7 @@ const StartupDashboard = () => {
               <h1 className="text-xl md:text-2xl font-bold text-white">
                 Welcome, {user?.user_metadata?.full_name?.split(' ')[0] || startupData?.name || 'Founder'}!
            </h1>
-              <p className="text-sm text-blue-100 flex items-center flex-wrap">
+              <div className="text-sm text-blue-100 flex items-center flex-wrap">
                 <span className="mr-3">{startupData?.name || 'Your Startup Dashboard'}</span>
                 {lastUpdated && !isInitialLoading && (
                     <Tooltip content={`Last updated: ${lastUpdated.toLocaleString('en-US')}`}>
@@ -290,7 +290,7 @@ const StartupDashboard = () => {
                     </Tooltip>
              )}
                 {isInitialLoading && <Spinner size="xs" color="white" className="ml-2" />}
-           </p>
+           </div>
          </div>
        </div>
           

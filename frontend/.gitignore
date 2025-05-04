@@ -7,7 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency directories
 node_modules
+
+# Test results
+test_reports/
+cypress/videos/
+cypress/screenshots/
+
+# Build artifacts
 dist
 dist-ssr
 *.local
@@ -22,3 +30,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase specific
+frontend/supabase/.temp/
+frontend/supabase/functions/**/.env
+frontend/supabase/functions/**/node_modules/

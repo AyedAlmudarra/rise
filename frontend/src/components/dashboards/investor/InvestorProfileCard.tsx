@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  Card, Avatar, Badge, Button, Modal, Tabs,
+  Card as CardBox, Avatar, Badge, Button, Modal, Tabs, Progress, Tooltip
 } from 'flowbite-react';
 import { 
   IconMail, IconWorld, 
-  IconBrandLinkedin, IconEdit, IconSettings, IconUserCircle
+  IconBrandLinkedin, IconSettings, IconUserCircle,
+  IconInfoCircle, IconBuildingSkyscraper, IconHierarchy, IconLocation, IconLicense
 } from '@tabler/icons-react';
 import { InvestorProfile } from '@/types/database';
 
@@ -14,177 +15,251 @@ interface InvestorProfileCardProps {
   error: string | null;
   userEmail?: string;
   userName?: string;
+  avatar_url?: string | null;
 }
 
 const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({ 
-  investorData, isLoading, error, userEmail, userName 
+  investorData, isLoading, error, userEmail, userName, avatar_url
 }) => {
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('profile');
 
   if (isLoading) {
     return (
-      <Card className="animate-pulse">
-        <div className="p-4 text-center">
-          <div className="h-4 bg-gray-200 rounded-full w-3/4 mb-4 mx-auto"></div>
-          <div className="h-3 bg-gray-200 rounded-full w-1/2 mb-3 mx-auto"></div>
-          <div className="h-3 bg-gray-200 rounded-full w-2/3 mb-3 mx-auto"></div>
-          <div className="h-3 bg-gray-200 rounded-full w-1/3 mb-3 mx-auto"></div>
-          <div className="h-3 bg-gray-200 rounded-full w-1/2 mb-3 mx-auto"></div>
+      <CardBox className="animate-pulse">
+        <div className="h-20 bg-gray-300 dark:bg-gray-600 rounded-t-lg"></div>
+        <div className="px-4 pb-4">
+          <div className="-mt-10 mb-4">
+            <div className="rounded-full bg-gray-400 dark:bg-gray-700 h-20 w-20 border-4 border-white dark:border-gray-800 mx-auto"></div>
+          </div>
+          <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-3 mx-auto"></div>
+          <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 mb-4 mx-auto"></div>
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
+            <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-5/6"></div>
+          </div>
         </div>
-      </Card>
+      </CardBox>
     );
   }
 
   if (error) {
+    return <CardBox><div className="p-4 text-center text-red-500">Error loading investor profile: {error}</div></CardBox>;
+  }
+
+  if (!investorData) {
     return (
-      <Card>
-        <div className="p-4 text-center text-red-500">
-          <p className="mb-2 font-medium">Error loading investor profile</p>
-          <p className="text-sm">{error}</p>
-          {/* TODO: Implement re-fetch logic for investor data */}
+      <CardBox>
+        <div className="flex flex-col items-center justify-center h-full text-center py-8">
+          <IconUserCircle size={48} className="text-gray-400 dark:text-gray-500 mb-4" />
+          <p className="text-gray-500 dark:text-gray-400 mb-3">
+            Investor profile details are not available.
+          </p>
           <Button 
-            color="light" 
             size="xs" 
-            className="mt-2" 
-            onClick={() => console.log('TODO: Implement Try Again functionality')}
+            color="blue" 
+            onClick={() => console.log('TODO: Implement Create/Edit Profile navigation')}
           >
-            Try Again
+            Complete Your Profile
           </Button>
         </div>
-      </Card>
+      </CardBox>
     );
   }
 
-  // Helper to display array data nicely
-  const renderArrayField = (label: string, items: string[] | null | undefined) => {
-    if (!items || items.length === 0) {
-      return (
-        <div className="flex items-start mb-2">
-          <span className="font-semibold min-w-[140px] text-gray-700 dark:text-gray-300">{label}:</span>
-          <span className="text-gray-500 dark:text-gray-400">N/A</span>
-        </div>
-      );
-    }
-    return (
-      <div className="flex items-start mb-2">
-        <span className="font-semibold min-w-[140px] text-gray-700 dark:text-gray-300">{label}:</span>
-        <div className="flex flex-wrap gap-1">
-          {items.map((item, index) => (
-            <Badge key={index} color="blue" className="text-xs">{item}</Badge>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const { 
+    company_name, job_title, website, linkedin_profile, 
+    preferred_industries, preferred_stage, preferred_geography,
+    company_description
+  } = investorData;
 
-  const hasWebsite = investorData?.website && investorData.website.trim() !== '';
-  const hasLinkedin = investorData?.linkedin_profile && investorData.linkedin_profile.trim() !== '';
+  const hasWebsite = website && website.trim() !== '';
+  const hasLinkedin = linkedin_profile && linkedin_profile.trim() !== '';
+
+  const requiredFields: (keyof InvestorProfile)[] = [
+    'company_name', 'job_title', 'preferred_industries', 
+    'preferred_stage', 'preferred_geography'
+  ];
+  
+  const filledFieldsCount = requiredFields.filter(field => {
+    const value = investorData[field];
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    } 
+    return value !== null && value !== undefined && value !== '';
+  }).length;
+  const completionPercentage = Math.round((filledFieldsCount / requiredFields.length) * 100);
+
+  const avatarUrlActual = avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName?.[0] || 'I')}&background=random&color=fff`;
 
   return (
     <>
-      <Card className="overflow-hidden">
-        {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 -mt-6 -mx-4 mb-4">
-          <div className="flex items-center justify-between">
-            <h5 className="text-xl font-bold text-white">
-              Investor Profile
-            </h5>
-            <Button size="xs" color="light" onClick={() => setShowProfileModal(true)}>
-              <IconEdit size={14} className="mr-1" /> Profile
-            </Button>
-          </div>
-        </div>
-        
-        {/* Profile content */}
-        <div className="px-1 py-2">
-          {!investorData ? (
-            <div className="text-center p-4">
-              <Avatar size="lg" rounded className="mb-3 mx-auto border-4 border-gray-100" />
-              <p className="mb-2 font-medium">No profile data found</p>
-              <p className="text-sm text-gray-500 mb-3">Please complete your investor profile.</p>
-              {/* TODO: Implement navigation to profile creation/edit page */}
+      <CardBox className="overflow-hidden shadow-lg border-0 bg-white dark:bg-gray-800">
+        <div className="h-24 bg-gradient-to-r from-purple-500 to-indigo-600 dark:from-purple-700 dark:to-indigo-800 relative">
+          <div className="absolute top-3 right-3 z-10">
+            <Tooltip content="View Full Profile & Settings">
               <Button 
                 size="xs" 
-                color="blue" 
-                onClick={() => console.log('TODO: Implement Create/Edit Profile navigation')}
+                color="light" 
+                className="bg-white/10 hover:bg-white/20 border-0 text-white rounded-full p-1.5 shadow-sm" 
+                onClick={() => setShowProfileModal(true)}
               >
-                Create Profile
+                <IconSettings size={16} />
               </Button>
+            </Tooltip>
+          </div>
+        </div>
+
+        <div className="px-4 pb-4 relative">
+          <div className="flex flex-col items-center -mt-12 mb-3">
+            <Avatar
+              img={avatarUrlActual}
+              alt={`${userName || 'Investor'} avatar`}
+              size="xl"
+              rounded
+              className="border-4 border-white dark:border-gray-800 shadow-md"
+            />
+          </div>
+
+          <div className="text-center mb-4">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              {userName || userEmail?.split('@')[0] || 'Investor'}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {job_title || 'Investor'} {company_name ? `at ${company_name}` : ''}
+            </p>
+            <div className="flex justify-center gap-3 mt-2">
+              {hasWebsite && (
+                <Tooltip content="Website">
+                  <a 
+                    href={website!.startsWith('http') ? website! : `https://${website}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1"
+                  >
+                    <IconWorld size={18} />
+                  </a>
+                </Tooltip>
+              )}
+              {hasLinkedin && (
+                 <Tooltip content="LinkedIn Profile">
+                   <a 
+                     href={linkedin_profile!.startsWith('http') ? linkedin_profile! : `https://${linkedin_profile}`}
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1"
+                   >
+                     <IconBrandLinkedin size={18} />
+                   </a>
+                 </Tooltip>
+              )}
+              {userEmail && (
+                 <Tooltip content="Email">
+                   <a 
+                     href={`mailto:${userEmail}`} 
+                     className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1"
+                   >
+                     <IconMail size={18} />
+                   </a>
+                 </Tooltip>
+              )}
             </div>
-          ) : (
-            <div className="space-y-3">
-              {/* Avatar and name section */}
-              <div className="flex items-center mb-4">
-                <Avatar 
-                  placeholderInitials={(userName || userEmail || '?')[0].toUpperCase()}
-                  alt={investorData.company_name || 'Investor'} 
-                  size="lg" 
-                  rounded 
-                  className="mr-3 border-2 border-gray-100"
-                />
-                <div>
-                  <h6 className="font-bold text-gray-800 dark:text-white">
-                    {userName || userEmail?.split('@')[0] || 'Investor'}
-                  </h6>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {investorData.job_title || 'Investor'} at {investorData.company_name || 'N/A'}
-                  </p>
-                  <div className="flex gap-2 mt-1">
-                    {hasWebsite && (
-                      <a 
-                        href={investorData.website!.startsWith('http') ? investorData.website! : `https://${investorData.website}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        <IconWorld size={16} />
-                      </a>
-                    )}
-                    {hasLinkedin && (
-                      <a 
-                        href={investorData.linkedin_profile!} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        <IconBrandLinkedin size={16} />
-                      </a>
-                    )}
-                    <a 
-                      href={`mailto:${userEmail}`} 
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                    >
-                      <IconMail size={16} />
-                    </a>
-                  </div>
-                </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                Profile completion
               </div>
+              <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                {completionPercentage}%
+              </div>
+            </div>
+            <Progress
+              progress={completionPercentage}
+              color={completionPercentage < 50 ? 'red' : completionPercentage < 80 ? 'yellow' : 'green'}
+              size="sm"
+            />
+            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center">
+              <IconInfoCircle size={12} className="mr-1" />
+              A complete profile helps find better startup matches
+            </div>
+          </div>
 
-              {/* Divider */}
-              <hr className="my-3 border-gray-200 dark:border-gray-700" />
-
-              {/* Profile Details List */}
-              <div className="space-y-2 text-sm">
-                {renderArrayField('Preferred Industries', investorData.preferred_industries)}
-                {renderArrayField('Preferred Geography', investorData.preferred_geography)}
-                {renderArrayField('Preferred Stage', investorData.preferred_stage)}
-                
-                {investorData.company_description && (
-                  <div className="mt-3">
-                    <p className="font-semibold mb-1 text-gray-700 dark:text-gray-300">About:</p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {investorData.company_description}
-                    </p>
-                  </div>
+          <div className="space-y-3 text-sm border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h6 className="text-sm font-semibold text-gray-800 dark:text-white mb-2">Investment Focus</h6>
+            
+            <div className="flex items-start">
+              <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center min-w-[90px]">
+                <IconBuildingSkyscraper size={16} className="mr-2 text-blue-500 flex-shrink-0" />
+                Industries:
+              </span>
+              <div className="ml-2 flex flex-wrap gap-1">
+                {preferred_industries && preferred_industries.length > 0 ? (
+                  preferred_industries.map((item, index) => (
+                    <Badge key={index} color="gray" size="xs">{item}</Badge>
+                  ))
+                ) : (
+                  <span className="text-gray-500 dark:text-gray-400">N/A</span>
                 )}
               </div>
             </div>
-          )}
-        </div>
-      </Card>
 
-      {/* Detailed Profile Modal */}
+            <div className="flex items-start">
+              <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center min-w-[90px]">
+                <IconHierarchy size={16} className="mr-2 text-blue-500 flex-shrink-0" />
+                Stages:
+              </span>
+              <div className="ml-2 flex flex-wrap gap-1">
+                {preferred_stage && preferred_stage.length > 0 ? (
+                  preferred_stage.map((item, index) => (
+                    <Badge key={index} color="gray" size="xs">{item}</Badge>
+                  ))
+                ) : (
+                  <span className="text-gray-500 dark:text-gray-400">N/A</span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center min-w-[90px]">
+                <IconLocation size={16} className="mr-2 text-blue-500 flex-shrink-0" />
+                Geography:
+              </span>
+              <div className="ml-2 flex flex-wrap gap-1">
+                {preferred_geography && preferred_geography.length > 0 ? (
+                  preferred_geography.map((item, index) => (
+                    <Badge key={index} color="gray" size="xs">{item}</Badge>
+                  ))
+                ) : (
+                  <span className="text-gray-500 dark:text-gray-400">N/A</span>
+                )}
+              </div>
+            </div>
+
+             <div className="flex items-start">
+                <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center min-w-[90px]">
+                  <IconLicense size={16} className="mr-2 text-blue-500 flex-shrink-0" />
+                  Fund/Company:
+                </span>
+                <span className="ml-2 text-gray-600 dark:text-gray-400">
+                  {company_name || 'N/A'}
+                 </span>
+             </div>
+          </div>
+          
+           {company_description && (
+               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h6 className="text-sm font-semibold text-gray-800 dark:text-white mb-1">About</h6>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {company_description}
+                  </p>
+               </div>
+           )}
+
+        </div>
+      </CardBox>
+
       <Modal
         show={showProfileModal}
         onClose={() => setShowProfileModal(false)}
@@ -322,9 +397,7 @@ const InvestorProfileCard: React.FC<InvestorProfileCardProps> = ({
               active={activeTab === 'settings'}
             >
               <div className="p-4 text-center text-gray-500">
-                {/* TODO: Implement Account Settings UI/Form */}
                 <p>Account settings will be available here.</p>
-                {/* TODO: Implement action for Edit Profile button (e.g., navigate, open form) */}
                 <Button 
                   color="blue" 
                   size="sm" 

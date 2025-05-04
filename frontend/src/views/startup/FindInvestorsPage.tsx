@@ -12,8 +12,7 @@ import {
 import { HiOutlineSearch, HiOutlineFilter, HiOutlineUserGroup, HiLocationMarker, HiBriefcase, HiOutlineBriefcase } from 'react-icons/hi';
 import { supabase } from '@/lib/supabaseClient';
 import { InvestorProfile } from '@/types/database';
-// import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import ProfilePreviewModal from '@/components/profile/ProfilePreviewModal';
 
 // Helper Function to get unique filter options
 const getUniqueOptions = (items: (string[] | null)[] | undefined): string[] => {
@@ -38,6 +37,12 @@ const FindInvestorsPage: React.FC = () => {
   const [selectedGeographies, setSelectedGeographies] = useState<string[]>([]);
   const [selectedStages, setSelectedStages] = useState<string[]>([]);
   const [selectedInvestorTypes, setSelectedInvestorTypes] = useState<InvestorType[]>([]);
+
+  // State for the modal
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedInvestorId, setSelectedInvestorId] = useState<string | null>(null);
+  // Role is always investor on this page, but good practice for modal prop
+  const [selectedRole, setSelectedRole] = useState<'startup' | 'investor' | null>('investor'); 
 
   // Unique options for filters, derived from fetched data
   const uniqueIndustries = useMemo(() => getUniqueOptions(investors?.map(inv => inv.preferred_industries)), [investors]);
@@ -152,6 +157,18 @@ const FindInvestorsPage: React.FC = () => {
         case 'Personal': return 'warning';
         default: return 'gray';
     }
+  };
+
+  const handleOpenModal = (userId: string) => {
+    setSelectedInvestorId(userId);
+    setSelectedRole('investor'); // Explicitly set role
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedInvestorId(null);
+    setSelectedRole(null); // Clear role on close
   };
 
   return (
@@ -360,8 +377,7 @@ const FindInvestorsPage: React.FC = () => {
 
                     <div className="flex-shrink-0 flex sm:flex-col lg:flex-row gap-2 w-full sm:w-auto order-2 sm:order-4 justify-end">
                         <Button 
-                          as={Link} 
-                          to={`/view/investor/${investor.user_id}`} 
+                          onClick={() => handleOpenModal(investor.user_id)}
                           size="xs"
                           className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
                         >
@@ -385,6 +401,14 @@ const FindInvestorsPage: React.FC = () => {
           )}
         </>
       )}
+
+      {/* Render the Modal */} 
+      <ProfilePreviewModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        userId={selectedInvestorId}
+        profileRole={selectedRole}
+      />
     </div>
   );
 };

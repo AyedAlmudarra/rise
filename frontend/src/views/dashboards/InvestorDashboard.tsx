@@ -2,19 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { InvestorProfile } from '@/types/database';
-import { Spinner, Alert, Avatar, Button, Badge, Tabs, Dropdown, Card } from 'flowbite-react';
+import { Spinner, Alert, Avatar, Button, Tabs, Tooltip } from 'flowbite-react';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  IconBell, 
   IconRefresh, 
-  IconSettings,
-  IconUser,
-  IconBriefcase,
-  IconLayoutDashboard,
   IconSearch,
   IconChartPie,
-  IconUsers
+  IconBuildingSkyscraper,
+  IconLocation,
+  IconHierarchy,
+  IconLicense,
 } from "@tabler/icons-react";
 
 // Import the investor dashboard components directly from their files
@@ -31,18 +29,9 @@ const InvestorDashboard = () => {
   const [dataError, setDataError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [showNotifications, setShowNotifications] = useState<boolean>(false);
-  const [notificationCount, setNotificationCount] = useState<number>(2);
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
   
-  // Mock notifications data
-  const notifications = [
-    { id: 1, type: 'startup', message: 'New startup match: CloudScale', time: '10 minutes ago', read: false },
-    { id: 2, type: 'deal', message: 'Deal status updated: Term Sheet sent to Quantum Analytics', time: '2 hours ago', read: false },
-    { id: 3, type: 'system', message: 'Weekly market insights report is ready', time: '1 day ago', read: true },
-  ];
-
   useEffect(() => {
     fetchInvestorData();
     
@@ -120,127 +109,99 @@ const InvestorDashboard = () => {
     }
   }, [investorData]);
 
-  const markAllNotificationsAsRead = () => {
-    setNotificationCount(0);
-    toast.success("All notifications marked as read");
+  // Helper function to format array count for stats
+  const formatArrayCount = (items: string[] | null | undefined): string => {
+    if (!items || items.length === 0) return '0';
+    return items.length.toString();
   };
 
-  // Enhanced welcome message with notification center
+  // Updated renderWelcomeHeader based on StartupDashboard style
   const renderWelcomeHeader = () => (
-    <div className="mb-6 bg-gradient-to-r from-purple-600 to-indigo-700 dark:from-purple-800 dark:to-indigo-900 p-6 rounded-xl shadow-md">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div className="flex items-start mb-4 md:mb-0">
-          <div className="mr-4">
-            <Avatar 
-              size="lg" 
-              rounded 
-              img={user?.user_metadata?.avatar_url || "https://flowbite.com/docs/images/people/profile-picture-5.jpg"} 
-              bordered 
-              color="success" 
+    <div className="mb-6 rounded-xl overflow-hidden shadow-md">
+      {/* Use the same blue/indigo gradient as StartupDashboard */}
+      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 py-6 px-6">
+        {/* Subtle pattern - optional, keep if desired */}
+        <div className="absolute inset-0 opacity-[.04]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 40L40 0H20L0 20M40 40V20L20 40\'/%3E%3C/g%3E%3C/svg%3E")' }}></div>
+
+        <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center z-10">
+          {/* Left: Avatar & Welcome Text */}
+          <div className="flex items-center mb-4 md:mb-0">
+            <Avatar
+              img={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.user_metadata?.full_name?.[0] || '?')}&background=random&color=fff`}
+              rounded
+              size="lg"
+              className="ring-4 ring-white/30 shadow-lg flex-shrink-0" // Style from StartupDashboard
             />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-1 text-white">
-              {user?.user_metadata?.full_name || user?.email || 'Investor Dashboard'}
-              <Badge color="purple" className="ml-3">BETA</Badge>
-            </h1>
-            <p className="text-indigo-100 flex items-center">
-              Welcome to your dashboard
-              {!dataLoading && (
-                <span className="text-xs text-indigo-200 ml-4 flex items-center">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </span>
-              )}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-          <div className="relative">
-            <button 
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors relative"
-            >
-              <IconBell size={22} />
-              {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {notificationCount}
-                </span>
-              )}
-            </button>
-            
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden">
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                  <h3 className="font-medium">Notifications</h3>
-                  {notificationCount > 0 && (
-                    <button 
-                      onClick={markAllNotificationsAsRead}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Mark all as read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length > 0 ? (
-                    notifications.map(notification => (
-                      <div 
-                        key={notification.id} 
-                        className={`p-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                          !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                        }`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <p className={`text-sm ${!notification.read ? 'font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
-                            {notification.message}
-                          </p>
-                          {!notification.read && (
-                            <span className="inline-block h-2 w-2 bg-blue-600 rounded-full"></span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                      No notifications
-                    </div>
-                  )}
-                </div>
-                <div className="p-2 text-center border-t border-gray-200 dark:border-gray-700">
-                  <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                    View all notifications
-                  </button>
-                </div>
+            <div className="ml-4">
+              <h1 className="text-xl md:text-2xl font-bold text-white">
+                {/* Personalized Greeting */}
+                Welcome, {user?.user_metadata?.full_name?.split(' ')[0] || 'Investor'}!
+              </h1>
+              <div className="text-sm text-blue-100 flex items-center flex-wrap">
+                <span className="mr-3">Investor Dashboard</span>
+                {/* Last Updated display from StartupDashboard */}
+                {!dataLoading && lastUpdated && (
+                  <Tooltip content={`Last updated: ${lastUpdated.toLocaleString('en-US')}`}>
+                    <span className="flex items-center text-blue-200/80 cursor-help">
+                      <IconRefresh size={14} className="mr-1" /> {lastUpdated.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                    </span>
+                  </Tooltip>
+                )}
+                {dataLoading && <Spinner size="xs" color="white" className="ml-2" />}
               </div>
-            )}
+            </div>
           </div>
-          
-          <Button 
-            size="xs" 
-            color="light" 
-            pill
-            onClick={refreshData}
-          >
-            <IconRefresh size={16} />
-          </Button>
-          
-          <Dropdown
-            label=""
-            dismissOnClick={true}
-            renderTrigger={() => (
-              <Button size="xs" color="light" pill>
-                <IconSettings size={16} />
+
+          {/* Right: Actions - styled like StartupDashboard */}
+          <div className="flex items-center gap-2 self-start md:self-center flex-shrink-0">
+            <Tooltip content="Refresh Dashboard Data">
+              <Button size="sm" color="light" className="bg-white/10 hover:bg-white/20 border-0 text-white px-2" onClick={refreshData} disabled={dataLoading}>
+                <IconRefresh size={18} className={`${dataLoading ? 'animate-spin' : ''}`} />
               </Button>
-            )}
-          >
-            <Dropdown.Item icon={IconUser}>Profile</Dropdown.Item>
-            <Dropdown.Item icon={IconSettings}>Settings</Dropdown.Item>
-            <Dropdown.Item icon={IconLayoutDashboard}>Preferences</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item icon={IconBriefcase}>Switch to Startup</Dropdown.Item>
-          </Dropdown>
+            </Tooltip>
+          </div>
         </div>
+
+        {/* Investor Quick Stats Row */}
+        {investorData && !dataLoading && (
+          <div className="mt-6 pt-5 border-t border-white/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Stat Card Helper for Investor Data */}
+              {[ 
+                {
+                  icon: IconLicense,
+                  label: "Fund/Company",
+                  value: investorData.company_name || 'N/A'
+                },
+                {
+                  icon: IconBuildingSkyscraper,
+                  label: "Industries",
+                  value: formatArrayCount(investorData.preferred_industries)
+                },
+                {
+                  icon: IconHierarchy,
+                  label: "Stages",
+                  value: formatArrayCount(investorData.preferred_stage)
+                },
+                {
+                  icon: IconLocation,
+                  label: "Geography",
+                  value: formatArrayCount(investorData.preferred_geography)
+                }
+              ].map((stat, index) => (
+                <div key={index} className="p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 flex items-center gap-3 shadow-sm">
+                  <div className="flex-shrink-0 bg-white/10 rounded-full p-2">
+                    <stat.icon size={20} className="text-white/80" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-blue-100 font-medium uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-base md:text-lg text-white font-semibold truncate" title={stat.value}>{stat.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -258,8 +219,8 @@ const InvestorDashboard = () => {
       return (
         <Alert color="failure" className="mb-6">
           <span className="font-medium">Error!</span> Failed to load investor profile: {dataError}
-          <Button color="failure" size="xs" className="ml-3" onClick={fetchInvestorData}>
-            Retry
+          <Button color="failure" size="sm" className="ml-3" onClick={fetchInvestorData}> 
+            <IconRefresh size={16} className="mr-2"/> Retry
           </Button>
         </Alert>
       );
@@ -269,14 +230,18 @@ const InvestorDashboard = () => {
 
   const renderDashboardTabs = () => (
     <div className="mb-6">
-      <Tabs aria-label="Dashboard tabs"  onActiveTabChange={(tab) => {
-        const tabId = tab === 0 ? 'overview' : tab === 1 ? 'deals' : tab === 2 ? 'suggestions' : tab === 3 ? 'watchlist' : 'insights';
+      <Tabs aria-label="Dashboard tabs" onActiveTabChange={(tab) => {
+        // Simplify tab logic for remaining tabs
+        const tabId = tab === 0 ? 'overview' : 'suggestions';
         setActiveTab(tabId);
       }}>
+        {/* Keep only Overview and AI Suggestions tabs */}
         <Tabs.Item active={activeTab === 'overview'} title="Overview" icon={IconChartPie} />
-        <Tabs.Item active={activeTab === 'deals'} title="Deal Flow" icon={IconBriefcase} />
         <Tabs.Item active={activeTab === 'suggestions'} title="AI Suggestions" icon={IconSearch} />
+        {/* Remove Deal Flow and Watchlist tabs
+        <Tabs.Item active={activeTab === 'deals'} title="Deal Flow" icon={IconBriefcase} />
         <Tabs.Item active={activeTab === 'watchlist'} title="Watchlist" icon={IconUsers} />
+        */}
       </Tabs>
     </div>
   );
@@ -391,30 +356,25 @@ const InvestorDashboard = () => {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-6">
-              <InvestorProfileCard 
-                investorData={investorData} 
-                isLoading={dataLoading} 
+          <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-6"> 
+              <InvestorProfileCard
+                investorData={investorData}
+                isLoading={dataLoading}
                 error={dataError}
                 userName={user?.user_metadata?.full_name}
                 userEmail={user?.email}
+                avatar_url={user?.user_metadata?.avatar_url}
               />
             </div>
+            {/* Remove placeholder columns */}
+            {/*
             <div className="lg:col-span-2 space-y-6">
-              {/* Placeholder for Market Insights */}
               <Card><div className="p-4 text-gray-500">Market Insights Section (Placeholder)</div></Card>
-               {/* Placeholder for Watchlist */}
                <Card><div className="p-4 text-gray-500">Watchlist Section (Placeholder)</div></Card>
-               {/* <MarketInsightsSection .../> */}
-               {/* <WatchlistSection .../> */}
             </div>
+            */}
           </div>
-        );
-      case 'deals':
-        return (
-          <Card><div className="p-4 text-gray-500">Deal Flow Section (Placeholder)</div></Card>
-          /* <DealFlowSection .../> */
         );
       case 'suggestions':
          return (
@@ -422,22 +382,17 @@ const InvestorDashboard = () => {
               <Alert color="info">AI Suggestions have moved to the dedicated <a href="/ai-insights" className="font-medium underline hover:text-blue-700">AI Insights page</a>.</Alert>
            </div>
          );
-      case 'watchlist':
-        return (
-           <Card><div className="p-4 text-gray-500">Watchlist Section (Placeholder)</div></Card>
-          /* <WatchlistSection .../> */
-        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {renderWelcomeHeader()}
       {renderStatusIndicators()}
       {renderDashboardTabs()}
-      <div className="mt-6"> {/* Add margin for content below tabs */} 
+      <div> 
         {renderDashboardContent()}
       </div>
       

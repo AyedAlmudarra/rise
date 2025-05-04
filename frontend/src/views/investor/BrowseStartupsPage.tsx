@@ -15,7 +15,9 @@ import { HiOutlineBuildingOffice2, HiCalendarDays } from 'react-icons/hi2';
 import { supabase } from '@/lib/supabaseClient';
 import { StartupProfile } from '@/types/database'; // Assuming StartupProfile type exists
 import { useAuth } from '@/context/AuthContext';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import ProfilePreviewModal from '@/components/profile/ProfilePreviewModal'; // Import the modal
+import { toast } from 'react-hot-toast'; // Import toast
 
 // Define Startup Stages explicitly if needed for filtering/display
 // const startupStages = ['Idea', 'MVP', 'Seed', 'Series A', 'Series B+'] as const;
@@ -33,6 +35,7 @@ type ConnectionStatus = 'pending' | 'accepted' | 'declined' | 'idle';
 
 const BrowseStartupsPage: React.FC = () => {
   const { user, userRole } = useAuth(); // Add userRole back from useAuth
+  const navigate = useNavigate(); // Get the navigate function
   const [startups, setStartups] = useState<StartupProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +50,12 @@ const BrowseStartupsPage: React.FC = () => {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [selectedGeographies, setSelectedGeographies] = useState<string[]>([]);
   const [selectedStages, setSelectedStages] = useState<string[]>([]);
-  // Add other filters as needed (e.g., revenue range, team size)
+  // --- Add Modal State Variables ---
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedStartupUserId, setSelectedStartupUserId] = useState<string | null>(null);
+  // Role is always startup on this page
+  const [selectedRole, setSelectedRole] = useState<'startup' | 'investor' | null>('startup');
+  // --- End Added State ---
 
   // Unique options for filters (derived from fetched data - implement later)
   const uniqueIndustries = useMemo(() => getUniqueOptions(startups?.map(s => s.industry)), [startups]);
@@ -197,24 +205,27 @@ const BrowseStartupsPage: React.FC = () => {
     setConnectingUserId(startupUserId);
     try {
         const { error: rpcError } = await supabase.rpc('create_connection_request', {
-            recipient_user_id: startupUserId
+            p_recipient_user_id: startupUserId,
+            p_request_message: null
         });
 
         if (rpcError) {
             console.error("Error sending connection request:", rpcError);
+            // Add user-facing error toast
             if (rpcError.message.includes("cooldown")) {
-                 console.warn("Cooldown period active for connection request.");
+                 toast.error("Request cooldown: Please wait before sending another request.");
             } else if (rpcError.message.includes("exists")){
-                 console.info("Connection or request already exists.");
+                 toast.error("Connection or request already exists."); // Or maybe toast.info?
             } else {
-                 console.error(`Failed to send request: ${rpcError.message}`);
+                 toast.error(`Failed to send request: ${rpcError.message}`);
             }
         } else {
-            console.log("Connection request sent!");
+            toast.success("Connection request sent!"); // Add success toast
             setConnectionStatuses(prev => new Map(prev).set(startupUserId, 'pending'));
         }
     } catch (err: any) {
         console.error("Client-side error sending connection request:", err);
+        toast.error("An unexpected error occurred. Please try again."); // Generic client error toast
     } finally {
         setConnectingUserId(null);
     }
@@ -234,7 +245,11 @@ const BrowseStartupsPage: React.FC = () => {
             return <Button size="xs" color="gray" disabled>Request Sent</Button>;
         case 'accepted':
             return (
-                <Button as={Link} to="/messages" size="xs" color="success">
+                <Button 
+                    onClick={() => navigate('/app/messages')}
+                    size="xs" 
+                    color="success"
+                >
                     Message
                 </Button>
             );
@@ -256,6 +271,22 @@ const BrowseStartupsPage: React.FC = () => {
     }
   };
 
+  // --- Modal Handlers ---
+  const handleOpenModal = (userId: string | undefined) => {
+    if (!userId) return; // Don't open if userId is missing
+    setSelectedStartupUserId(userId);
+    setSelectedRole('startup'); // Explicitly set role
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedStartupUserId(null);
+    // Optionally clear role, though it's fixed here
+    // setSelectedRole(null); 
+  };
+  // --- End Modal Handlers ---
+
   return (
     <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header */}
@@ -266,7 +297,7 @@ const BrowseStartupsPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center">
-              Browse Startups
+              Find Startups
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
               Discover and filter innovative startups.
@@ -438,8 +469,7 @@ const BrowseStartupsPage: React.FC = () => {
                     {/* Section 4: Action Buttons */}
                     <div className="flex-shrink-0 flex sm:flex-col lg:flex-row gap-2 w-full sm:w-auto order-2 sm:order-4 justify-end">
                         <Button
-                          as={Link}
-                          to={`/view/startup/${startup.id}`} // Corrected: Use startup.id (numeric) instead of user_id (UUID)
+                          onClick={() => handleOpenModal(startup.user_id)}
                           size="xs"
                           className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
                         >
@@ -462,6 +492,14 @@ const BrowseStartupsPage: React.FC = () => {
           )}
         </>
       )}
+
+      {/* Render the Modal */}
+      <ProfilePreviewModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        userId={selectedStartupUserId}
+        profileRole={selectedRole} // Should be 'startup' when opened from here
+      />
     </div>
   );
 };

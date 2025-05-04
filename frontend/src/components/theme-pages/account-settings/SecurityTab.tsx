@@ -1,89 +1,115 @@
-
-import { Button } from "flowbite-react";
-import CardBox from "../../shared/CardBox";
-import { IconDeviceDesktop, IconDeviceLaptop, IconDeviceMobile, IconDotsVertical } from "@tabler/icons-react";
-import OutlineCard from "src/components/shared/OutlineCard";
+import { useState, useEffect } from 'react';
+import { Button, Spinner, Alert } from "flowbite-react";
+import OutlineCard from "@/components/shared/OutlineCard";
+import { IconLogout, IconShieldCheck, IconShieldOff } from "@tabler/icons-react";
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 const SecurityTab = () => {
+  const { session } = useAuth();
+
+  const [isMfaEnabled, setIsMfaEnabled] = useState<boolean | null>(null);
+  const [loadingMfaStatus, setLoadingMfaStatus] = useState(true);
+  const [signOutLoading, setSignOutLoading] = useState(false);
+
+  useEffect(() => {
+    const checkMfaStatus = async () => {
+      setLoadingMfaStatus(true);
+      if (!session) {
+          setIsMfaEnabled(false);
+          setLoadingMfaStatus(false);
+          return;
+      }
+      try {
+        const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        
+        if (error) {
+          console.error("Error fetching MFA status:", error);
+          setIsMfaEnabled(false); 
+        } else if (data) {
+          setIsMfaEnabled(data.currentLevel === 'aal2'); 
+        }
+      } catch (error) {
+         console.error("Unexpected error fetching MFA status:", error);
+         setIsMfaEnabled(false);
+      } finally {
+        setLoadingMfaStatus(false);
+      }
+    };
+
+    checkMfaStatus();
+  }, [session]);
+
+  const handleSignOutAll = async () => {
+    setSignOutLoading(true);
+    const { error } = await supabase.auth.signOut({ scope: 'global' });
+    setSignOutLoading(false);
+
+    if (error) {
+      toast.error(`Error signing out everywhere: ${error.message}`);
+    } else {
+      toast.success('Successfully signed out from all devices.');
+    }
+  };
+  
+  const handleManageMfa = () => {
+      toast('MFA Management page/modal not yet implemented.');
+  };
+
+  const handleEnableMfa = () => {
+      toast('MFA Setup page/modal not yet implemented.');
+  };
+
   return (
     <>
-      <div className="grid grid-cols-12 lg:gap-y-30 lg:gap-x-30 gap-y-30 gap-x-0">
-        <div className="lg:col-span-8 col-span-12">
-          <OutlineCard className="shadow-none">
-            <h5 className="card-title mb-1">Two-factor Authentication</h5>
-            <div className="flex gap-4 items-center mb-4">
-              <div className="lg:flex gap-4 ">
-                <p className="card-subtitle">
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Corporis sapiente sunt earum officiis laboriosam ut.
-                </p>
-                <Button color={"primary"} className="lg:mt-0 mt-3">Enable</Button>
-              </div>
+      <div className="space-y-6">
+        <OutlineCard className="shadow-none">
+          <h5 className="card-title mb-3">Two-Factor Authentication (2FA)</h5>
+          {loadingMfaStatus ? (
+            <div className="flex items-center text-gray-500">
+              <Spinner size="sm" className="mr-2" />
+              <span>Checking 2FA status...</span>
             </div>
+          ) : isMfaEnabled === null ? (
+             <Alert color="warning">Could not determine 2FA status.</Alert>
+          ) : isMfaEnabled ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                <IconShieldCheck size={20} />
+                <span>Status: Enabled</span>
+              </div>
+              <Button color="primary" size="sm" onClick={handleManageMfa}>Manage 2FA</Button>
+            </div>
+          ) : (
+             <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <IconShieldOff size={20} />
+                 <span>Status: Disabled</span>
+              </div>
+              <Button color="primary" size="sm" onClick={handleEnableMfa}>Enable 2FA</Button>
+            </div>
+          )}
+           <p className="card-subtitle mt-3 text-sm">
+              Enhance your account security by requiring a second verification step when you sign in.
+           </p>
+        </OutlineCard>
 
-            <div className="flex items-center justify-between border-t border-ld pt-4">
-              <div className="">
-                <h6 className="text-base">Authentication App</h6>
-                <p className="text-sm text-bodytext">Google auth app</p>
-              </div>
-              <Button color={"lightprimary"}>Setup</Button>
-            </div>
-            <div className="flex items-center justify-between border-t border-ld pt-4 mt-3">
-              <div className="">
-                <h6 className="text-base">Another e-mail</h6>
-                <p className="text-sm text-bodytext">
-                  E-mail to send verification link
-                </p>
-              </div>
-              <Button color={"lightprimary"}>Setup</Button>
-            </div>
-            <div className="flex items-center justify-between border-t border-ld pt-4 mt-3">
-              <div className="">
-                <h6 className="text-base">SMS Recovery</h6>
-                <p className="text-sm text-bodytext">
-                  Your phone number or something
-                </p>
-              </div>
-              <Button color={"lightprimary"}>Setup</Button>
-            </div>
-          </OutlineCard>
-        </div>
-        <div className="lg:col-span-4 col-span-12">
-          <CardBox>
-            <div className="flex justify-center h-12 w-12 rounded-md bg-muted dark:bg-darkmuted items-center text-dark dark:text-white">
-              <IconDeviceLaptop className="text-primary" />
-            </div>
-            <h5 className="text-lg mt-1">Devices</h5>
-            <p className="text-sm text-bodytext -mt-1">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit Rem.
+        <OutlineCard className="shadow-none">
+            <h5 className="card-title mb-3">Active Sessions</h5>
+             <p className="card-subtitle text-sm mb-4">
+               If you suspect unauthorized access or are using a public computer, you can sign out from all other active sessions across all devices.
             </p>
-            <Button color={"primary"} className="w-fit mt-3">
-              Sign out from all devices
-            </Button>
-
-            <div className="flex gap-3.5 items-center mt-6">
-              <IconDeviceMobile className="text-dark dark:text-white"  />
-              <div>
-                <h6 className="text-base">iPhone 14</h6>
-                <p className="text-sm text-bodytext">London UK, Oct 23 at 1:15 AM</p>
-              </div>
-              <IconDotsVertical size={18} className="cursor-pointer ms-auto text-dark dark:text-white" />
-            </div>
-            <div className="flex gap-3.5 items-center border-t border-ld mt-2 pt-3">
-              <IconDeviceDesktop className="text-dark dark:text-white"  />
-              <div>
-                <h6 className="text-base">Macbook Air</h6>
-                <p className="text-sm text-bodytext">Gujarat India, Oct 24 at 3:15 AM</p>
-              </div>
-              <IconDotsVertical size={18} className="cursor-pointer ms-auto text-dark dark:text-white" />
-            </div>
-            <Button color={'lightprimary'} className="mt-3">Need Help?</Button>
-          </CardBox>
-        </div>
-      </div>
-      <div className="flex justify-end gap-3 pt-7">
-        <Button color={"primary"}>Save</Button>
-        <Button color={"lighterror"}>Cancel</Button>
+             <Button 
+               color={"warning"} 
+               onClick={handleSignOutAll}
+               isProcessing={signOutLoading}
+               disabled={signOutLoading}
+             >
+              <IconLogout size={18} className="mr-2"/>
+               Sign out from all devices
+             </Button>
+        </OutlineCard>
       </div>
     </>
   );

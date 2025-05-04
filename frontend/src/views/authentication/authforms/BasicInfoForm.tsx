@@ -1,6 +1,5 @@
 import React from 'react';
 import { Input } from '../../../components/shadcn-ui/Default-Ui/input';
-// import FormSectionCard from '../../../components/shared/FormSectionCard'; // Removed unused import
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "../../../components/shadcn-ui/Default-Ui/form";
 import { StartupRegistrationData } from '../../../types/startupRegistration';
@@ -29,13 +28,6 @@ const industries = [
 // Countries options (showing just a few for the example)
 const countries = [
   { value: "Saudi Arabia", label: "Saudi Arabia" },
-  { value: "United Arab Emirates", label: "United Arab Emirates" },
-  { value: "Qatar", label: "Qatar" },
-  { value: "Kuwait", label: "Kuwait" },
-  { value: "Bahrain", label: "Bahrain" },
-  { value: "Oman", label: "Oman" },
-  { value: "Egypt", label: "Egypt" },
-  { value: "Jordan", label: "Jordan" },
   { value: "Other", label: "Other" },
 ];
 

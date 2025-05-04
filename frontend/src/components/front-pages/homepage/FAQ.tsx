@@ -73,15 +73,6 @@ export const FaqComponent = () => {
               className="underline hover:text-primary"
             >
               Contact Support
-            </a>{" "}
-            <span>or</span>
-            <a
-              href="https://discord.com/invite/eMzE8F6Wqs"
-              className="underline hover:text-primary"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ask On Discord
             </a>
           </p>
         </div>

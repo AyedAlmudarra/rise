@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { StartupProfile } from '@/types/database';
 import AIInsightsSection from '@/components/dashboards/startup/AIInsightsSection';
-import AISuggestionsSection from '@/components/dashboards/investor/AISuggestionsSection';
 import {
   IconBrain,
   IconBulb,
@@ -23,6 +22,7 @@ import {
   ProjectionsRisksCard
 } from "@/components/dashboards/startup";
 import { toast } from 'react-hot-toast';
+import ComingSoonPlaceholder from '@/components/placeholders/ComingSoonPlaceholder';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import AnalysisReportDocument from '@/components/pdf/AnalysisReportDocument';
 
@@ -189,13 +189,6 @@ const AIInsightsPage: React.FC = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
-
- 
-
-  // Dummy refresh function for AISuggestionsSection
-  const handleInvestorRefresh = () => {
-    console.log("Investor AI Suggestions refresh triggered (mock)");
   };
 
   return (
@@ -403,23 +396,10 @@ const AIInsightsPage: React.FC = () => {
           {/* Investor AI Suggestions Section */}
           {userRole === 'investor' && (
             <div className="xl:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
-                <div className="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-4">
-                  <h3 className="text-xl font-bold text-white flex items-center">
-                    <IconBrain size={20} className="mr-2" />
-                    Investor Recommendations
-                  </h3>
-                  <p className="text-emerald-100 text-sm mt-1">
-                    AI-matched startups tailored to your preferences
-                  </p>
-                </div>
-                <div className="p-6">
-                  <AISuggestionsSection
-                    // isLoading is managed internally
-                    onRefreshProp={handleInvestorRefresh} 
-                  />
-                </div>
-              </div>
+              <ComingSoonPlaceholder 
+                featureName="AI-Powered Startup Suggestions"
+                description="Our AI engine is learning! Soon, you'll find personalized startup recommendations matched to your investment criteria right here."
+              />
             </div>
           )}
 
