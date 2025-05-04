@@ -18,7 +18,10 @@ cypress/screenshots/
 # Build artifacts
 dist
 dist-ssr
-*.local
+
+# Environment Variables
+.env
+*.local # Keep this to cover .env.local, .env.development.local etc.
 
 # Editor directories and files
 .vscode/*
