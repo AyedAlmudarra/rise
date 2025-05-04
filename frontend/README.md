@@ -1,46 +1,70 @@
-# Getting Started with Create React App
+# RISE Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This directory contains the React frontend application for the RISE platform.
+
+## Technology Stack
+
+*   **Framework:** React (using Vite)
+*   **Language:** TypeScript
+*   **UI:** MaterialM Template, Tailwind CSS, Flowbite React
+*   **State Management:** React Context API (primarily for Auth)
+*   **Routing:** React Router DOM
+*   **API Client:** Supabase Client Library
+*   **Testing:** Vitest, React Testing Library, Cypress
 
 ## Available Scripts
 
-In the project directory, you can run:
+In this (`frontend`) directory, you can run the following commands:
 
-### `npm start`
+### `npm run dev`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Runs the app in development mode.
+Open [http://localhost:5173](http://localhost:5173) (or the port specified by Vite) to view it in the browser.
+The page will automatically reload if you make edits. You will also see any lint errors in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner (Vitest) in interactive watch mode.
+
+### `npm run coverage`
+
+Runs tests with Vitest and generates a coverage report.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds the app for production to the `dist` folder.
+It correctly bundles React in production mode and optimizes the build for the best performance. The build is minified and the filenames include hashes.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm run preview`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Serves the production build locally for previewing before deployment.
 
-### `npm run eject`
+### `npm run cy:open`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Opens the Cypress test runner GUI.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### `npm run cy:run`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Runs Cypress end-to-end tests headlessly.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Environment Variables
 
-## Learn More
+This project requires environment variables for connecting to Supabase and potentially other services (like OpenAI).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1.  Create a `.env.local` file in this `frontend` directory.
+2.  Add the required variables (see the root `README.md` for details), for example:
+    ```env
+    VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+    VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+    VITE_OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+    ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Supabase Functions
+
+The definitions and code for Supabase Edge Functions used by this application are located within the `frontend/supabase/functions` directory. Refer to the Supabase documentation and the root `README.md` for more details on local development and deployment of these functions.
+
+## Deployment
+
+This frontend is configured for deployment via Netlify, as specified in `netlify.toml`.
+
+---
